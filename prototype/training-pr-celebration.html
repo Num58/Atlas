@@ -98,6 +98,7 @@
     @keyframes scaleIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
     .share-card-close { margin-top: 16px; font-size: 14px; color: var(--text-tertiary); cursor: pointer; }
   </style>
+  <link rel="stylesheet" href="shared.css">
 </head>
 <body>
 <div class="container">
@@ -181,25 +182,31 @@ for (let i = 0; i < 150; i++) {
   particles.push(createParticle());
 }
 
-// Continuous spawn
+const MAX_PARTICLES = 200;
+
+// Continuous spawn with cap
 setInterval(() => {
-  for (let i = 0; i < 5; i++) {
-    particles.push(createParticle());
+  if (particles.length < MAX_PARTICLES) {
+    const toSpawn = Math.min(5, MAX_PARTICLES - particles.length);
+    for (let i = 0; i < toSpawn; i++) {
+      particles.push(createParticle());
+    }
   }
 }, 200);
 
 function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  particles.forEach((p, i) => {
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
     p.x += p.vx;
     p.y += p.vy;
-    p.vy += 0.02; // gravity
+    p.vy += 0.02;
     p.life -= p.decay;
 
     if (p.life <= 0) {
       particles.splice(i, 1);
-      return;
+      continue;
     }
 
     ctx.save();
@@ -209,22 +216,28 @@ function animate() {
     ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
     ctx.fill();
 
-    // Glow
     ctx.shadowColor = p.color;
     ctx.shadowBlur = 10;
     ctx.fill();
     ctx.restore();
-  });
+  }
 
   requestAnimationFrame(animate);
 }
 
-animate();
-
-window.addEventListener('resize', () => {
+function initCanvas() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
-});
+  // Refill particles on resize
+  while (particles.length < 50) {
+    particles.push(createParticle());
+  }
+}
+
+initCanvas();
+animate();
+
+window.addEventListener('resize', initCanvas);
 
 function showShareCard() {
   document.getElementById('shareCard').classList.add('active');

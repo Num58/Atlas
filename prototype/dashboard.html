@@ -100,18 +100,15 @@
     .bar-fill.green { background: linear-gradient(to top, var(--color-success), rgba(0,210,160,0.3)); }
     .bar-label { font-size: 10px; color: var(--text-tertiary); }
 
-    /* Radar chart (simple) */
+    /* Radar chart (Canvas-based) */
     .radar-placeholder {
       width: 160px; height: 160px; margin: 0 auto;
-      border-radius: 50%; position: relative;
-      background: conic-gradient(
-        var(--color-primary) 0deg 72deg,
-        var(--color-success) 72deg 144deg,
-        var(--color-info) 144deg 216deg,
-        var(--color-k) 216deg 288deg,
-        var(--color-gold) 288deg 360deg
-      );
+      position: relative;
       display: flex; align-items: center; justify-content: center;
+    }
+    .radar-canvas {
+      position: absolute;
+      top: 0; left: 0;
     }
     .radar-inner {
       width: 100px; height: 100px; border-radius: 50%;
@@ -161,6 +158,7 @@
     @keyframes scorePulse { 0%,100%{filter:brightness(1)} 50%{filter:brightness(1.2)} }
     .pulse { animation: scorePulse 2s ease-in-out infinite; }
   </style>
+  <link rel="stylesheet" href="shared.css">
 </head>
 <body>
 <div class="container">
@@ -232,6 +230,7 @@
     <div class="chart-card" style="text-align:center;">
       <div class="chart-title">LISA 英语四维能力</div>
       <div class="radar-placeholder">
+        <canvas class="radar-canvas" id="radarCanvas" width="160" height="160"></canvas>
         <div class="radar-inner">
           <div class="radar-score">B1</div>
           <div class="radar-label">CEFR 估计</div>
@@ -340,6 +339,57 @@ if (growthEl) {
     growthEl.textContent = Math.floor(current);
   }, interval);
 }
+
+// Canvas radar chart
+(function drawRadar() {
+  const canvas = document.getElementById('radarCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const cx = 80, cy = 80, r = 65;
+  const labels = ['听力', '发音', '自发度', '充分度'];
+  const values = [0.82, 0.75, 0.68, 0.60]; // 示例数据
+  const color = '#FF5C00';
+
+  // Grid
+  [0.25, 0.5, 0.75, 1.0].forEach(level => {
+    ctx.beginPath();
+    for (let i = 0; i <= 4; i++) {
+      const angle = (Math.PI * 2 * i / 4) - Math.PI / 2;
+      const x = cx + r * level * Math.cos(angle);
+      const y = cy + r * level * Math.sin(angle);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+    ctx.stroke();
+  });
+
+  // Data
+  ctx.beginPath();
+  values.forEach((v, i) => {
+    const angle = (Math.PI * 2 * i / 4) - Math.PI / 2;
+    const x = cx + r * v * Math.cos(angle);
+    const y = cy + r * v * Math.sin(angle);
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(255,92,0,0.2)';
+  ctx.fill();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // Labels
+  ctx.fillStyle = '#B0B0CC';
+  ctx.font = '10px PingFang SC, sans-serif';
+  ctx.textAlign = 'center';
+  labels.forEach((label, i) => {
+    const angle = (Math.PI * 2 * i / 4) - Math.PI / 2;
+    const x = cx + (r + 15) * Math.cos(angle);
+    const y = cy + (r + 15) * Math.sin(angle) + 4;
+    ctx.fillText(label, x, y);
+  });
+})();
 </script>
 </body>
 </html>

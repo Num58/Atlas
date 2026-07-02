@@ -17,7 +17,7 @@
       --color-success: #00D2A0;
       --color-alex: #FF4500;
       --color-xiaoye: #00CED1;
-      --color-elena: #FFB6C1;
+      --color-elena: #E898A8;
       --color-k: #7B68EE;
       --color-rin: #2E8B57;
       --radius-sm: 8px;
@@ -209,6 +209,7 @@
     .nav-back { display: inline-flex; align-items: center; gap: 4px; color: var(--text-tertiary); text-decoration: none; font-size: 14px; padding: 16px; position: absolute; top: 0; left: 0; z-index: 10; }
     .nav-back:hover { color: var(--text-primary); }
   </style>
+  <link rel="stylesheet" href="shared.css">
 </head>
 <body>
 <div class="container">
@@ -361,8 +362,8 @@ const partners = [
   },
   {
     id: 'elena', name: 'Elena', codename: '晨曦', emoji: '🌅',
-    color: '#FFB6C1', quote: '"温柔但坚定，产后康复专家。相信每一次微小进步都值得庆祝。"',
-    tags: ['产后康复', '身心平衡', '温柔美式'], bg: 'linear-gradient(135deg, #FFB6C1, #FF69B4)'
+    color: '#E898A8', quote: '"温柔但坚定，产后康复专家。相信每一次微小进步都值得庆祝。"',
+    tags: ['产后康复', '身心平衡', '温柔美式'], bg: 'linear-gradient(135deg, #E898A8, #FF69B4)'
   },
   {
     id: 'k', name: 'K', codename: '零', emoji: '💜',
@@ -460,24 +461,48 @@ function goToStep(n) {
 }
 
 function spawnParticles(count, color) {
-  const colors = [color, '#FFD700', '#FF8C00'];
-  for (let i = 0; i < count; i++) {
-    const p = document.createElement('div');
-    p.className = 'particle';
-    p.style.cssText = `
-      left: ${50 + (Math.random() - 0.5) * 20}%;
-      top: ${40 + (Math.random() - 0.5) * 30}%;
-      width: ${4 + Math.random() * 8}px;
-      height: ${4 + Math.random() * 8}px;
-      background: ${colors[Math.floor(Math.random() * colors.length)]};
-      border-radius: 50%;
-      --tx: ${(Math.random() - 0.5) * 300}px;
-      --ty: ${(Math.random() - 0.5) * 300 - 100}px;
-      animation-delay: ${Math.random() * 0.5}s;
-    `;
-    document.body.appendChild(p);
-    setTimeout(() => p.remove(), 2000);
+  // Use Canvas-based particles for better performance
+  let canvas = document.getElementById('particleCanvas');
+  if (!canvas) {
+    canvas = document.createElement('canvas');
+    canvas.id = 'particleCanvas';
+    canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999;';
+    document.body.appendChild(canvas);
   }
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const ctx = canvas.getContext('2d');
+  const colors = [color, '#FFD700', '#FF8C00'];
+  const particles = [];
+  const MAX_P = 120;
+
+  for (let i = 0; i < Math.min(count, MAX_P); i++) {
+    particles.push({
+      x: canvas.width / 2 + (Math.random() - 0.5) * 100,
+      y: canvas.height * 0.4 + (Math.random() - 0.5) * 80,
+      vx: (Math.random() - 0.5) * 4,
+      vy: (Math.random() - 0.5) * 4 - 2,
+      size: 3 + Math.random() * 6,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      life: 1,
+      decay: 0.008 + Math.random() * 0.015
+    });
+  }
+
+  function anim() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    let alive = false;
+    particles.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.vy += 0.03; p.life -= p.decay;
+      if (p.life <= 0) return; else alive = true;
+      ctx.save(); ctx.globalAlpha = p.life;
+      ctx.fillStyle = p.color; ctx.shadowColor = p.color; ctx.shadowBlur = 8;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+    });
+    if (alive) requestAnimationFrame(anim); else { canvas.remove(); }
+  }
+  requestAnimationFrame(anim);
 }
 
 function completeBonding() {
