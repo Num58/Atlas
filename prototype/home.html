@@ -1,46 +1,501 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>PrimeAtlas</title><link rel="stylesheet" href="shared.css"><style>
-  .home{padding:var(--space-lg);padding-bottom:120px}
-  .partner-card{display:flex;align-items:center;gap:var(--space-md);padding:var(--space-lg);background:var(--bg-card);border-radius:var(--radius-xl);margin-bottom:var(--space-lg)}
-  .partner-face{font-size:40px;width:56px;height:56px;border-radius:50%;background:var(--bg-elevated);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-  .partner-info{flex:1}
-  .partner-greeting{font-size:var(--text-md);color:var(--text-secondary);line-height:1.5}
-  .partner-name{font-size:var(--text-sm);color:var(--text-tertiary);margin-top:var(--space-xs)}
-  .training-card{background:linear-gradient(135deg,var(--bg-elevated),var(--bg-card));border:1px solid var(--bg-divider);border-radius:var(--radius-xl);padding:var(--space-xl);margin-bottom:var(--space-lg)}
-  .training-card-label{font-size:var(--text-xs);color:var(--text-tertiary);text-transform:uppercase;letter-spacing:1px;margin-bottom:var(--space-sm)}
-  .training-card-title{font-size:var(--text-xl);font-weight:700;margin-bottom:var(--space-sm)}
-  .training-card-meta{font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:var(--space-lg);line-height:1.6}
-  .start-btn{width:100%;padding:18px;border-radius:var(--radius-lg);background:var(--color-primary);color:#fff;font-size:var(--text-lg);font-weight:700;border:none;cursor:pointer;text-decoration:none;display:flex;align-items:center;justify-content:center}
-  .start-btn:active{transform:scale(.98)}
-  .quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md);margin-top:var(--space-lg)}
-  .quick-card{background:var(--bg-card);border-radius:var(--radius-lg);padding:var(--space-lg);text-decoration:none;color:var(--text-primary);border:1px solid var(--bg-divider);transition:all .15s}
-  .quick-card:active{background:var(--bg-elevated)}
-  .quick-card-icon{font-size:28px;margin-bottom:var(--space-sm)}
-  .quick-card-title{font-size:var(--text-md);font-weight:600;margin-bottom:2px}
-  .quick-card-desc{font-size:var(--text-xs);color:var(--text-tertiary)}
-  .flame{display:inline-block;animation:pulse 2s infinite}
-</style></head><body><div class="app"><div class="home">
-  <div class="partner-card">
-    <div class="partner-face">🔥</div>
-    <div class="partner-info">
-      <div class="partner-greeting">早。今天深蹲日。<br>准备好了吗？</div>
-      <div class="partner-name">Alex · 连续训练 <span class="flame">🔥</span> 12 天</div>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>PrimeAtlas — 首页</title>
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    .greeting-section {
+      padding: var(--space-xl) var(--space-lg) var(--space-lg);
+    }
+    .greeting-time {
+      font-size: var(--font-size-caption);
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: var(--space-xs);
+    }
+    .greeting-text {
+      font-size: var(--font-size-headline);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-text);
+    }
+    .greeting-sub {
+      font-size: var(--font-size-body);
+      color: var(--color-text-secondary);
+      margin-top: var(--space-xs);
+    }
+    .buddy-card {
+      background: linear-gradient(135deg, rgba(124, 92, 252, 0.15), var(--color-bg-card));
+      border: 1px solid rgba(124, 92, 252, 0.2);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      display: flex;
+      gap: var(--space-md);
+      align-items: center;
+      margin: 0 var(--space-lg) var(--space-lg);
+    }
+    .buddy-avatar-lg {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--gradient-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      flex-shrink: 0;
+      box-shadow: var(--shadow-glow);
+    }
+    .buddy-info {
+      flex: 1;
+    }
+    .buddy-name {
+      font-size: var(--font-size-body);
+      font-weight: var(--font-weight-semibold);
+    }
+    .buddy-status {
+      font-size: var(--font-size-caption);
+      color: var(--color-accent);
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+    .buddy-status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--color-accent);
+      animation: pulse 2s ease infinite;
+    }
+    .buddy-msg {
+      font-size: var(--font-size-caption);
+      color: var(--color-text-secondary);
+      margin-top: 2px;
+    }
+    /* 模块入口卡片 */
+    .module-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-md);
+      padding: 0 var(--space-lg);
+      margin-bottom: var(--space-xl);
+    }
+    .module-card {
+      background: var(--color-bg-card);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg) var(--space-md);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+    .module-card:active {
+      transform: scale(0.96);
+    }
+    .module-card.highlight {
+      border-color: var(--color-primary);
+      box-shadow: var(--shadow-glow);
+    }
+    .module-card-icon {
+      font-size: 28px;
+    }
+    .module-card-title {
+      font-size: var(--font-size-caption);
+      font-weight: var(--font-weight-semibold);
+    }
+    .module-card-stat {
+      font-size: 10px;
+      color: var(--color-text-muted);
+    }
+    /* 时间线 */
+    .timeline-section {
+      padding: 0 var(--space-lg);
+    }
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-lg);
+    }
+    .section-label {
+      font-size: var(--font-size-subtitle);
+      font-weight: var(--font-weight-bold);
+    }
+    .section-badge {
+      font-size: var(--font-size-caption);
+      color: var(--color-text-muted);
+      background: var(--color-bg-input);
+      padding: 2px var(--space-sm);
+      border-radius: var(--radius-full);
+    }
+    .time-block-card {
+      background: var(--color-bg-card);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      margin-bottom: var(--space-md);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .time-block-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .time-block-title {
+      font-size: var(--font-size-body);
+      font-weight: var(--font-weight-semibold);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+    .time-block-time {
+      font-size: var(--font-size-caption);
+      color: var(--color-text-muted);
+    }
+    .task-list {
+      margin-top: var(--space-md);
+    }
+    .task-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      padding: var(--space-sm) 0;
+    }
+    .task-status-icon {
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .task-label {
+      flex: 1;
+      font-size: var(--font-size-body);
+    }
+    .task-label.done {
+      text-decoration: line-through;
+      color: var(--color-text-muted);
+    }
+    .task-label.pending {
+      color: var(--color-text);
+    }
+    .task-label.follow {
+      color: var(--color-need-follow);
+    }
+    .task-label.expired {
+      color: var(--color-text-muted);
+      text-decoration: line-through;
+    }
+    .time-block.expired-block .time-block-card {
+      opacity: 0.5;
+      background: var(--color-bg-elevated);
+    }
+    .collapsed-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-md) var(--space-lg);
+      margin: 0 var(--space-lg) var(--space-md);
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      font-size: var(--font-size-caption);
+      color: var(--color-text-muted);
+      min-height: var(--touch-min);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    .collapsed-header .arrow {
+      transition: transform var(--transition-fast);
+    }
+    .collapsed-header.expanded .arrow {
+      transform: rotate(180deg);
+    }
+    .collapsed-content {
+      display: none;
+    }
+    .collapsed-content.show {
+      display: block;
+    }
+    /* 日总结 */
+    .daily-summary {
+      margin: var(--space-lg);
+      padding: var(--space-lg);
+      background: linear-gradient(135deg, rgba(0, 229, 160, 0.08), rgba(124, 92, 252, 0.08));
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .summary-title {
+      font-size: var(--font-size-caption);
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-md);
+    }
+    .summary-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-md);
+    }
+    .summary-stat {
+      text-align: center;
+    }
+    .summary-stat-value {
+      font-size: var(--font-size-title);
+      font-weight: var(--font-weight-bold);
+    }
+    .summary-stat-label {
+      font-size: 10px;
+      color: var(--color-text-muted);
+      margin-top: 2px;
+    }
+    .summary-stat-value.done-color { color: var(--color-done); }
+    .summary-stat-value.pending-color { color: var(--color-pending); }
+    .summary-stat-value.warning-color { color: var(--color-warning); }
+  </style>
+</head>
+<body>
+<div class="app-container">
+  <div class="page-content">
+
+    <!-- 问候区域 -->
+    <div class="greeting-section">
+      <div class="greeting-time" id="greetingTime">上午好</div>
+      <div class="greeting-text" id="greetingName">张弛，</div>
+      <div class="greeting-sub" id="greetingMsg">今天状态不错，来动一动？</div>
     </div>
+
+    <!-- 伙伴卡片 -->
+    <div class="buddy-card">
+      <div class="buddy-avatar-lg">🦊</div>
+      <div class="buddy-info">
+        <div class="buddy-name">Atlas</div>
+        <div class="buddy-status">
+          <span class="buddy-status-dot"></span> 在线
+        </div>
+        <div class="buddy-msg">昨天硬拉进步了5kg，今天继续深蹲！</div>
+      </div>
+      <span style="font-size: 20px; color: var(--color-text-muted);">›</span>
+    </div>
+
+    <!-- 模块入口卡片 -->
+    <div class="module-cards">
+      <div class="module-card highlight" onclick="switchToModule('training')">
+        <div class="module-card-icon">🏋️</div>
+        <div class="module-card-title">动作训练库</div>
+        <div class="module-card-stat">今日待训练</div>
+      </div>
+      <div class="module-card" onclick="switchToModule('english')">
+        <div class="module-card-icon">🗣️</div>
+        <div class="module-card-title">英语口语</div>
+        <div class="module-card-stat">每日15分钟</div>
+      </div>
+      <div class="module-card" onclick="switchToModule('reading')">
+        <div class="module-card-icon">📚</div>
+        <div class="module-card-title">读书</div>
+        <div class="module-card-stat">《原子习惯》</div>
+      </div>
+    </div>
+
+    <!-- 全天时间线 -->
+    <div class="timeline-section">
+      <div class="section-header">
+        <span class="section-label">今日时间线</span>
+        <span class="section-badge" id="dateBadge">7月2日 周四</span>
+      </div>
+
+      <!-- 早上时段 — 已过期折叠 -->
+      <div class="time-block expired-block" id="morningBlock">
+        <div class="collapsed-header" onclick="toggleCollapse('morningCollapse')">
+          <span>🌅</span>
+          <span>早上</span>
+          <span style="color: var(--color-text-muted);">6:00 - 9:00</span>
+          <span class="badge badge-expired">已过期</span>
+          <span style="margin-left: auto;" class="arrow">▼</span>
+        </div>
+        <div class="collapsed-content" id="morningCollapse">
+          <div class="time-block-card" style="margin: 0 var(--space-lg) var(--space-md);">
+            <div class="time-block-header-row">
+              <span class="time-block-title">🧘 晨间拉伸</span>
+              <span class="time-block-time">6:30</span>
+            </div>
+            <div class="task-list">
+              <div class="task-item">
+                <span class="task-status-icon">✅</span>
+                <span class="task-label done">猫牛式 2组</span>
+              </div>
+              <div class="task-item">
+                <span class="task-status-icon">✅</span>
+                <span class="task-label done">肩部环绕 2组</span>
+              </div>
+              <div class="task-item">
+                <span class="task-status-icon">⬜</span>
+                <span class="task-label expired">泡沫轴放松</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 中午时段 — 当前活跃 -->
+      <div class="time-block" id="noonBlock">
+        <div class="time-block-card">
+          <div class="time-block-header-row">
+            <span class="time-block-title">☀️ 中午</span>
+            <span class="time-block-time">11:00 - 14:00</span>
+          </div>
+          <div class="task-list">
+            <div class="task-item">
+              <span class="task-status-icon">✅</span>
+              <span class="task-label done">午餐蛋白补充</span>
+            </div>
+            <div class="task-item">
+              <span class="task-status-icon">⏳</span>
+              <span class="task-label pending">午休小憩 20min</span>
+            </div>
+            <div class="task-item">
+              <span class="task-status-icon">⏳</span>
+              <span class="task-label pending">办公桌拉伸</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 下午/晚上时段 -->
+      <div class="time-block" id="eveningBlock">
+        <div class="time-block-card">
+          <div class="time-block-header-row">
+            <span class="time-block-title">🌆 傍晚</span>
+            <span class="time-block-time">17:00 - 20:00</span>
+          </div>
+          <div class="task-list">
+            <div class="task-item">
+              <span class="task-status-icon">⏳</span>
+              <span class="task-label pending">🏋️ 力量训练 — 深蹲日</span>
+            </div>
+            <div class="task-item">
+              <span class="task-status-icon">⏳</span>
+              <span class="task-label pending">🧘 训练后拉伸</span>
+            </div>
+            <div class="task-item">
+              <span class="task-status-icon">⏳</span>
+              <span class="task-label pending">💧 补水 500ml</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 碎片时间 -->
+      <div class="time-block" id="fragmentBlock">
+        <div class="time-block-card">
+          <div class="time-block-header-row">
+            <span class="time-block-title">⏱️ 碎片时间</span>
+            <span class="time-block-time">全天</span>
+          </div>
+          <div class="task-list">
+            <div class="task-item">
+              <span class="task-status-icon">✅</span>
+              <span class="task-label done">🗣️ 英语跟读 5min</span>
+            </div>
+            <div class="task-item">
+              <span class="task-status-icon">⏳</span>
+              <span class="task-label pending">📖 读书 10min</span>
+            </div>
+            <div class="task-item">
+              <span class="task-status-icon">⏳</span>
+              <span class="task-label pending">🚶 散步 3000步</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 今日数据总结 -->
+    <div class="daily-summary">
+      <div class="summary-title">今日进度总结</div>
+      <div class="summary-stats">
+        <div class="summary-stat">
+          <div class="summary-stat-value done-color">4</div>
+          <div class="summary-stat-label">✅ 已完成</div>
+        </div>
+        <div class="summary-stat">
+          <div class="summary-stat-value pending-color">5</div>
+          <div class="summary-stat-label">⏳ 待完成</div>
+        </div>
+        <div class="summary-stat">
+          <div class="summary-stat-value warning-color">1</div>
+          <div class="summary-stat-label">⬜ 已过期</div>
+        </div>
+      </div>
+    </div>
+
   </div>
-  <div class="training-card">
-    <div class="training-card-label">今日训练计划</div>
-    <div class="training-card-title">下肢力量 · 弹跳专项</div>
-    <div class="training-card-meta">🏋️ 杠铃深蹲 4×5 @80kg<br>🦵 保加利亚分腿蹲 3×8<br>🏀 弹跳训练 3×6<br>⏱ 预计 52 分钟</div>
-    <a href="training-session.html" class="start-btn">开始训练</a>
-  </div>
-  <div class="quick-grid">
-    <a href="english-practice.html" class="quick-card"><div class="quick-card-icon">🗣️</div><div class="quick-card-title">英语练习</div><div class="quick-card-desc">口语对话 · 跟读训练</div></a>
-    <a href="reading.html" class="quick-card"><div class="quick-card-icon">📚</div><div class="quick-card-title">读书</div><div class="quick-card-desc">《原子习惯》· 继续阅读</div></a>
-    <a href="dashboard.html" class="quick-card"><div class="quick-card-icon">📊</div><div class="quick-card-title">数据</div><div class="quick-card-desc">本周容量 +8% · 成长指数 742</div></a>
-    <a href="profile.html" class="quick-card"><div class="quick-card-icon">⚙️</div><div class="quick-card-title">设置</div><div class="quick-card-desc">伙伴管理 · 身体档案</div></a>
-  </div>
+
+  <!-- 底部Tab导航 -->
+  <nav class="tab-bar">
+    <a href="home.html" class="tab-item active">
+      <span class="tab-icon">🏠</span>
+      <span class="tab-label">首页</span>
+    </a>
+    <a href="module-training.html" class="tab-item" id="moduleTab">
+      <span class="tab-icon">📦</span>
+      <span class="tab-label">模块</span>
+    </a>
+    <a href="profile.html" class="tab-item">
+      <span class="tab-icon">👤</span>
+      <span class="tab-label">我的</span>
+    </a>
+  </nav>
 </div>
-<div class="tab-bar">
-  <a href="home.html" class="tab-item active"><span class="tab-icon">🏠</span>首页</a>
-  <a href="training-history.html" class="tab-item"><span class="tab-icon">🏋️</span>训练</a>
-  <a href="profile.html" class="tab-item"><span class="tab-icon">👤</span>我的</a>
-</div></div></body></html>
+
+<script>
+  // 时段感知
+  function updateGreeting() {
+    const hour = new Date().getHours();
+    let greeting, msg;
+    if (hour < 10) {
+      greeting = '早上好';
+      msg = '新的一天，从晨间仪式开始吧！';
+    } else if (hour < 14) {
+      greeting = '中午好';
+      msg = '午间别忘了活动一下身体。';
+    } else if (hour < 18) {
+      greeting = '下午好';
+      msg = '下午的训练准备好了吗？';
+    } else {
+      greeting = '晚上好';
+      msg = '今天的训练任务完成了吗？';
+    }
+    document.getElementById('greetingTime').textContent = greeting;
+    document.getElementById('greetingMsg').textContent = msg;
+
+    // 模拟时段折叠：如果超过14点，折叠早上
+    if (hour >= 14) {
+      document.getElementById('morningBlock').classList.add('expired-block');
+    }
+  }
+
+  // 折叠/展开
+  function toggleCollapse(id) {
+    const el = document.getElementById(id);
+    const header = el.previousElementSibling;
+    el.classList.toggle('show');
+    header.classList.toggle('expanded');
+  }
+
+  // 模块切换：点击卡片 → 跳转模块Tab
+  function switchToModule(type) {
+    // 存储目标模块类型
+    sessionStorage.setItem('primeatlas_module', type);
+    window.location.href = 'module-training.html';
+  }
+
+  // 初始化日期
+  const days = ['日', '一', '二', '三', '四', '五', '六'];
+  const now = new Date();
+  document.getElementById('dateBadge').textContent =
+    `${now.getMonth()+1}月${now.getDate()}日 周${days[now.getDay()]}`;
+
+  updateGreeting();
+</script>
+</body>
+</html>

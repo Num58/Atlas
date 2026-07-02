@@ -1,20 +1,241 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>休息日 — PrimeAtlas</title><link rel="stylesheet" href="shared.css"><style>
-  .rest{padding:var(--space-xl);text-align:center;padding-bottom:120px}
-  .rest-emoji{font-size:64px;margin:var(--space-xl) 0}
-  .rest-title{font-size:var(--text-2xl);font-weight:700;margin-bottom:var(--space-md)}
-  .rest-msg{font-size:var(--text-md);color:var(--text-secondary);line-height:1.8;margin-bottom:var(--space-xl)}
-  .recovery-options{display:flex;flex-direction:column;gap:var(--space-md);margin:var(--space-xl) 0}
-  .recovery-card{background:var(--bg-card);border-radius:var(--radius-lg);padding:var(--space-lg);text-align:left;border:1px solid var(--bg-divider);cursor:pointer;text-decoration:none;color:var(--text-primary)}
-  .recovery-card:active{background:var(--bg-elevated)}
-  .recovery-icon{font-size:28px;margin-bottom:var(--space-sm)}
-  .recovery-name{font-size:var(--text-md);font-weight:600}
-  .recovery-desc{font-size:var(--text-sm);color:var(--text-secondary);margin-top:4px}
-</style></head><body><div class="app"><div class="rest">
-  <div class="rest-emoji">😌</div><div class="rest-title">休息日</div><div class="rest-msg">"今天不训练。<br>休息也是训练的一部分。<br>你的身体在昨天的深蹲后正在变强。"<br><br><span style="color:var(--text-tertiary);font-size:var(--text-sm)">— Alex</span></div>
-  <div class="recovery-options">
-    <a href="#" class="recovery-card"><div class="recovery-icon">🧘</div><div class="recovery-name">10分钟呼吸放松</div><div class="recovery-desc">Alex 陪你做呼吸和轻度拉伸</div></a>
-    <a href="#" class="recovery-card"><div class="recovery-icon">🚶</div><div class="recovery-name">户外散步</div><div class="recovery-desc">20分钟轻松散步，帮助恢复</div></a>
-    <a href="#" class="recovery-card"><div class="recovery-icon">📖</div><div class="recovery-name">读一会书</div><div class="recovery-desc">继续《原子习惯》第5章</div></a>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>PrimeAtlas — 休息日</title>
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    .rest-container {
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-bg);
+      padding: var(--space-3xl);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .rest-bg-glow {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(124, 92, 252, 0.08) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .rest-icon {
+      font-size: 80px;
+      margin-bottom: var(--space-xl);
+      animation: scaleIn 0.6s ease;
+      position: relative;
+      z-index: 1;
+    }
+    .rest-title {
+      font-size: var(--font-size-headline);
+      font-weight: var(--font-weight-bold);
+      margin-bottom: var(--space-md);
+      position: relative;
+      z-index: 1;
+    }
+    .rest-subtitle {
+      font-size: var(--font-size-body);
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-3xl);
+      line-height: 1.6;
+      position: relative;
+      z-index: 1;
+    }
+    .rest-tips {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+      width: 100%;
+      max-width: 300px;
+      margin-bottom: var(--space-3xl);
+      position: relative;
+      z-index: 1;
+    }
+    .rest-tip {
+      background: var(--color-bg-card);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      text-align: left;
+    }
+    .rest-tip-icon {
+      font-size: 28px;
+      flex-shrink: 0;
+    }
+    .rest-tip-text {
+      font-size: var(--font-size-body);
+      color: var(--color-text-secondary);
+    }
+    .rest-tip-title {
+      font-size: var(--font-size-caption);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text);
+      margin-bottom: 2px;
+    }
+    .rest-buddy-card {
+      background: linear-gradient(135deg, rgba(124, 92, 252, 0.1), var(--color-bg-card));
+      border: 1px solid rgba(124, 92, 252, 0.15);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin-bottom: var(--space-3xl);
+      position: relative;
+      z-index: 1;
+    }
+    .rest-buddy-emoji {
+      font-size: 40px;
+      margin-bottom: var(--space-sm);
+    }
+    .rest-buddy-msg {
+      font-size: var(--font-size-body);
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+    }
+    .rest-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-md);
+      width: 100%;
+      max-width: 300px;
+      margin-bottom: var(--space-xl);
+      position: relative;
+      z-index: 1;
+    }
+    .rest-stat {
+      text-align: center;
+    }
+    .rest-stat-value {
+      font-size: var(--font-size-title);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-accent);
+    }
+    .rest-stat-label {
+      font-size: 10px;
+      color: var(--color-text-muted);
+    }
+    .next-training {
+      background: var(--color-bg-card);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      margin-bottom: var(--space-xl);
+      position: relative;
+      z-index: 1;
+    }
+    .next-training-label {
+      font-size: var(--font-size-caption);
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-sm);
+    }
+    .next-training-info {
+      font-size: var(--font-size-body-lg);
+      font-weight: var(--font-weight-semibold);
+    }
+  </style>
+</head>
+<body>
+<div class="app-container">
+<div class="rest-container">
+  <div class="rest-bg-glow"></div>
+
+  <div class="rest-icon">😴</div>
+
+  <div class="rest-title">今天是休息日</div>
+  <div class="rest-subtitle">
+    休息也是训练的一部分。<br>
+    肌肉在休息时生长，神经系统在恢复。
   </div>
-  <a href="home.html" class="btn btn-ghost">返回首页</a>
-</div></div></body></html>
+
+  <!-- 本周训练回顾 -->
+  <div class="rest-stats">
+    <div class="rest-stat">
+      <div class="rest-stat-value">3</div>
+      <div class="rest-stat-label">本周训练</div>
+    </div>
+    <div class="rest-stat">
+      <div class="rest-stat-value">8.5T</div>
+      <div class="rest-stat-label">周总吨位</div>
+    </div>
+    <div class="rest-stat">
+      <div class="rest-stat-value">85%</div>
+      <div class="rest-stat-label">计划完成</div>
+    </div>
+  </div>
+
+  <!-- 休息日建议 -->
+  <div class="rest-tips">
+    <div class="rest-tip">
+      <span class="rest-tip-icon">💧</span>
+      <div>
+        <div class="rest-tip-title">保持补水</div>
+        <div class="rest-tip-text">今天喝够 2L 水</div>
+      </div>
+    </div>
+    <div class="rest-tip">
+      <span class="rest-tip-icon">🍗</span>
+      <div>
+        <div class="rest-tip-title">补充蛋白质</div>
+        <div class="rest-tip-text">目标 120g 蛋白质摄入</div>
+      </div>
+    </div>
+    <div class="rest-tip">
+      <span class="rest-tip-icon">🚶</span>
+      <div>
+        <div class="rest-tip-title">轻松活动</div>
+        <div class="rest-tip-text">散步 30 分钟或轻度拉伸</div>
+      </div>
+    </div>
+    <div class="rest-tip">
+      <span class="rest-tip-icon">😴</span>
+      <div>
+        <div class="rest-tip-title">充足睡眠</div>
+        <div class="rest-tip-text">今晚目标 8 小时睡眠</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 伙伴消息 -->
+  <div class="rest-buddy-card">
+    <div class="rest-buddy-emoji">🦊</div>
+    <div class="rest-buddy-msg">
+      "好好休息，张弛。<br>
+      你这一周的表现非常棒！<br>
+      明天的硬拉日我已经准备好了。<br>
+      今天放松一下，看会儿书？"
+    </div>
+  </div>
+
+  <!-- 下次训练预告 -->
+  <div class="next-training">
+    <div class="next-training-label">下次训练</div>
+    <div class="next-training-info">明天 · 🏋️ 硬拉日</div>
+    <div style="font-size: var(--font-size-caption); color: var(--color-text-muted); margin-top: var(--space-xs);">
+      预计吨位 2,500kg · 中等强度
+    </div>
+  </div>
+
+  <div style="width: 100%; max-width: 300px; position: relative; z-index: 1;">
+    <button class="btn btn-primary btn-block btn-lg" onclick="location.href='home.html'">
+      返回首页
+    </button>
+    <button class="btn btn-secondary btn-block mt-md" onclick="location.href='module-reading.html'">
+      📖 去读书
+    </button>
+  </div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>PrimeAtlas — 读书模块</title>
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    .book-shelf {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-md);
+      padding: 0 var(--space-lg);
+    }
+    .book-card {
+      background: var(--color-bg-card);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    .book-card:active {
+      transform: scale(0.97);
+    }
+    .book-cover {
+      height: 140px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+    }
+    .book-cover.c1 { background: linear-gradient(135deg, #7C5CFC, #5A3FCC); }
+    .book-cover.c2 { background: linear-gradient(135deg, #FF6B6B, #EE5A5A); }
+    .book-cover.c3 { background: linear-gradient(135deg, #4ECDC4, #44B5AD); }
+    .book-cover.c4 { background: linear-gradient(135deg, #FFB84D, #F0A030); }
+    .book-info {
+      padding: var(--space-md);
+    }
+    .book-title {
+      font-size: var(--font-size-body);
+      font-weight: var(--font-weight-semibold);
+      margin-bottom: 2px;
+    }
+    .book-author {
+      font-size: var(--font-size-caption);
+      color: var(--color-text-muted);
+    }
+    .book-progress {
+      margin-top: var(--space-sm);
+    }
+    .book-progress-text {
+      font-size: 10px;
+      color: var(--color-text-muted);
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+    .current-reading {
+      background: linear-gradient(135deg, rgba(124, 92, 252, 0.1), var(--color-bg-card));
+      border: 1px solid rgba(124, 92, 252, 0.2);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      margin: 0 var(--space-lg) var(--space-lg);
+      display: flex;
+      gap: var(--space-lg);
+    }
+    .current-book-cover {
+      width: 80px;
+      height: 110px;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, #7C5CFC, #5A3FCC);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      flex-shrink: 0;
+    }
+    .current-book-info {
+      flex: 1;
+    }
+    .current-book-title {
+      font-size: var(--font-size-body-lg);
+      font-weight: var(--font-weight-bold);
+      margin-bottom: 4px;
+    }
+    .current-book-author {
+      font-size: var(--font-size-caption);
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-sm);
+    }
+    .agent-chat-section {
+      margin: 0 var(--space-lg) var(--space-lg);
+    }
+    .agent-chat-title {
+      font-weight: var(--font-weight-semibold);
+      margin-bottom: var(--space-md);
+    }
+    .agent-message {
+      background: var(--color-bg-elevated);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      margin-bottom: var(--space-sm);
+      border-top-left-radius: var(--radius-sm);
+    }
+    .agent-message-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-sm);
+    }
+    .agent-avatar-sm {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--gradient-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
+    .agent-name {
+      font-size: var(--font-size-caption);
+      font-weight: var(--font-weight-semibold);
+    }
+    .agent-text {
+      font-size: var(--font-size-body);
+      line-height: 1.6;
+      color: var(--color-text-secondary);
+    }
+    .agent-actions {
+      display: flex;
+      gap: var(--space-sm);
+      margin-top: var(--space-sm);
+    }
+    .chat-input-row {
+      display: flex;
+      gap: var(--space-sm);
+      padding: 0 var(--space-lg);
+    }
+    .chat-input-row .input {
+      flex: 1;
+    }
+  </style>
+</head>
+<body>
+<div class="app-container">
+  <div class="page-content">
+
+    <!-- 模块切换器 -->
+    <div class="module-switcher">
+      <button class="module-switch-chip" onclick="location.href='module-training.html'">🏋️ 训练</button>
+      <button class="module-switch-chip" onclick="location.href='module-english.html'">🗣️ 英语</button>
+      <button class="module-switch-chip active">📚 读书</button>
+    </div>
+
+    <!-- 当前在读 -->
+    <div class="current-reading">
+      <div class="current-book-cover">📖</div>
+      <div class="current-book-info">
+        <div class="current-book-title">原子习惯</div>
+        <div class="current-book-author">James Clear</div>
+        <div class="book-progress">
+          <div class="book-progress-text">
+            <span>已读 42%</span>
+            <span>第6章</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-bar-fill" style="width: 42%;"></div>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-sm mt-md">继续阅读</button>
+      </div>
+    </div>
+
+    <!-- Agent对话 -->
+    <div class="agent-chat-section">
+      <div class="agent-chat-title">📖 读书伙伴 · Atlas</div>
+
+      <div class="agent-message">
+        <div class="agent-message-header">
+          <div class="agent-avatar-sm">🦊</div>
+          <span class="agent-name">Atlas</span>
+        </div>
+        <div class="agent-text">
+          上次读到"习惯的复利效应"。你知道吗，每天进步1%，一年后会变成37倍。就像训练一样，关键在于持续而非强度。
+        </div>
+      </div>
+
+      <div class="agent-message">
+        <div class="agent-message-header">
+          <div class="agent-avatar-sm">🦊</div>
+          <span class="agent-name">Atlas</span>
+        </div>
+        <div class="agent-text">
+          今天想继续读吗？还是想回顾一下前面的要点？
+        </div>
+        <div class="agent-actions">
+          <button class="btn btn-secondary btn-sm">📖 继续阅读</button>
+          <button class="btn btn-secondary btn-sm">📝 回顾要点</button>
+          <button class="btn btn-secondary btn-sm">💬 讨论</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 书架 -->
+    <div style="padding: 0 var(--space-lg); margin-bottom: var(--space-md);">
+      <div class="flex-between">
+        <span style="font-weight: var(--font-weight-semibold);">我的书架</span>
+        <span style="font-size: var(--font-size-caption); color: var(--color-text-muted);">共4本</span>
+      </div>
+    </div>
+
+    <div class="book-shelf">
+      <div class="book-card">
+        <div class="book-cover c1">📖</div>
+        <div class="book-info">
+          <div class="book-title">原子习惯</div>
+          <div class="book-author">James Clear</div>
+          <div class="book-progress">
+            <div class="book-progress-text"><span>进行中</span><span>42%</span></div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width:42%"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="book-card">
+        <div class="book-cover c2">🧠</div>
+        <div class="book-info">
+          <div class="book-title">刻意练习</div>
+          <div class="book-author">Anders Ericsson</div>
+          <div class="book-progress">
+            <div class="book-progress-text"><span>待读</span><span>0%</span></div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width:0%"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="book-card">
+        <div class="book-cover c3">🏃</div>
+        <div class="book-info">
+          <div class="book-title">天生就会跑</div>
+          <div class="book-author">Christopher McDougall</div>
+          <div class="book-progress">
+            <div class="book-progress-text"><span>已完成</span><span>100%</span></div>
+            <div class="progress-bar"><div class="progress-bar-fill accent" style="width:100%"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="book-card">
+        <div class="book-cover c4">💪</div>
+        <div class="book-info">
+          <div class="book-title">力量训练基础</div>
+          <div class="book-author">Mark Rippetoe</div>
+          <div class="book-progress">
+            <div class="book-progress-text"><span>待读</span><span>0%</span></div>
+            <div class="progress-bar"><div class="progress-bar-fill" style="width:0%"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 输入框 -->
+    <div class="chat-input-row mt-xl">
+      <input type="text" class="input" placeholder="问Atlas关于这本书的问题...">
+      <button class="btn btn-primary" style="min-width: var(--touch-min);">发送</button>
+    </div>
+
+  </div>
+
+  <!-- 底部Tab导航 -->
+  <nav class="tab-bar">
+    <a href="home.html" class="tab-item">
+      <span class="tab-icon">🏠</span>
+      <span class="tab-label">首页</span>
+    </a>
+    <a href="module-reading.html" class="tab-item active">
+      <span class="tab-icon">📦</span>
+      <span class="tab-label">模块</span>
+    </a>
+    <a href="profile.html" class="tab-item">
+      <span class="tab-icon">👤</span>
+      <span class="tab-label">我的</span>
+    </a>
+  </nav>
+</div>
+</body>
+</html>

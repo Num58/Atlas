@@ -1,231 +1,540 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>训练 — PrimeAtlas</title><link rel="stylesheet" href="shared.css"><style>
-  .session{padding:var(--space-lg);padding-bottom:140px;min-height:100vh}
-  .phase-tag{display:inline-block;padding:4px 12px;border-radius:var(--radius-full);font-size:11px;font-weight:600;margin-bottom:var(--space-md)}
-  .t-warmup{background:rgba(255,140,0,.15);color:#FF8C00}
-  .t-work{background:rgba(255,92,0,.15);color:var(--color-primary)}
-  .t-rest{background:rgba(74,144,255,.15);color:var(--color-info)}
-  .t-cool{background:rgba(42,157,143,.15);color:var(--color-success)}
-  .t-done{background:rgba(42,157,143,.15);color:var(--color-success)}
-  .partner-mini{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--bg-card);border-radius:var(--radius-lg);margin-bottom:var(--space-lg);border:1px solid var(--bg-divider);cursor:pointer}
-  .partner-mini:active{background:var(--bg-elevated)}
-  .partner-mini-face{font-size:24px;width:36px;height:36px;border-radius:50%;background:var(--bg-elevated);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-  .partner-mini-msg{font-size:var(--text-sm);color:var(--text-secondary);flex:1}
-  .big-display{text-align:center;padding:var(--space-xl) 0}
-  .big-exercise{font-size:32px;font-weight:700;margin-bottom:4px}
-  .big-target{font-size:20px;color:var(--text-secondary);margin-bottom:var(--space-lg)}
-  .big-timer{font-size:80px;font-weight:700;font-family:var(--font-data);line-height:1;margin:var(--space-lg) 0}
-  .big-timer.rest{color:var(--color-info)}
-  .big-timer.warn{color:var(--color-energy)}
-  .dots{display:flex;justify-content:center;gap:8px;margin:var(--space-md) 0}
-  .dot{width:14px;height:14px;border-radius:50%;background:var(--bg-divider);transition:all .3s}
-  .dot.done{background:var(--color-primary)}
-  .dot.current{background:var(--color-primary);box-shadow:0 0 8px rgba(255,92,0,.6)}
-  .last-set{text-align:center;padding:var(--space-md);background:var(--bg-card);border-radius:var(--radius-md);margin-bottom:var(--space-md);font-size:var(--text-sm);color:var(--text-secondary)}
-  .last-set span{color:var(--text-primary);font-weight:600}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>PrimeAtlas — 训练执行</title>
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    .session-container {
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      background: var(--color-bg);
+    }
+    /* 顶部状态栏 */
+    .session-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-lg);
+      flex-shrink: 0;
+    }
+    .session-phase {
+      font-size: var(--font-size-caption);
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .session-progress {
+      font-size: var(--font-size-caption);
+      color: var(--color-text-secondary);
+    }
+    .session-exit {
+      background: none;
+      border: none;
+      color: var(--color-text-muted);
+      font-size: var(--font-size-body);
+      cursor: pointer;
+      min-width: var(--touch-min);
+      min-height: var(--touch-min);
+    }
+    /* 大字核心区 */
+    .session-core {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-2xl);
+      text-align: center;
+    }
+    .exercise-name-display {
+      font-size: 32px;
+      font-weight: var(--font-weight-bold);
+      color: var(--color-text);
+      line-height: 1.2;
+      margin-bottom: var(--space-sm);
+    }
+    .exercise-detail-display {
+      font-size: var(--font-size-body);
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-2xl);
+    }
+    .timer-display {
+      font-size: 80px;
+      font-weight: var(--font-weight-bold);
+      font-family: var(--font-mono);
+      color: var(--color-text);
+      line-height: 1;
+      letter-spacing: -2px;
+      margin-bottom: var(--space-lg);
+    }
+    .timer-display.resting {
+      color: var(--color-accent);
+    }
+    .set-counter {
+      font-size: var(--font-size-body-lg);
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-3xl);
+    }
+    .set-dot-row {
+      display: flex;
+      gap: var(--space-sm);
+      justify-content: center;
+      margin-bottom: var(--space-xl);
+    }
+    .set-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--color-bg-input);
+    }
+    .set-dot.done {
+      background: var(--color-accent);
+    }
+    .set-dot.current {
+      background: var(--color-primary);
+      box-shadow: 0 0 8px rgba(124, 92, 252, 0.5);
+    }
+    /* 底部操作区 */
+    .session-actions {
+      padding: var(--space-xl) var(--space-lg);
+      padding-bottom: calc(var(--space-3xl) + env(safe-area-inset-bottom, 8px));
+      flex-shrink: 0;
+    }
+    /* 确认层 */
+    .confirm-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--color-bg-overlay);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      z-index: 200;
+    }
+    .confirm-sheet {
+      background: var(--color-bg-card);
+      border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+      padding: var(--space-2xl);
+      width: 100%;
+      max-width: var(--viewport-max);
+      animation: slideUp 0.3s ease;
+    }
+    .confirm-title {
+      font-size: var(--font-size-subtitle);
+      font-weight: var(--font-weight-bold);
+      margin-bottom: var(--space-lg);
+      text-align: center;
+    }
+    .confirm-data {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-md);
+      margin-bottom: var(--space-xl);
+      text-align: center;
+    }
+    .confirm-data-item {
+      background: var(--color-bg-elevated);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+    }
+    .confirm-data-value {
+      font-size: var(--font-size-title);
+      font-weight: var(--font-weight-bold);
+    }
+    .confirm-data-label {
+      font-size: 10px;
+      color: var(--color-text-muted);
+    }
+    /* 休息阶段 */
+    .rest-buddy-msg {
+      background: var(--color-bg-elevated);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      text-align: center;
+      margin-top: var(--space-xl);
+      border-top-left-radius: var(--radius-sm);
+    }
+    .rest-buddy-avatar {
+      font-size: 36px;
+      margin-bottom: var(--space-sm);
+    }
+    .rest-buddy-text {
+      font-size: var(--font-size-body);
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+    }
+    .next-preview {
+      background: var(--color-bg-card);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      margin-top: var(--space-lg);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .next-preview-title {
+      font-size: var(--font-size-caption);
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-sm);
+    }
+    .next-preview-data {
+      display: flex;
+      justify-content: space-around;
+      font-size: var(--font-size-body);
+    }
+    /* 完成阶段 */
+    .completion-icon {
+      font-size: 64px;
+      margin-bottom: var(--space-lg);
+      animation: scaleIn 0.5s ease;
+    }
+    .completion-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-md);
+      width: 100%;
+      max-width: 320px;
+      margin: var(--space-xl) auto;
+    }
+    .completion-stat {
+      text-align: center;
+    }
+    .completion-stat-value {
+      font-size: var(--font-size-headline);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-accent);
+    }
+    .completion-stat-label {
+      font-size: var(--font-size-caption);
+      color: var(--color-text-muted);
+    }
+  </style>
+</head>
+<body>
+<div class="app-container">
+<div class="session-container" id="sessionRoot">
 
-  /* 组间休息 — 纯休息，不强制交互 */
-  .rest-panel{text-align:center;padding:var(--space-xl) 0}
-  .rest-countdown{font-size:48px;font-weight:700;font-family:var(--font-data);color:var(--color-info);margin:var(--space-lg) 0}
-  .rest-hint{font-size:var(--text-sm);color:var(--text-tertiary);margin:var(--space-md) 0}
+  <!-- 头部 -->
+  <div class="session-header">
+    <button class="session-exit" onclick="exitSession()">✕</button>
+    <span class="session-phase" id="phaseLabel">热身</span>
+    <span class="session-progress" id="progressLabel">1/6</span>
+  </div>
 
-  /* 快速确认弹层 — 1次点击 */
-  .quick-confirm{display:none;position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:414px;background:var(--bg-elevated);border-radius:var(--radius-xl) var(--radius-xl) 0 0;padding:var(--space-xl);padding-bottom:calc(var(--space-xl) + var(--safe-bottom));z-index:50;border-top:1px solid var(--bg-divider)}
-  .quick-confirm.active{display:block}
-  .confirm-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:49}
-  .confirm-overlay.active{display:block}
-  .confirm-row{display:flex;align-items:center;justify-content:center;gap:var(--space-lg);margin:var(--space-lg) 0}
-  .confirm-val{font-size:48px;font-weight:700;font-family:var(--font-data)}
-  .confirm-unit{font-size:var(--text-md);color:var(--text-secondary)}
-  .confirm-btn{width:100%;padding:18px;border-radius:var(--radius-lg);border:none;font-size:var(--text-xl);font-weight:700;cursor:pointer;margin-top:var(--space-md)}
-  .confirm-ok{background:var(--color-primary);color:#fff}
-  .confirm-edit{background:transparent;color:var(--text-secondary);border:1px solid var(--bg-divider);margin-top:var(--space-sm);font-size:var(--text-md)}
-  .confirm-ok:active,.confirm-edit:active{transform:scale(.97)}
+  <!-- 核心显示区 -->
+  <div class="session-core" id="coreDisplay">
+    <!-- 动态渲染 -->
+  </div>
 
-  /* 伙伴消息面板 */
-  .partner-panel{display:none;position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:414px;background:var(--bg-elevated);border-radius:var(--radius-xl) var(--radius-xl) 0 0;padding:var(--space-xl);padding-bottom:calc(var(--space-xl) + var(--safe-bottom));z-index:50;border-top:1px solid var(--bg-divider);max-height:60vh;overflow-y:auto}
-  .partner-panel.active{display:block}
-  .partner-msg-item{display:flex;gap:var(--space-md);padding:var(--space-md) 0;border-bottom:1px solid var(--bg-divider)}
-  .partner-msg-item .face{font-size:28px;flex-shrink:0}
-  .partner-msg-item .msg{font-size:var(--text-sm);color:var(--text-secondary);line-height:1.6}
-  .partner-cheer-btn{display:block;width:100%;padding:14px;margin-top:var(--space-sm);border-radius:var(--radius-md);border:1px solid var(--bg-divider);background:var(--bg-card);color:var(--color-primary);font-size:var(--text-md);font-weight:600;cursor:pointer;text-align:center}
-  .partner-cheer-btn:active{background:var(--bg-elevated)}
+  <!-- 底部操作 -->
+  <div class="session-actions" id="actionArea">
+    <!-- 动态渲染 -->
+  </div>
 
-  .hidden{display:none!important}
-  .action-row{display:flex;gap:var(--space-md);margin-top:var(--space-lg)}
-  .action-row .btn{flex:1}
-  .fixed-bottom{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:414px;padding:var(--space-lg);padding-bottom:calc(var(--space-lg) + var(--safe-bottom));background:linear-gradient(transparent,var(--bg-primary) 40%)}
-
-  /* 编辑面板 */
-  .edit-panel{display:none;position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:414px;background:var(--bg-elevated);border-radius:var(--radius-xl) var(--radius-xl) 0 0;padding:var(--space-xl);padding-bottom:calc(var(--space-xl) + var(--safe-bottom));z-index:51;border-top:1px solid var(--bg-divider)}
-  .edit-panel.active{display:block}
-  .edit-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-lg)}
-  .edit-title{font-size:var(--text-lg);font-weight:700}
-  .quick-btns{display:flex;gap:var(--space-sm);flex-wrap:wrap;margin-bottom:var(--space-md)}
-  .qbtn{flex:1;min-width:55px;padding:12px 6px;border-radius:var(--radius-md);border:1px solid var(--bg-divider);background:var(--bg-card);color:var(--text-primary);font-size:var(--text-md);font-weight:600;cursor:pointer;text-align:center}
-  .qbtn.sel{border-color:var(--color-primary);background:rgba(255,92,0,.15);color:var(--color-primary)}
-  .rpe-row{display:flex;gap:4px;margin:var(--space-md) 0}
-  .rpe-btn{flex:1;padding:12px 4px;border-radius:var(--radius-md);border:1px solid var(--bg-divider);background:var(--bg-card);color:var(--text-secondary);font-size:10px;cursor:pointer;text-align:center;line-height:1.3}
-  .rpe-btn .v{font-size:var(--text-md);font-weight:700;display:block}
-  .rpe-btn.sel{border-color:var(--color-primary);background:rgba(255,92,0,.15);color:var(--color-primary)}
-</style></head><body><div class="app"><div class="session">
-
-  <!-- 热身阶段 -->
-  <div id="warmup"><div class="phase-tag t-warmup">🔥 热身 · 5个动作</div>
-    <div class="partner-mini" onclick="openPartner()"><div class="partner-mini-face">🔥</div><div class="partner-mini-msg" id="warmupMsg">让身体醒过来。按你的节奏来。</div></div>
-    <div class="big-display"><div class="big-exercise" id="wuName">开合跳</div><div class="big-target">轻度有氧 · 全身激活</div><div class="big-timer" id="wuTimer">2:00</div>
-      <div class="dots" id="wuDots"><div class="dot current"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>
-    <div class="fixed-bottom"><div class="action-row"><button class="btn btn-secondary" onclick="skipPhase('warmup','work')">跳过热身</button><button class="btn btn-primary" id="wuNext">下一个动作</button></div></div></div>
-
-  <!-- 正式训练 -->
-  <div id="work" class="hidden"><div class="phase-tag t-work">🏋️ 杠铃深蹲 · 第 <span id="setNum">1</span>/5 组</div>
-    <div class="partner-mini" onclick="openPartner()"><div class="partner-mini-face">🔥</div><div class="partner-mini-msg" id="workMsg">准备好了吗？</div></div>
-    <div class="big-display"><div class="big-exercise">杠铃深蹲</div><div class="big-target">80kg × 5次</div><div class="big-timer" id="workTimer">0:00</div>
-      <div class="dots" id="workDots"><div class="dot current"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>
-    <div class="last-set" id="lastSetInfo" style="display:none"></div>
-    <div class="fixed-bottom"><div class="action-row"><button class="btn btn-ghost" onclick="skipPhase('work','cooldown')">跳过</button><button class="btn btn-primary" id="workBtn">完成一组</button></div></div></div>
-
-  <!-- 组间休息 -->
-  <div id="rest" class="hidden"><div class="phase-tag t-rest">⏸️ 组间休息</div>
-    <div class="rest-panel"><div class="rest-countdown" id="restTimer">2:30</div><div class="rest-hint">休息一下。下一组：杠铃深蹲 80kg × 5</div></div>
-    <div class="fixed-bottom"><div class="action-row"><button class="btn btn-ghost" id="restEditBtn">修改数据</button><button class="btn btn-primary" id="restNextBtn">开始下一组</button></div></div></div>
-
-  <!-- 冷却拉伸 -->
-  <div id="cooldown" class="hidden"><div class="phase-tag t-cool">🧘 冷却拉伸 · 4个动作</div>
-    <div class="partner-mini" onclick="openPartner()"><div class="partner-mini-face">🔥</div><div class="partner-mini-msg" id="coolMsg">辛苦了。慢慢来，不着急。</div></div>
-    <div class="big-display"><div class="big-exercise" id="cdName">股四头肌拉伸</div><div class="big-target">每侧保持 30 秒</div><div class="big-timer" id="cdTimer">0:30</div>
-      <div class="dots" id="cdDots"><div class="dot current"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>
-    <div class="fixed-bottom"><div class="action-row"><button class="btn btn-secondary" onclick="skipPhase('cooldown','complete')">跳过冷却</button><button class="btn btn-primary" id="cdNext">下一个动作</button></div></div></div>
-
-  <!-- 训练完成 -->
-  <div id="complete" class="hidden"><div class="phase-tag t-done">✅ 训练完成</div>
-    <div class="big-display"><div style="font-size:48px;margin-bottom:var(--space-md)">🏆</div><div class="big-exercise">训练完成！</div><div class="big-target" style="margin-bottom:var(--space-xl)">总容量 5,200kg · 平均 RPE 7.5 · 52分钟</div></div>
-    <div class="card" style="margin-bottom:var(--space-lg)"><div style="font-size:var(--text-md);color:var(--text-secondary);line-height:1.8">"今天总共举了 5,200 公斤。股四头肌在尖叫，但它们在变强。"<br><span style="color:var(--text-tertiary);font-size:var(--text-sm)">— Alex</span></div></div>
-    <a href="home.html" class="start-btn" style="text-decoration:none;display:flex;align-items:center;justify-content:center">返回首页</a></div>
-
-</div></div>
-
-<!-- 快速确认弹层 -->
-<div class="confirm-overlay" id="confirmOverlay" onclick="closeConfirm()"></div>
-<div class="quick-confirm" id="confirmPanel">
-  <div style="text-align:center;font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:var(--space-md)">杠铃深蹲 · 第 <span id="cfmSet">3</span> 组完成</div>
-  <div class="confirm-row"><span class="confirm-val">80</span><span class="confirm-unit">kg</span><span style="font-size:24px;color:var(--text-tertiary);margin:0 8px">×</span><span class="confirm-val">5</span><span class="confirm-unit">次</span></div>
-  <div style="text-align:center;font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:var(--space-sm)">RPE <span id="cfmRPE">7.5</span></div>
-  <button class="confirm-btn confirm-ok" onclick="confirmSet()">确认 ✓</button>
-  <button class="confirm-btn confirm-edit" onclick="closeConfirm();openEdit()">修改数据</button>
 </div>
 
-<!-- 数据修改面板 -->
-<div class="edit-panel" id="editPanel">
-  <div class="edit-header"><div class="edit-title">修改数据</div><button class="btn btn-ghost" onclick="closeEdit()">✕</button></div>
-  <div style="font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:var(--space-md)">杠铃深蹲 · 第 <span id="editSet">3</span> 组</div>
-  <div style="font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:var(--space-sm)">重量 (kg)</div>
-  <div class="quick-btns"><button class="qbtn">75</button><button class="qbtn sel">80</button><button class="qbtn">82.5</button><button class="qbtn">85</button></div>
-  <div style="font-size:var(--text-sm);color:var(--text-secondary);margin:var(--space-md) 0 var(--space-sm)">次数</div>
-  <div class="quick-btns"><button class="qbtn">3</button><button class="qbtn">4</button><button class="qbtn sel">5</button><button class="qbtn">6</button></div>
-  <div style="font-size:var(--text-sm);color:var(--text-secondary);margin:var(--space-md) 0 var(--space-sm)">RPE</div>
-  <div class="rpe-row"><button class="rpe-btn"><span class="v">6</span>轻松</button><button class="rpe-btn sel"><span class="v">7</span>适中</button><button class="rpe-btn"><span class="v">8</span>吃力</button><button class="rpe-btn"><span class="v">9</span>很吃力</button><button class="rpe-btn"><span class="v">10</span>极限</button></div>
-  <div class="action-row" style="margin-top:var(--space-xl)"><button class="btn btn-secondary" onclick="closeEdit()">取消</button><button class="btn btn-primary" onclick="closeEdit()">保存</button></div>
+<!-- 确认层 -->
+<div class="confirm-overlay" id="confirmOverlay" style="display:none;">
+  <div class="confirm-sheet">
+    <div class="confirm-title">确认完成</div>
+    <div class="confirm-data" id="confirmData">
+      <div class="confirm-data-item">
+        <div class="confirm-data-value" id="confirmWeight">80kg</div>
+        <div class="confirm-data-label">重量</div>
+      </div>
+      <div class="confirm-data-item">
+        <div class="confirm-data-value" id="confirmReps">8</div>
+        <div class="confirm-data-label">次数</div>
+      </div>
+      <div class="confirm-data-item">
+        <div class="confirm-data-value" id="confirmRPE">7</div>
+        <div class="confirm-data-label">RPE</div>
+      </div>
+    </div>
+    <button class="btn btn-primary btn-block btn-lg" onclick="confirmSet()">
+      ✓ 确认完成
+    </button>
+    <button class="btn btn-ghost btn-block mt-md" onclick="cancelConfirm()">
+      取消
+    </button>
+  </div>
 </div>
-
-<!-- 伙伴消息面板 -->
-<div class="confirm-overlay" id="partnerOverlay" onclick="closePartner()"></div>
-<div class="partner-panel" id="partnerPanel">
-  <div style="font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-lg)">🔥 Alex</div>
-  <div class="partner-msg-item"><div class="face">🔥</div><div class="msg">准备好了吗？深蹲日，你的主场。</div></div>
-  <div class="partner-msg-item"><div class="face">🔥</div><div class="msg">第三组了。膝盖稳定，核心收紧。你做得到。</div></div>
-  <div class="partner-msg-item"><div class="face">🔥</div><div class="msg">上一组 RPE 7.5，节奏控制得很好。</div></div>
-  <button class="partner-cheer-btn" onclick="cheerPartner()">💪 给我打气</button>
-  <button class="btn btn-ghost btn-block" style="margin-top:var(--space-sm)" onclick="closePartner()">关闭</button>
 </div>
 
 <script>
-let currentSet=1,totalSets=5,wuIdx=0,cdIdx=0,workSec=0,restSec=150,wuSec=120,cdSec=30;
-const wuNames=['开合跳','弓步转体','踝关节激活','Plyo预演','核心激活'];
-const wuDurs=[120,60,90,120,90];
-const cdNames=['股四头肌拉伸','腘绳肌拉伸','臀大肌拉伸','全身放松'];
-const cdDurs=[30,30,30,120];
-let timers=[];
+  // 训练数据
+  const exercises = [
+    { name: '空杠热身', detail: '热身 · 20kg', sets: 2, reps: 10, weight: '20kg', type: 'warmup' },
+    { name: '杠铃深蹲', detail: '热身组 1', sets: 1, reps: 8, weight: '40kg', type: 'warmup' },
+    { name: '杠铃深蹲', detail: '热身组 2', sets: 1, reps: 5, weight: '60kg', type: 'warmup' },
+    { name: '杠铃深蹲', detail: '正式组', sets: 4, reps: 8, weight: '80kg', type: 'working' },
+    { name: '罗马尼亚硬拉', detail: '正式组', sets: 3, reps: 10, weight: '60kg', type: 'working' },
+    { name: '训练后拉伸', detail: '冷却', sets: 1, reps: 5, weight: '5分钟', type: 'cooldown' },
+  ];
 
-function clearTimers(){timers.forEach(clearInterval);timers=[]}
+  let currentExercise = 0;
+  let currentSet = 0;
+  let phase = 'warmup'; // warmup | working | rest | cooldown | complete
+  let restTimer = 90;
+  let restInterval = null;
+  let totalSetsDone = 0;
+  let totalWeight = 0;
 
-function skipPhase(from,to){
-  clearTimers();
-  document.getElementById(from).classList.add('hidden');
-  document.getElementById(to).classList.remove('hidden');
-  if(to==='work'){startWorkTimer()}
-  if(to==='cooldown'){startCdTimer()}
-}
+  function render() {
+    const ex = exercises[currentExercise];
+    const core = document.getElementById('coreDisplay');
+    const actions = document.getElementById('actionArea');
+    const phaseLabel = document.getElementById('phaseLabel');
+    const progressLabel = document.getElementById('progressLabel');
 
-// 热身 — 用户手动控制
-document.getElementById('wuNext').addEventListener('click',()=>{
-  wuIdx++;clearTimers();
-  if(wuIdx>=wuNames.length){skipPhase('warmup','work');return}
-  document.getElementById('wuName').textContent=wuNames[wuIdx];
-  wuSec=wuDurs[wuIdx];updateWuDisplay();
-  document.getElementById('warmupMsg').textContent=['跟上了。','髋关节打开，慢慢来。','激活踝关节，弹跳的基础。','轻一点，只是预演。','收紧核心，像训练时一样。'][wuIdx];
-  updateDots('wuDots',wuIdx,wuNames.length);
-  startWuTimer();
-});
-function updateWuDisplay(){const m=Math.floor(wuSec/60),s=wuSec%60;document.getElementById('wuTimer').textContent=m+':'+String(s).padStart(2,'0')}
-function startWuTimer(){clearTimers();timers.push(setInterval(()=>{if(wuSec>0){wuSec--;updateWuDisplay()}},1000))}
-startWuTimer();
+    progressLabel.textContent = `${currentExercise + 1}/${exercises.length}`;
 
-// 正式训练
-function startWorkTimer(){clearTimers();timers.push(setInterval(()=>{workSec++;const m=Math.floor(workSec/60),s=workSec%60;document.getElementById('workTimer').textContent=m+':'+String(s).padStart(2,'0')},1000))}
-function updateDots(id,idx,total){const d=document.getElementById(id).children;for(let i=0;i<total;i++){d[i].className='dot';if(i<idx)d[i].classList.add('done');if(i===idx)d[i].classList.add('current')}}
+    if (phase === 'warmup' || phase === 'working') {
+      phaseLabel.textContent = phase === 'warmup' ? '热身' : '训练';
+      core.innerHTML = `
+        <div class="exercise-name-display">${ex.name}</div>
+        <div class="exercise-detail-display">${ex.detail} · ${ex.weight} × ${ex.reps}</div>
+        <div class="set-counter">第 ${currentSet + 1}/${ex.sets} 组</div>
+        <div class="set-dot-row">
+          ${Array.from({length: ex.sets}, (_, i) =>
+            `<span class="set-dot ${i < currentSet ? 'done' : i === currentSet ? 'current' : ''}"></span>`
+          ).join('')}
+        </div>
+      `;
 
-document.getElementById('workBtn').addEventListener('click',()=>{
-  clearTimers();workSec=0;
-  document.getElementById('cfmSet').textContent=currentSet;
-  document.getElementById('confirmOverlay').classList.add('active');
-  document.getElementById('confirmPanel').classList.add('active');
-});
-function confirmSet(){
-  closeConfirm();
-  updateDots('workDots',currentSet,totalSets);currentSet++;
-  if(currentSet>totalSets){skipPhase('work','cooldown');return}
-  document.getElementById('setNum').textContent=currentSet;
-  document.getElementById('lastSetInfo').style.display='block';
-  document.getElementById('lastSetInfo').innerHTML='上一组：80kg × 5 · RPE 7.5 · <span style="color:var(--color-primary);cursor:pointer" onclick="openEdit()">修改数据</span>';
-  const msgs=['稳住。','膝盖轨迹很好。','第三组了，注意力集中。','倒数第二组，顶住。','最后一组！把剩下的都放进去。'];
-  document.getElementById('workMsg').textContent=msgs[currentSet-1];
-  // 进入组间休息
-  document.getElementById('work').classList.add('hidden');
-  restSec=150;updateRestDisplay();
-  document.getElementById('rest').classList.remove('hidden');
-  clearTimers();timers.push(setInterval(()=>{if(restSec>0){restSec--;updateRestDisplay()}},1000));
-}
-function updateRestDisplay(){const m=Math.floor(restSec/60),s=restSec%60;document.getElementById('restTimer').textContent=m+':'+String(s).padStart(2,'0')}
-document.getElementById('restNextBtn').addEventListener('click',()=>{
-  clearTimers();document.getElementById('rest').classList.add('hidden');document.getElementById('work').classList.remove('hidden');startWorkTimer()
-});
-document.getElementById('restEditBtn').addEventListener('click',()=>{
-  document.getElementById('editSet').textContent=currentSet-1;openEdit()
-});
+      // 热身/拉伸不自动推进
+      if (ex.type === 'warmup' || ex.type === 'cooldown') {
+        actions.innerHTML = `
+          <button class="btn btn-primary btn-block btn-lg" onclick="completeSet()">
+            完成 · 进入下一组
+          </button>
+          ${currentSet > 0 ? `<button class="btn btn-ghost btn-block mt-sm" onclick="skipSet()">跳过此组</button>` : ''}
+        `;
+      } else {
+        actions.innerHTML = `
+          <button class="btn btn-primary btn-block btn-lg" onclick="showConfirm()">
+            完成 · 进入下一组
+          </button>
+        `;
+      }
 
-// 冷却
-document.getElementById('cdNext').addEventListener('click',()=>{
-  cdIdx++;clearTimers();
-  if(cdIdx>=cdNames.length){skipPhase('cooldown','complete');return}
-  document.getElementById('cdName').textContent=cdNames[cdIdx];cdSec=cdDurs[cdIdx];updateCdDisplay();
-  updateDots('cdDots',cdIdx,cdNames.length);
-  startCdTimer();
-});
-function updateCdDisplay(){const m=Math.floor(cdSec/60),s=cdSec%60;document.getElementById('cdTimer').textContent=m+':'+String(s).padStart(2,'0')}
-function startCdTimer(){clearTimers();timers.push(setInterval(()=>{if(cdSec>0){cdSec--;updateCdDisplay()}},1000))}
+    } else if (phase === 'rest') {
+      phaseLabel.textContent = '组间休息';
+      const nextEx = currentSet >= ex.sets - 1 ? exercises[currentExercise + 1] : ex;
+      const nextSetNum = currentSet >= ex.sets - 1 ? 0 : currentSet + 1;
 
-// 面板
-function closeConfirm(){document.getElementById('confirmOverlay').classList.remove('active');document.getElementById('confirmPanel').classList.remove('active')}
-function openEdit(){document.getElementById('editPanel').classList.add('active')}
-function closeEdit(){document.getElementById('editPanel').classList.remove('active')}
-function openPartner(){document.getElementById('partnerOverlay').classList.add('active');document.getElementById('partnerPanel').classList.add('active')}
-function closePartner(){document.getElementById('partnerOverlay').classList.remove('active');document.getElementById('partnerPanel').classList.remove('active')}
-function cheerPartner(){
-  const msgs=['你可以的！','就这一组！','你是最棒的！','冲！','PR在向你招手！','咬牙顶住！'];
-  const p=document.getElementById('partnerPanel');
-  const div=document.createElement('div');div.className='partner-msg-item';
-  div.innerHTML='<div class="face">🔥</div><div class="msg">'+msgs[Math.floor(Math.random()*msgs.length)]+'</div>';
-  p.insertBefore(div,p.children[3]);
-}
+      core.innerHTML = `
+        <div style="font-size: var(--font-size-caption); color: var(--color-text-muted); margin-bottom: var(--space-sm);">
+          组间休息
+        </div>
+        <div class="timer-display resting" id="restTimerDisplay">${formatTime(restTimer)}</div>
+        <div class="set-counter">已完成 ${currentSet + 1}/${ex.sets} 组</div>
+        ${nextEx ? `
+        <div class="next-preview">
+          <div class="next-preview-title">下一组预览</div>
+          <div class="next-preview-data">
+            <span>${nextEx.name}</span>
+            <span>${nextEx.weight}</span>
+            <span>×${nextEx.reps}</span>
+          </div>
+        </div>` : ''}
+        <div class="rest-buddy-msg">
+          <div class="rest-buddy-avatar">🦊</div>
+          <div class="rest-buddy-text" id="buddyMsg">深呼吸，你做得很好！每一组都在变强。</div>
+        </div>
+      `;
+
+      actions.innerHTML = `
+        <button class="btn btn-secondary btn-block" onclick="skipRest()">
+          跳过休息 · 继续训练
+        </button>
+        <button class="btn btn-ghost btn-block mt-sm" onclick="addRest()">
+          +30秒
+        </button>
+      `;
+
+      startRestTimer();
+
+    } else if (phase === 'cooldown') {
+      phaseLabel.textContent = '冷却';
+      core.innerHTML = `
+        <div class="exercise-name-display">${ex.name}</div>
+        <div class="exercise-detail-display">${ex.detail} · ${ex.weight}</div>
+        <div class="set-counter">最后一步</div>
+        <div style="font-size: 48px; margin: var(--space-xl) 0;">🧘</div>
+      `;
+      actions.innerHTML = `
+        <button class="btn btn-primary btn-block btn-lg" onclick="completeCooldown()">
+          完成训练
+        </button>
+      `;
+
+    } else if (phase === 'complete') {
+      phaseLabel.textContent = '完成';
+      core.innerHTML = `
+        <div class="completion-icon">🎉</div>
+        <div style="font-size: var(--font-size-headline); font-weight: var(--font-weight-bold); margin-bottom: var(--space-sm);">
+          训练完成！
+        </div>
+        <div style="font-size: var(--font-size-body); color: var(--color-text-secondary);">
+          今天又进步了一点
+        </div>
+        <div class="completion-stats">
+          <div class="completion-stat">
+            <div class="completion-stat-value">${totalSetsDone}</div>
+            <div class="completion-stat-label">总组数</div>
+          </div>
+          <div class="completion-stat">
+            <div class="completion-stat-value">${Math.floor(totalWeight/1000)}T</div>
+            <div class="completion-stat-label">总吨位</div>
+          </div>
+          <div class="completion-stat">
+            <div class="completion-stat-value">45'</div>
+            <div class="completion-stat-label">训练时长</div>
+          </div>
+        </div>
+        <div style="margin-top: var(--space-lg);">
+          <span class="badge badge-done">深蹲完成 ✓</span>
+        </div>
+      `;
+      actions.innerHTML = `
+        <button class="btn btn-primary btn-block btn-lg" onclick="location.href='home.html'">
+          返回首页
+        </button>
+        <button class="btn btn-ghost btn-block mt-sm" onclick="location.href='pr-celebration.html'">
+          🎉 查看PR庆祝
+        </button>
+      `;
+    }
+  }
+
+  function formatTime(s) {
+    const m = Math.floor(s / 60);
+    const sec = s % 60;
+    return `${m}:${sec.toString().padStart(2, '0')}`;
+  }
+
+  function startRestTimer() {
+    clearInterval(restInterval);
+    restInterval = setInterval(() => {
+      restTimer--;
+      const display = document.getElementById('restTimerDisplay');
+      if (display) display.textContent = formatTime(restTimer);
+      if (restTimer <= 0) {
+        clearInterval(restInterval);
+        advanceAfterRest();
+      }
+    }, 1000);
+  }
+
+  function advanceAfterRest() {
+    clearInterval(restInterval);
+    const ex = exercises[currentExercise];
+    currentSet++;
+    if (currentSet >= ex.sets) {
+      currentSet = 0;
+      currentExercise++;
+      if (currentExercise >= exercises.length) {
+        phase = 'complete';
+      } else {
+        phase = exercises[currentExercise].type;
+        restTimer = 90;
+      }
+    } else {
+      phase = ex.type;
+      restTimer = 90;
+    }
+    render();
+  }
+
+  function completeSet() {
+    const ex = exercises[currentExercise];
+    totalSetsDone++;
+    totalWeight += parseInt(ex.weight) * ex.reps;
+    currentSet++;
+
+    if (currentSet >= ex.sets) {
+      currentSet = 0;
+      currentExercise++;
+      if (currentExercise >= exercises.length) {
+        phase = 'complete';
+      } else {
+        const next = exercises[currentExercise];
+        if (next.type === 'cooldown') {
+          phase = 'cooldown';
+        } else if (next.type === 'warmup') {
+          phase = 'warmup';
+        } else {
+          phase = 'rest';
+          restTimer = 90;
+        }
+      }
+    } else {
+      if (ex.type === 'working') {
+        phase = 'rest';
+        restTimer = 90;
+      }
+    }
+    render();
+  }
+
+  function showConfirm() {
+    document.getElementById('confirmOverlay').style.display = 'flex';
+    const ex = exercises[currentExercise];
+    document.getElementById('confirmWeight').textContent = ex.weight;
+    document.getElementById('confirmReps').textContent = ex.reps;
+    document.getElementById('confirmRPE').textContent = '7';
+  }
+
+  function confirmSet() {
+    document.getElementById('confirmOverlay').style.display = 'none';
+    completeSet();
+  }
+
+  function cancelConfirm() {
+    document.getElementById('confirmOverlay').style.display = 'none';
+  }
+
+  function skipSet() {
+    currentSet++;
+    if (currentSet >= exercises[currentExercise].sets) {
+      currentSet = 0;
+      currentExercise++;
+      if (currentExercise >= exercises.length) {
+        phase = 'complete';
+      } else {
+        phase = exercises[currentExercise].type;
+      }
+    }
+    render();
+  }
+
+  function skipRest() {
+    clearInterval(restInterval);
+    advanceAfterRest();
+  }
+
+  function addRest() {
+    restTimer += 30;
+    const display = document.getElementById('restTimerDisplay');
+    if (display) display.textContent = formatTime(restTimer);
+  }
+
+  function completeCooldown() {
+    phase = 'complete';
+    render();
+  }
+
+  function exitSession() {
+    if (confirm('确定要退出训练吗？进度将丢失。')) {
+      window.location.href = 'module-training.html';
+    }
+  }
+
+  // 初始化
+  phase = exercises[0].type;
+  render();
 </script>
-</body></html>
+</body>
+</html>

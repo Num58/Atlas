@@ -1,45 +1,372 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>首次启动 — PrimeAtlas</title><link rel="stylesheet" href="shared.css"><style>
-  .onboard{padding:var(--space-xl);min-height:100vh;display:flex;flex-direction:column;justify-content:center}
-  .step{text-align:center}
-  .step-emoji{font-size:64px;margin-bottom:var(--space-lg)}
-  .step-title{font-size:var(--text-2xl);font-weight:700;margin-bottom:var(--space-md)}
-  .step-desc{font-size:var(--text-md);color:var(--text-secondary);margin-bottom:var(--space-xl);line-height:1.8}
-  .options{display:flex;flex-direction:column;gap:var(--space-md);margin-bottom:var(--space-xl)}
-  .option{width:100%;padding:16px;border-radius:var(--radius-lg);border:1px solid var(--bg-divider);background:var(--bg-card);color:var(--text-primary);font-size:var(--text-md);cursor:pointer;text-align:center}
-  .option.selected{border-color:var(--color-primary);background:rgba(255,92,0,.1)}
-  .partner-cards{display:flex;gap:var(--space-md);overflow-x:auto;padding-bottom:var(--space-md)}
-  .pcard{flex-shrink:0;width:140px;padding:var(--space-lg);border-radius:var(--radius-xl);border:2px solid var(--bg-divider);background:var(--bg-card);text-align:center;cursor:pointer}
-  .pcard.selected{border-color:var(--color-primary)}
-  .pcard-face{font-size:40px;margin-bottom:var(--space-sm)}
-  .pcard-name{font-size:var(--text-md);font-weight:700;margin-bottom:4px}
-  .pcard-desc{font-size:var(--text-xs);color:var(--text-tertiary);line-height:1.4}
-  .skip-link{text-align:center;margin-top:var(--space-lg);color:var(--text-tertiary);font-size:var(--text-sm);cursor:pointer}
-</style></head><body><div class="app"><div class="onboard">
-  <!-- Step 1: 伙伴召唤 -->
-  <div id="s1" class="step">
-    <div class="step-emoji">🤝</div><div class="step-title">召唤你的训练伙伴</div><div class="step-desc">每个人都有一个等待被唤醒的训练伙伴。<br>你的伙伴是谁？</div>
-    <div class="partner-cards" id="partnerCards">
-      <div class="pcard" onclick="selectPartner(this,'Alex','🔥')"><div class="pcard-face">🔥</div><div class="pcard-name">Alex·赤焰</div><div class="pcard-desc">前特种部队体能教官<br>"痛苦是暂时的，荣耀是永远的"</div></div>
-      <div class="pcard" onclick="selectPartner(this,'小野','⚡')"><div class="pcard-face">⚡</div><div class="pcard-name">小野·疾风</div><div class="pcard-desc">街头篮球出身<br>"别想太多，干就完了"</div></div>
-      <div class="pcard" onclick="selectPartner(this,'Elena','🌟')"><div class="pcard-face">🌟</div><div class="pcard-name">Elena·晨曦</div><div class="pcard-desc">运动科学博士<br>"你的身体比你以为的更强大"</div></div>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>PrimeAtlas — 首次启动</title>
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    .onboarding-container {
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      background: var(--color-bg);
+      position: relative;
+      overflow: hidden;
+    }
+    .onboarding-bg {
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(ellipse at 30% 20%, rgba(124, 92, 252, 0.1) 0%, transparent 50%),
+                  radial-gradient(ellipse at 70% 80%, rgba(0, 229, 160, 0.05) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    .onboarding-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-3xl) var(--space-xl);
+      position: relative;
+      z-index: 1;
+      text-align: center;
+    }
+    .step-indicator {
+      display: flex;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-3xl);
+    }
+    .step-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--color-bg-input);
+      transition: all var(--transition-normal);
+    }
+    .step-dot.active {
+      background: var(--color-primary);
+      width: 24px;
+      border-radius: 4px;
+    }
+    .step-dot.done {
+      background: var(--color-accent);
+    }
+    .onboarding-icon {
+      font-size: 80px;
+      margin-bottom: var(--space-xl);
+      animation: scaleIn 0.6s ease;
+    }
+    .onboarding-title {
+      font-size: var(--font-size-headline);
+      font-weight: var(--font-weight-bold);
+      margin-bottom: var(--space-md);
+      line-height: 1.3;
+    }
+    .onboarding-desc {
+      font-size: var(--font-size-body);
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-3xl);
+      line-height: 1.6;
+      max-width: 280px;
+    }
+    .onboarding-actions {
+      width: 100%;
+      padding: var(--space-xl);
+      padding-bottom: calc(var(--space-3xl) + env(safe-area-inset-bottom, 8px));
+      position: relative;
+      z-index: 1;
+    }
+    /* 伙伴选择 */
+    .buddy-options {
+      display: flex;
+      gap: var(--space-md);
+      justify-content: center;
+      margin-bottom: var(--space-xl);
+    }
+    .buddy-option {
+      width: 80px;
+      height: 100px;
+      border-radius: var(--radius-lg);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      background: var(--color-bg-card);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-sm);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    .buddy-option.selected {
+      border-color: var(--color-primary);
+      box-shadow: var(--shadow-glow);
+      background: rgba(124, 92, 252, 0.1);
+    }
+    .buddy-option .emoji {
+      font-size: 36px;
+    }
+    .buddy-option .name {
+      font-size: var(--font-size-caption);
+      color: var(--color-text-secondary);
+    }
+    /* 目标选择 */
+    .goal-options {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+      width: 100%;
+      max-width: 300px;
+    }
+    .goal-option {
+      padding: var(--space-lg);
+      border-radius: var(--radius-md);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      background: var(--color-bg-card);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+    .goal-option.selected {
+      border-color: var(--color-primary);
+      background: rgba(124, 92, 252, 0.1);
+    }
+    .goal-option-icon {
+      font-size: 28px;
+    }
+    .goal-option-text {
+      font-size: var(--font-size-body);
+      font-weight: var(--font-weight-medium);
+    }
+    .goal-option-sub {
+      font-size: var(--font-size-caption);
+      color: var(--color-text-muted);
+    }
+    /* 场景选择 */
+    .scene-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-md);
+      width: 100%;
+      max-width: 300px;
+    }
+    .scene-option {
+      padding: var(--space-lg);
+      border-radius: var(--radius-md);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      background: var(--color-bg-card);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      text-align: center;
+    }
+    .scene-option.selected {
+      border-color: var(--color-primary);
+      background: rgba(124, 92, 252, 0.1);
+    }
+    .scene-option-icon {
+      font-size: 32px;
+      margin-bottom: var(--space-sm);
+    }
+    .scene-option-label {
+      font-size: var(--font-size-caption);
+      font-weight: var(--font-weight-medium);
+    }
+  </style>
+</head>
+<body>
+<div class="app-container">
+<div class="onboarding-container">
+  <div class="onboarding-bg"></div>
+
+  <!-- 步骤指示器 -->
+  <div style="padding: var(--space-2xl) var(--space-lg) 0; position: relative; z-index: 1;">
+    <div class="step-indicator" id="stepIndicator">
+      <span class="step-dot active"></span>
+      <span class="step-dot"></span>
+      <span class="step-dot"></span>
     </div>
-    <button class="btn btn-primary btn-block btn-lg" onclick="next(2)">选择伙伴</button>
-    <div class="skip-link" onclick="next(2)">先跳过，90秒快速体验 →</div>
   </div>
-  <!-- Step 2: 目标 -->
-  <div id="s2" class="step hidden"><div class="step-emoji">🎯</div><div class="step-title">你的目标是什么？</div><div class="options">
-    <div class="option selected" onclick="selectGoal(this)">🏀 篮球弹跳 / 扣篮</div>
-    <div class="option" onclick="selectGoal(this)">🏸 羽毛球专项</div>
-    <div class="option" onclick="selectGoal(this)">💪 增肌</div>
-    <div class="option" onclick="selectGoal(this)">🔥 减脂</div>
-    <div class="option" onclick="selectGoal(this)">🧘 产后康复</div>
-  </div><button class="btn btn-primary btn-block btn-lg" onclick="next(3)">继续</button></div>
-  <!-- Step 3: 完成 -->
-  <div id="s3" class="step hidden"><div class="step-emoji">🤝</div><div class="step-title">契约已成！</div><div class="step-desc">从今天起，你不再是一个人训练。<br>Alex 会陪你变强。</div>
-  <a href="home.html" class="btn btn-primary btn-block btn-lg" style="text-decoration:none">进入 PrimeAtlas</a></div>
-</div></div>
+
+  <!-- 内容区 -->
+  <div class="onboarding-content" id="stepContent">
+    <!-- 动态渲染 -->
+  </div>
+
+  <!-- 操作区 -->
+  <div class="onboarding-actions" id="stepActions">
+    <!-- 动态渲染 -->
+  </div>
+</div>
+</div>
+
 <script>
-function selectPartner(el,name,emoji){document.querySelectorAll('.pcard').forEach(c=>c.classList.remove('selected'));el.classList.add('selected')}
-function selectGoal(el){document.querySelectorAll('#s2 .option').forEach(o=>o.classList.remove('selected'));el.classList.add('selected')}
-function next(n){document.querySelectorAll('.step').forEach(s=>s.classList.add('hidden'));document.getElementById('s'+n).classList.remove('hidden')}
-</script></body></html>
+  let currentStep = 0;
+  let selectedBuddy = 'fox';
+  let selectedGoal = 'strength';
+  let selectedScenes = ['home', 'gym'];
+
+  const steps = [
+    {
+      title: '召唤你的训练伙伴',
+      desc: '选择一个伙伴，它会陪你训练、为你加油、提醒你休息。',
+      icon: '🦊',
+      content: 'buddy'
+    },
+    {
+      title: '你的目标是什么？',
+      desc: '设定目标，Atlas会为你定制训练计划。',
+      icon: '🎯',
+      content: 'goal'
+    },
+    {
+      title: '你在哪里训练？',
+      desc: 'Atlas会根据你的训练场景调整建议。',
+      icon: '📍',
+      content: 'scene'
+    }
+  ];
+
+  function renderStep() {
+    const step = steps[currentStep];
+    const content = document.getElementById('stepContent');
+    const actions = document.getElementById('stepActions');
+    const indicator = document.getElementById('stepIndicator');
+
+    // 更新步骤指示器
+    indicator.innerHTML = steps.map((_, i) =>
+      `<span class="step-dot ${i === currentStep ? 'active' : i < currentStep ? 'done' : ''}"></span>`
+    ).join('');
+
+    // 图标
+    const iconHtml = `<div class="onboarding-icon">${step.icon}</div>`;
+
+    // 伙伴选择
+    if (step.content === 'buddy') {
+      content.innerHTML = `
+        ${iconHtml}
+        <div class="onboarding-title">${step.title}</div>
+        <div class="onboarding-desc">${step.desc}</div>
+        <div class="buddy-options">
+          <div class="buddy-option ${selectedBuddy === 'fox' ? 'selected' : ''}" onclick="selectBuddy('fox')">
+            <span class="emoji">🦊</span>
+            <span class="name">Atlas</span>
+          </div>
+          <div class="buddy-option ${selectedBuddy === 'bear' ? 'selected' : ''}" onclick="selectBuddy('bear')">
+            <span class="emoji">🐻</span>
+            <span class="name">Titan</span>
+          </div>
+          <div class="buddy-option ${selectedBuddy === 'tiger' ? 'selected' : ''}" onclick="selectBuddy('tiger')">
+            <span class="emoji">🐯</span>
+            <span class="name">Blaze</span>
+          </div>
+        </div>
+      `;
+    }
+
+    // 目标选择
+    if (step.content === 'goal') {
+      content.innerHTML = `
+        ${iconHtml}
+        <div class="onboarding-title">${step.title}</div>
+        <div class="onboarding-desc">${step.desc}</div>
+        <div class="goal-options">
+          <div class="goal-option ${selectedGoal === 'strength' ? 'selected' : ''}" onclick="selectGoal('strength')">
+            <span class="goal-option-icon">💪</span>
+            <div>
+              <div class="goal-option-text">增力</div>
+              <div class="goal-option-sub">提升三大项重量</div>
+            </div>
+          </div>
+          <div class="goal-option ${selectedGoal === 'muscle' ? 'selected' : ''}" onclick="selectGoal('muscle')">
+            <span class="goal-option-icon">🏋️</span>
+            <div>
+              <div class="goal-option-text">增肌</div>
+              <div class="goal-option-sub">增加肌肉量</div>
+            </div>
+          </div>
+          <div class="goal-option ${selectedGoal === 'health' ? 'selected' : ''}" onclick="selectGoal('health')">
+            <span class="goal-option-icon">❤️</span>
+            <div>
+              <div class="goal-option-text">健康</div>
+              <div class="goal-option-sub">保持活力与体态</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // 场景选择
+    if (step.content === 'scene') {
+      content.innerHTML = `
+        ${iconHtml}
+        <div class="onboarding-title">${step.title}</div>
+        <div class="onboarding-desc">${step.desc}</div>
+        <div class="scene-options">
+          <div class="scene-option ${selectedScenes.includes('home') ? 'selected' : ''}" onclick="toggleScene('home')">
+            <div class="scene-option-icon">🏠</div>
+            <div class="scene-option-label">居家训练</div>
+          </div>
+          <div class="scene-option ${selectedScenes.includes('gym') ? 'selected' : ''}" onclick="toggleScene('gym')">
+            <div class="scene-option-icon">🏋️</div>
+            <div class="scene-option-label">健身房</div>
+          </div>
+          <div class="scene-option ${selectedScenes.includes('outdoor') ? 'selected' : ''}" onclick="toggleScene('outdoor')">
+            <div class="scene-option-icon">🌳</div>
+            <div class="scene-option-label">户外</div>
+          </div>
+          <div class="scene-option ${selectedScenes.includes('office') ? 'selected' : ''}" onclick="toggleScene('office')">
+            <div class="scene-option-icon">💼</div>
+            <div class="scene-option-label">办公室</div>
+          </div>
+        </div>
+      `;
+    }
+
+    // 操作按钮
+    actions.innerHTML = `
+      <button class="btn btn-primary btn-block btn-lg" onclick="nextStep()">
+        ${currentStep < steps.length - 1 ? '继续' : '开始训练之旅 🚀'}
+      </button>
+      ${currentStep > 0 ? `<button class="btn btn-ghost btn-block mt-sm" onclick="prevStep()">返回上一步</button>` : ''}
+    `;
+  }
+
+  function selectBuddy(b) { selectedBuddy = b; renderStep(); }
+  function selectGoal(g) { selectedGoal = g; renderStep(); }
+  function toggleScene(s) {
+    if (selectedScenes.includes(s)) {
+      if (selectedScenes.length > 1) selectedScenes = selectedScenes.filter(x => x !== s);
+    } else {
+      selectedScenes.push(s);
+    }
+    renderStep();
+  }
+
+  function nextStep() {
+    if (currentStep < steps.length - 1) {
+      currentStep++;
+      renderStep();
+    } else {
+      // 完成引导，跳转首页
+      window.location.href = 'home.html';
+    }
+  }
+
+  function prevStep() {
+    if (currentStep > 0) {
+      currentStep--;
+      renderStep();
+    }
+  }
+
+  renderStep();
+</script>
+</body>
+</html>

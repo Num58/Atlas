@@ -1,37 +1,359 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>我的 — PrimeAtlas</title><link rel="stylesheet" href="shared.css"><style>
-  .prof{padding:var(--space-lg);padding-bottom:120px}
-  .prof-header{display:flex;align-items:center;gap:var(--space-md);margin-bottom:var(--space-xl)}
-  .prof-avatar{font-size:48px;width:64px;height:64px;border-radius:50%;background:var(--bg-elevated);display:flex;align-items:center;justify-content:center}
-  .prof-name{font-size:var(--text-lg);font-weight:700}
-  .prof-level{font-size:var(--text-sm);color:var(--text-tertiary)}
-  .menu-group{margin-bottom:var(--space-xl)}
-  .menu-title{font-size:var(--text-xs);color:var(--text-tertiary);text-transform:uppercase;letter-spacing:1px;margin-bottom:var(--space-sm);padding:0 var(--space-sm)}
-  .menu-item{display:flex;align-items:center;justify-content:space-between;padding:14px var(--space-md);background:var(--bg-card);border-radius:var(--radius-md);margin-bottom:2px;cursor:pointer;text-decoration:none;color:var(--text-primary)}
-  .menu-item:active{background:var(--bg-elevated)}
-  .menu-left{display:flex;align-items:center;gap:var(--space-md)}
-  .menu-icon{font-size:20px}
-  .menu-arrow{color:var(--text-tertiary)}
-  .toggle{width:48px;height:28px;border-radius:14px;background:var(--bg-divider);position:relative;cursor:pointer;transition:background .2s}
-  .toggle.on{background:var(--color-primary)}
-  .toggle::after{content:'';position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:left .2s}
-  .toggle.on::after{left:23px}
-</style></head><body><div class="app"><div class="prof">
-  <div class="prof-header"><div class="prof-avatar">🔥</div><div><div class="prof-name">张逸飞</div><div class="prof-level">Alex · Lv.3 信任 · 连续训练 12 天</div></div></div>
-  <div class="menu-group"><div class="menu-title">训练</div>
-    <a href="#" class="menu-item"><span class="menu-left"><span class="menu-icon">📋</span>身体档案</span><span class="menu-arrow">→</span></a>
-    <a href="#" class="menu-item"><span class="menu-left"><span class="menu-icon">🎯</span>训练目标</span><span class="menu-arrow">→</span></a>
-    <a href="#" class="menu-item"><span class="menu-left"><span class="menu-icon">📍</span>训练场景</span><span class="menu-arrow">→</span></a>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>PrimeAtlas — 个人中心</title>
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    .profile-header {
+      text-align: center;
+      padding: var(--space-3xl) var(--space-lg) var(--space-xl);
+    }
+    .profile-avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: var(--gradient-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      margin: 0 auto var(--space-md);
+      box-shadow: var(--shadow-glow);
+    }
+    .profile-name {
+      font-size: var(--font-size-title);
+      font-weight: var(--font-weight-bold);
+    }
+    .profile-level {
+      font-size: var(--font-size-caption);
+      color: var(--color-primary-light);
+      margin-top: var(--space-xs);
+    }
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-sm);
+      padding: 0 var(--space-lg);
+      margin-bottom: var(--space-xl);
+    }
+    .stat-card {
+      background: var(--color-bg-card);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      text-align: center;
+    }
+    .stat-card-value {
+      font-size: var(--font-size-subtitle);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-accent);
+    }
+    .stat-card-label {
+      font-size: 10px;
+      color: var(--color-text-muted);
+      margin-top: 2px;
+    }
+    .section-group {
+      margin: 0 var(--space-lg) var(--space-xl);
+    }
+    .section-group-title {
+      font-size: var(--font-size-caption);
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: var(--space-md);
+    }
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      padding: var(--space-lg);
+      background: var(--color-bg-card);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--space-sm);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      min-height: var(--touch-min);
+    }
+    .menu-item:active {
+      background: var(--color-bg-elevated);
+    }
+    .menu-item-icon {
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .menu-item-content {
+      flex: 1;
+    }
+    .menu-item-title {
+      font-size: var(--font-size-body);
+      font-weight: var(--font-weight-medium);
+    }
+    .menu-item-desc {
+      font-size: var(--font-size-caption);
+      color: var(--color-text-muted);
+    }
+    .menu-item-arrow {
+      color: var(--color-text-muted);
+      font-size: 18px;
+    }
+    .menu-item-value {
+      font-size: var(--font-size-caption);
+      color: var(--color-text-secondary);
+      margin-right: var(--space-sm);
+    }
+    .toggle-switch {
+      width: 48px;
+      height: 28px;
+      border-radius: 14px;
+      background: var(--color-bg-input);
+      position: relative;
+      cursor: pointer;
+      transition: background var(--transition-fast);
+      flex-shrink: 0;
+    }
+    .toggle-switch.on {
+      background: var(--color-accent);
+    }
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: white;
+      top: 3px;
+      left: 3px;
+      transition: left var(--transition-fast);
+    }
+    .toggle-switch.on::after {
+      left: 23px;
+    }
+    .body-stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-md);
+    }
+    .body-stat-item {
+      background: var(--color-bg-card);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .body-stat-label {
+      font-size: 10px;
+      color: var(--color-text-muted);
+      margin-bottom: 4px;
+    }
+    .body-stat-value {
+      font-size: var(--font-size-body-lg);
+      font-weight: var(--font-weight-semibold);
+    }
+    .body-stat-unit {
+      font-size: var(--font-size-caption);
+      color: var(--color-text-muted);
+      font-weight: var(--font-weight-regular);
+    }
+  </style>
+</head>
+<body>
+<div class="app-container">
+  <div class="page-content">
+
+    <!-- 个人头部 -->
+    <div class="profile-header">
+      <div class="profile-avatar">🦊</div>
+      <div class="profile-name">张弛</div>
+      <div class="profile-level">Atlas · 训练伙伴 Lv.12</div>
+    </div>
+
+    <!-- 数据看板 -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-card-value">128</div>
+        <div class="stat-card-label">总训练次数</div>
+      </div>
+      <div class="stat-card-value" style="color: var(--color-warning);">7</div>
+        <div class="stat-card-label">连续天数</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-value">42T</div>
+        <div class="stat-card-label">总吨位</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-value">5</div>
+        <div class="stat-card-label">PR次数</div>
+      </div>
+    </div>
+
+    <!-- 身体档案 -->
+    <div class="section-group">
+      <div class="section-group-title">身体档案</div>
+      <div class="body-stats">
+        <div class="body-stat-item">
+          <div class="body-stat-label">体重</div>
+          <div class="body-stat-value">75 <span class="body-stat-unit">kg</span></div>
+        </div>
+        <div class="body-stat-item">
+          <div class="body-stat-label">身高</div>
+          <div class="body-stat-value">178 <span class="body-stat-unit">cm</span></div>
+        </div>
+        <div class="body-stat-item">
+          <div class="body-stat-label">体脂率</div>
+          <div class="body-stat-value">18.5 <span class="body-stat-unit">%</span></div>
+        </div>
+        <div class="body-stat-item">
+          <div class="body-stat-label">骨骼肌</div>
+          <div class="body-stat-value">35.2 <span class="body-stat-unit">kg</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 目标管理 -->
+    <div class="section-group">
+      <div class="section-group-title">目标</div>
+      <div class="menu-item">
+        <span class="menu-item-icon">🎯</span>
+        <div class="menu-item-content">
+          <div class="menu-item-title">深蹲 100kg</div>
+          <div class="menu-item-desc">当前 80kg · 已完成 80%</div>
+        </div>
+        <div class="progress-bar" style="width: 80px;">
+          <div class="progress-bar-fill" style="width: 80%;"></div>
+        </div>
+        <span class="menu-item-arrow">›</span>
+      </div>
+      <div class="menu-item">
+        <span class="menu-item-icon">🎯</span>
+        <div class="menu-item-content">
+          <div class="menu-item-title">体脂率降到15%</div>
+          <div class="menu-item-desc">当前 18.5% · 已完成 30%</div>
+        </div>
+        <div class="progress-bar" style="width: 80px;">
+          <div class="progress-bar-fill accent" style="width: 30%;"></div>
+        </div>
+        <span class="menu-item-arrow">›</span>
+      </div>
+    </div>
+
+    <!-- 伙伴设置 -->
+    <div class="section-group">
+      <div class="section-group-title">伙伴设置</div>
+      <div class="menu-item">
+        <span class="menu-item-icon">🦊</span>
+        <div class="menu-item-content">
+          <div class="menu-item-title">伙伴性格</div>
+          <div class="menu-item-desc">鼓励型教练</div>
+        </div>
+        <span class="menu-item-value">鼓励型</span>
+        <span class="menu-item-arrow">›</span>
+      </div>
+      <div class="menu-item">
+        <span class="menu-item-icon">🎨</span>
+        <div class="menu-item-content">
+          <div class="menu-item-title">伙伴外观</div>
+          <div class="menu-item-desc">小狐狸 Atlas</div>
+        </div>
+        <span class="menu-item-arrow">›</span>
+      </div>
+    </div>
+
+    <!-- 语音设置 -->
+    <div class="section-group">
+      <div class="section-group-title">语音与口音</div>
+      <div class="menu-item">
+        <span class="menu-item-icon">🔊</span>
+        <div class="menu-item-content">
+          <div class="menu-item-title">外放语音</div>
+          <div class="menu-item-desc">默认关闭</div>
+        </div>
+        <div class="toggle-switch" onclick="toggleSwitch(this)"></div>
+      </div>
+      <div class="menu-item">
+        <span class="menu-item-icon">🎧</span>
+        <div class="menu-item-content">
+          <div class="menu-item-title">耳机语音</div>
+          <div class="menu-item-desc">默认关闭</div>
+        </div>
+        <div class="toggle-switch" onclick="toggleSwitch(this)"></div>
+      </div>
+      <div class="menu-item">
+        <span class="menu-item-icon">🎤</span>
+        <div class="menu-item-content">
+          <div class="menu-item-title">语音指令</div>
+          <div class="menu-item-desc">默认关闭</div>
+        </div>
+        <div class="toggle-switch" onclick="toggleSwitch(this)"></div>
+      </div>
+      <div class="menu-item">
+        <span class="menu-item-icon">🗣️</span>
+        <div class="menu-item-content">
+          <div class="menu-item-title">英语口音</div>
+          <div class="menu-item-desc">美式英语</div>
+        </div>
+        <span class="menu-item-value">美式</span>
+        <span class="menu-item-arrow">›</span>
+      </div>
+    </div>
+
+    <!-- 其他 -->
+    <div class="section-group">
+      <div class="section-group-title">其他</div>
+      <div class="menu-item">
+        <span class="menu-item-icon">📊</span>
+        <div class="menu-item-content">
+          <div class="menu-item-title">训练历史</div>
+          <div class="menu-item-desc">查看完整训练记录</div>
+        </div>
+        <span class="menu-item-arrow">›</span>
+      </div>
+      <div class="menu-item">
+        <span class="menu-item-icon">⚙️</span>
+        <div class="menu-item-content">
+          <div class="menu-item-title">设置</div>
+          <div class="menu-item-desc">提醒、单位、数据导出</div>
+        </div>
+        <span class="menu-item-arrow">›</span>
+      </div>
+      <div class="menu-item" onclick="location.href='onboarding.html'">
+        <span class="menu-item-icon">🚀</span>
+        <div class="menu-item-content">
+          <div class="menu-item-title">重新引导</div>
+          <div class="menu-item-desc">重新设置目标和伙伴</div>
+        </div>
+        <span class="menu-item-arrow">›</span>
+      </div>
+    </div>
+
+    <div style="text-align: center; padding: var(--space-lg);">
+      <button class="btn btn-ghost" style="color: var(--color-text-muted);">退出登录</button>
+    </div>
+
   </div>
-  <div class="menu-group"><div class="menu-title">伙伴</div>
-    <a href="#" class="menu-item"><span class="menu-left"><span class="menu-icon">🤖</span>伙伴管理</span><span class="menu-arrow">→</span></a>
-    <div class="menu-item"><span class="menu-left"><span class="menu-icon">🎧</span>耳机语音</span><span style="font-size:var(--text-xs);color:var(--text-tertiary);margin-right:var(--space-sm)">蓝牙连接后可用</span><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
-    <div class="menu-item"><span class="menu-left"><span class="menu-icon">🎙️</span>语音指令</span><span style="font-size:var(--text-xs);color:var(--text-tertiary);margin-right:var(--space-sm)">需蓝牙耳机，仅辅助</span><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
-  </div>
-  <div class="menu-group"><div class="menu-title">设置</div>
-    <a href="#" class="menu-item"><span class="menu-left"><span class="menu-icon">🔔</span>通知</span><span class="menu-arrow">→</span></a>
-    <a href="#" class="menu-item"><span class="menu-left"><span class="menu-icon">🔒</span>隐私</span><span class="menu-arrow">→</span></a>
-    <a href="#" class="menu-item"><span class="menu-left"><span class="menu-icon">ℹ️</span>关于</span><span class="menu-arrow">→</span></a>
-  </div>
+
+  <!-- 底部Tab导航 -->
+  <nav class="tab-bar">
+    <a href="home.html" class="tab-item">
+      <span class="tab-icon">🏠</span>
+      <span class="tab-label">首页</span>
+    </a>
+    <a href="module-training.html" class="tab-item">
+      <span class="tab-icon">📦</span>
+      <span class="tab-label">模块</span>
+    </a>
+    <a href="profile.html" class="tab-item active">
+      <span class="tab-icon">👤</span>
+      <span class="tab-label">我的</span>
+    </a>
+  </nav>
 </div>
-<div class="tab-bar"><a href="home.html" class="tab-item"><span class="tab-icon">🏠</span>首页</a><a href="training-history.html" class="tab-item"><span class="tab-icon">🏋️</span>训练</a><a href="profile.html" class="tab-item active"><span class="tab-icon">👤</span>我的</a></div>
-</div></body></html>
+
+<script>
+  function toggleSwitch(el) {
+    el.classList.toggle('on');
+  }
+</script>
+</body>
+</html>

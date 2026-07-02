@@ -1,22 +1,204 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>🏆 新纪录！— PrimeAtlas</title><link rel="stylesheet" href="shared.css"><style>
-  body{background:#000;overflow:hidden;display:flex;align-items:center;justify-content:center;min-height:100vh}
-  .pr-scene{text-align:center;animation:fadeIn .5s var(--ease-out)}
-  .pr-icon{font-size:80px;animation:pulse .8s infinite}
-  .pr-title{font-size:40px;font-weight:700;background:linear-gradient(135deg,#FFD700,#FF8C00,#FFD700);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:var(--space-lg) 0}
-  .pr-exercise{font-size:var(--text-xl);color:var(--text-secondary);margin-bottom:var(--space-xl)}
-  .pr-compare{display:flex;justify-content:center;align-items:center;gap:var(--space-xl);margin:var(--space-xl) 0}
-  .pr-old,.pr-new{text-align:center}
-  .pr-old-val{font-size:var(--text-xl);color:var(--text-tertiary);text-decoration:line-through}
-  .pr-arrow{font-size:var(--text-2xl);color:var(--color-gold)}
-  .pr-new-val{font-size:48px;font-weight:700;font-family:var(--font-data);color:var(--color-gold)}
-  .pr-delta{font-size:var(--text-lg);color:var(--color-success);margin-top:4px}
-  .pr-share{display:flex;gap:var(--space-md);margin-top:var(--space-xl)}
-  .pr-share .btn{flex:1}
-  .pr-close{position:fixed;top:20px;right:20px;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.1);border:none;color:#fff;font-size:20px;cursor:pointer}
-</style></head><body>
-<div class="pr-scene"><div class="pr-icon">🏆</div><div class="pr-title">新纪录！</div><div class="pr-exercise">杠铃深蹲</div>
-  <div class="pr-compare"><div class="pr-old"><div style="color:var(--text-tertiary);font-size:var(--text-sm)">之前</div><div class="pr-old-val">90kg × 5</div></div>
-    <div class="pr-arrow">→</div><div class="pr-new"><div style="color:var(--text-tertiary);font-size:var(--text-sm)">现在</div><div class="pr-new-val">95kg × 5</div><div class="pr-delta">+5kg (+5.6%)</div></div></div>
-  <div class="pr-share"><button class="btn btn-secondary">保存图片</button><button class="btn btn-primary" onclick="window.close()">继续训练</button></div></div>
-<button class="pr-close" onclick="window.close()">✕</button>
-</body></html>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>PrimeAtlas — PR庆祝</title>
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    .celebration-container {
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-bg);
+      position: relative;
+      overflow: hidden;
+      padding: var(--space-3xl);
+      text-align: center;
+    }
+    .confetti-bg {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .confetti-piece {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 2px;
+      animation: confettiFall 3s ease forwards;
+    }
+    @keyframes confettiFall {
+      0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+    }
+    .pr-badge-large {
+      font-size: 80px;
+      animation: scaleIn 0.5s ease, pulse 2s ease infinite 0.5s;
+      margin-bottom: var(--space-xl);
+    }
+    .pr-title {
+      font-size: var(--font-size-headline);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-text);
+      margin-bottom: var(--space-sm);
+      animation: fadeIn 0.6s ease 0.2s both;
+    }
+    .pr-subtitle {
+      font-size: var(--font-size-body);
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-3xl);
+      animation: fadeIn 0.6s ease 0.4s both;
+    }
+    .pr-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-md);
+      width: 100%;
+      max-width: 300px;
+      margin-bottom: var(--space-3xl);
+      animation: fadeIn 0.6s ease 0.6s both;
+    }
+    .pr-stat-card {
+      background: var(--color-bg-card);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .pr-stat-old {
+      font-size: var(--font-size-caption);
+      color: var(--color-text-muted);
+      text-decoration: line-through;
+    }
+    .pr-stat-new {
+      font-size: var(--font-size-headline);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-accent);
+    }
+    .pr-stat-label {
+      font-size: 10px;
+      color: var(--color-text-muted);
+      margin-top: 2px;
+    }
+    .pr-buddy-msg {
+      background: linear-gradient(135deg, rgba(124, 92, 252, 0.15), rgba(0, 229, 160, 0.1));
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      border: 1px solid rgba(124, 92, 252, 0.2);
+      margin-bottom: var(--space-3xl);
+      animation: fadeIn 0.6s ease 0.8s both;
+    }
+    .pr-buddy-emoji {
+      font-size: 36px;
+      margin-bottom: var(--space-sm);
+    }
+    .pr-buddy-text {
+      font-size: var(--font-size-body);
+      color: var(--color-text);
+      line-height: 1.6;
+    }
+    .pr-actions {
+      animation: fadeIn 0.6s ease 1s both;
+    }
+    /* 进度变化条 */
+    .pr-progress-compare {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      margin-top: var(--space-sm);
+    }
+    .pr-progress-bar-old {
+      height: 8px;
+      background: var(--color-bg-input);
+      border-radius: 4px;
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+    .pr-progress-bar-new {
+      height: 8px;
+      background: var(--gradient-primary);
+      border-radius: 4px;
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+<div class="app-container">
+<div class="celebration-container">
+  <!-- 彩纸效果 -->
+  <div class="confetti-bg" id="confetti"></div>
+
+  <div class="pr-badge-large">🏆</div>
+
+  <div class="pr-title">新的个人纪录！</div>
+  <div class="pr-subtitle">杠铃深蹲 · PR达成</div>
+
+  <div class="pr-stats">
+    <div class="pr-stat-card">
+      <div class="pr-stat-old">75kg</div>
+      <div class="pr-stat-new">80kg</div>
+      <div class="pr-stat-label">深蹲 1RM</div>
+      <div style="font-size: var(--font-size-caption); color: var(--color-accent); margin-top: var(--space-xs);">
+        ↑ 6.7%
+      </div>
+    </div>
+    <div class="pr-stat-card">
+      <div class="pr-stat-old">8 reps</div>
+      <div class="pr-stat-new">10 reps</div>
+      <div class="pr-stat-label">深蹲 80kg</div>
+      <div style="font-size: var(--font-size-caption); color: var(--color-accent); margin-top: var(--space-xs);">
+        ↑ 2 reps
+      </div>
+    </div>
+  </div>
+
+  <div class="pr-buddy-msg">
+    <div class="pr-buddy-emoji">🦊</div>
+    <div class="pr-buddy-text">
+      "太棒了！这是你第 <strong>6</strong> 次PR！<br>
+      每一滴汗水都没有白费。<br>
+      继续保持，你比自己想象的更强！"
+    </div>
+  </div>
+
+  <div class="pr-actions" style="width: 100%; max-width: 300px;">
+    <button class="btn btn-primary btn-block btn-lg" onclick="location.href='home.html'">
+      返回首页
+    </button>
+    <button class="btn btn-secondary btn-block mt-md" onclick="location.href='profile.html'">
+      查看数据看板
+    </button>
+    <button class="btn btn-ghost btn-block mt-sm" style="color: var(--color-primary-light);">
+      📸 分享PR海报
+    </button>
+  </div>
+</div>
+</div>
+
+<script>
+  // 生成彩纸
+  const confetti = document.getElementById('confetti');
+  const colors = ['#7C5CFC', '#00E5A0', '#FFB84D', '#FF5C5C', '#5CC5FF', '#FF6B9D'];
+  for (let i = 0; i < 40; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.left = Math.random() * 100 + '%';
+    piece.style.top = -(Math.random() * 50) + 'px';
+    piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+    piece.style.animationDelay = Math.random() * 2 + 's';
+    piece.style.animationDuration = (2 + Math.random() * 3) + 's';
+    piece.style.width = (6 + Math.random() * 8) + 'px';
+    piece.style.height = (6 + Math.random() * 8) + 'px';
+    piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    confetti.appendChild(piece);
+  }
+</script>
+</body>
+</html>
