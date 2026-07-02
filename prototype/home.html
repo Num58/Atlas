@@ -482,11 +482,11 @@
     header.classList.toggle('expanded');
   }
 
-  // 模块切换：点击卡片 → 跳转模块Tab
+  // 模块切换：点击卡片 → 跳转对应模块Tab
   function switchToModule(type) {
-    // 存储目标模块类型
     sessionStorage.setItem('primeatlas_module', type);
-    window.location.href = 'module-training.html';
+    const pages = { training: 'module-training.html', english: 'module-english.html', reading: 'module-reading.html' };
+    window.location.href = pages[type] || 'module-training.html';
   }
 
   // 初始化日期
