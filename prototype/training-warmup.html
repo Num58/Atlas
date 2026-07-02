@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>热身激活 — PrimeAtlas</title>
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    .warmup-container { padding: var(--space-lg); padding-bottom: 120px; }
+    .warmup-header { text-align: center; margin-bottom: var(--space-xl); }
+    .warmup-phase-badge { 
+      display: inline-block; padding: 4px 16px; border-radius: var(--radius-full);
+      background: rgba(255,140,0,0.2); color: var(--color-primary); font-size: var(--text-sm); font-weight: 600;
+      margin-bottom: var(--space-sm);
+    }
+    .warmup-title { font-size: var(--text-xl); font-weight: 700; }
+    .warmup-subtitle { font-size: var(--text-base); color: var(--text-secondary); margin-top: 4px; }
+
+    .exercise-card {
+      background: var(--bg-card); border-radius: var(--radius-lg); padding: var(--space-lg);
+      margin-bottom: var(--space-md); border: 1px solid var(--bg-divider);
+      display: flex; align-items: center; gap: var(--space-md);
+    }
+    .exercise-card.current {
+      border-color: var(--color-primary); box-shadow: var(--shadow-glow-primary);
+      background: var(--bg-elevated);
+    }
+    .exercise-card.done { opacity: 0.5; border-color: var(--color-success); }
+    .ex-num {
+      width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: var(--text-sm); font-weight: 700; flex-shrink: 0;
+    }
+    .ex-num.current { background: var(--color-primary); color: white; }
+    .ex-num.done { background: var(--color-success); color: white; }
+    .ex-num.pending { background: var(--bg-secondary); color: var(--text-tertiary); }
+    .ex-info { flex: 1; }
+    .ex-name { font-size: var(--text-md); font-weight: 600; }
+    .ex-detail { font-size: var(--text-sm); color: var(--text-secondary); margin-top: 2px; }
+    .ex-duration { font-size: var(--text-sm); color: var(--color-gold); font-weight: 600; }
+
+    .current-exercise {
+      background: var(--bg-elevated); border: 2px solid var(--color-primary); border-radius: var(--radius-xl);
+      padding: var(--space-xl); margin: var(--space-lg) 0; text-align: center;
+      box-shadow: var(--shadow-glow-primary);
+    }
+    .ce-name { font-size: var(--text-2xl); font-weight: 700; margin-bottom: var(--space-sm); }
+    .ce-timer { font-size: 56px; font-weight: 700; font-family: var(--font-data); color: var(--color-primary); margin: var(--space-md) 0; }
+    .ce-cues { font-size: var(--text-base); color: var(--text-secondary); line-height: 1.8; }
+
+    .partner-guide {
+      background: rgba(255,140,0,0.08); border-radius: var(--radius-lg); padding: var(--space-md);
+      margin: var(--space-md) 0; display: flex; align-items: center; gap: var(--space-md);
+    }
+    .partner-avatar { font-size: 32px; flex-shrink: 0; }
+    .partner-text { font-size: var(--text-base); color: var(--text-secondary); font-style: italic; line-height: 1.6; }
+
+    .progress-bar { height: 4px; background: var(--bg-divider); border-radius: 2px; margin: var(--space-md) 0; }
+    .progress-fill { height: 100%; background: var(--color-primary); border-radius: 2px; transition: width 0.3s; }
+
+    .bottom-actions {
+      position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+      width: 100%; max-width: 414px; padding: var(--space-lg); padding-bottom: calc(var(--space-lg) + var(--safe-bottom));
+      background: linear-gradient(transparent, var(--bg-primary) 30%);
+      display: flex; gap: var(--space-md);
+    }
+    .btn-skip { flex: 1; }
+    .btn-next { flex: 2; }
+  </style>
+</head>
+<body>
+<div class="app-container">
+  <div class="warmup-container">
+    <div class="warmup-header">
+      <div class="warmup-phase-badge">🔥 热身阶段</div>
+      <div class="warmup-title">篮球弹跳 · 下肢激活</div>
+      <div class="warmup-subtitle">通用热身 + 专项神经激活 · 预计 8 分钟</div>
+    </div>
+
+    <div class="progress-bar"><div class="progress-fill" style="width:38%"></div></div>
+
+    <!-- Partner Guide -->
+    <div class="partner-guide">
+      <div class="partner-avatar">🔥</div>
+      <div class="partner-text">"慢慢来，不着急。让关节润滑起来。弹跳需要爆发力，但爆发力来自充分的热身。跟着我做。"<br><span style="color:var(--text-tertiary);font-size:12px;">— Alex</span></div>
+    </div>
+
+    <!-- Current Exercise -->
+    <div class="current-exercise">
+      <div style="font-size:12px;color:var(--text-tertiary);margin-bottom:4px;">当前动作 · 2/5</div>
+      <div class="ce-name">🦵 弓步转体</div>
+      <div class="ce-timer" id="timer">0:45</div>
+      <div class="ce-cues">
+        要点：弓步时后膝接近地面，上半身向弓步侧旋转。<br>
+        呼吸：弓步时吸气，转体时呼气。
+      </div>
+    </div>
+
+    <!-- Exercise List -->
+    <div class="exercise-card done">
+      <div class="ex-num done">✓</div>
+      <div class="ex-info"><div class="ex-name">🏃 开合跳</div><div class="ex-detail">轻度有氧 · 全身激活</div></div>
+      <div class="ex-duration">2:00</div>
+    </div>
+
+    <div class="exercise-card current">
+      <div class="ex-num current">2</div>
+      <div class="ex-info"><div class="ex-name">🦵 弓步转体</div><div class="ex-detail">动态拉伸 · 髋关节+胸椎</div></div>
+      <div class="ex-duration">1:00</div>
+    </div>
+
+    <div class="exercise-card">
+      <div class="ex-num pending">3</div>
+      <div class="ex-info"><div class="ex-name">🦶 踝关节弹跳预演</div><div class="ex-detail">专项激活 · 踝关节刚性</div></div>
+      <div class="ex-duration">1:30</div>
+    </div>
+    <div class="exercise-card">
+      <div class="ex-num pending">4</div>
+      <div class="ex-info"><div class="ex-name">🏀 Plyo 低强度预演</div><div class="ex-detail">专项激活 · 神经募集</div></div>
+      <div class="ex-duration">2:00</div>
+    </div>
+    <div class="exercise-card">
+      <div class="ex-num pending">5</div>
+      <div class="ex-info"><div class="ex-name">💪 核心激活</div><div class="ex-detail">稳定性 · 死虫式+鸟狗式</div></div>
+      <div class="ex-duration">1:30</div>
+    </div>
+  </div>
+
+  <div class="bottom-actions">
+    <button class="btn btn-secondary btn-skip">跳过热身</button>
+    <button class="btn btn-primary btn-next" onclick="nextExercise()">下一个动作 →</button>
+  </div>
+
+  <div class="tab-bar">
+    <a href="partner-home.html" class="tab-item"><span class="tab-icon">🏠</span>首页</a>
+    <a href="training-home.html" class="tab-item"><span class="tab-icon">🏋️</span>训练</a>
+    <a href="english-dialogue.html" class="tab-item"><span class="tab-icon">🗣️</span>英语</a>
+    <a href="dashboard.html" class="tab-item"><span class="tab-icon">📊</span>数据</a>
+  </div>
+</div>
+
+<script>
+let seconds = 45;
+const timerEl = document.getElementById('timer');
+setInterval(() => {
+  if (seconds > 0) {
+    seconds--;
+    const m = Math.floor(seconds/60), s = seconds%60;
+    timerEl.textContent = m + ':' + String(s).padStart(2,'0');
+    if (seconds <= 10) timerEl.style.color = 'var(--color-energy)';
+  }
+}, 1000);
+
+function nextExercise() {
+  const cards = document.querySelectorAll('.exercise-card');
+  for (let i = 0; i < cards.length; i++) {
+    if (cards[i].classList.contains('current')) {
+      cards[i].classList.remove('current'); cards[i].classList.add('done');
+      cards[i].querySelector('.ex-num').className = 'ex-num done'; cards[i].querySelector('.ex-num').textContent = '✓';
+      if (cards[i+1]) {
+        cards[i+1].classList.add('current');
+        cards[i+1].querySelector('.ex-num').className = 'ex-num current';
+        const dur = cards[i+1].querySelector('.ex-duration').textContent;
+        const parts = dur.split(':'); seconds = parseInt(parts[0])*60 + parseInt(parts[1]);
+        timerEl.style.color = 'var(--color-primary)';
+        document.querySelector('.progress-fill').style.width = ((i+2)/5*100)+'%';
+      }
+      break;
+    }
+  }
+}
+</script>
+</body>
+</html>
