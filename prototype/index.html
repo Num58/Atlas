@@ -1,222 +1,32 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>PrimeAtlas 原型导航</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
-      background: #0a0a0f;
-      color: #f0f0f5;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .container {
-      width: 100%;
-      max-width: 600px;
-      padding: 40px 24px;
-    }
-    h1 {
-      font-size: 28px;
-      font-weight: 700;
-      margin-bottom: 8px;
-      background: linear-gradient(135deg, #ff6b35, #a78bfa);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .subtitle {
-      font-size: 14px;
-      color: #6a6a82;
-      margin-bottom: 32px;
-    }
-    .section {
-      margin-bottom: 28px;
-    }
-    .section-title {
-      font-size: 12px;
-      font-weight: 600;
-      color: #a0a0b8;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 12px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
-    }
-    .page-list {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .page-link {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 16px;
-      background: #1a1a26;
-      border-radius: 10px;
-      text-decoration: none;
-      color: #f0f0f5;
-      font-size: 14px;
-      font-weight: 500;
-      transition: all 0.15s ease;
-      border: 1px solid rgba(255,255,255,0.06);
-    }
-    .page-link:hover {
-      background: #22223a;
-      border-color: rgba(255,255,255,0.15);
-      transform: translateX(4px);
-    }
-    .page-link .icon {
-      font-size: 20px;
-      width: 32px;
-      text-align: center;
-    }
-    .page-link .desc {
-      font-size: 12px;
-      color: #6a6a82;
-      font-weight: 400;
-    }
-    .page-link .tag {
-      margin-left: auto;
-      padding: 2px 8px;
-      border-radius: 9999px;
-      font-size: 11px;
-      font-weight: 600;
-    }
-    .tag-core { background: rgba(255,107,53,0.15); color: #ff6b35; }
-    .tag-primary { background: rgba(74,222,128,0.15); color: #4ade80; }
-    .tag-secondary { background: rgba(96,165,250,0.15); color: #60a5fa; }
-    .tag-system { background: rgba(167,139,250,0.15); color: #a78bfa; }
-    .footer {
-      margin-top: 40px;
-      text-align: center;
-      font-size: 12px;
-      color: #6a6a82;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h1>PrimeAtlas</h1>
-    <p class="subtitle">AI 训练伙伴 · 原型 v2.0 · 移动端 375-414px</p>
-
-    <div class="section">
-      <div class="section-title">🔰 入口</div>
-      <ul class="page-list">
-        <li>
-          <a class="page-link" href="onboarding.html">
-            <span class="icon">🚀</span>
-            <span>首次启动引导<span class="desc">伙伴召唤·身体数据·目标设定</span></span>
-            <span class="tag tag-core">核心</span>
-          </a>
-        </li>
-        <li>
-          <a class="page-link" href="home.html">
-            <span class="icon">🏠</span>
-            <span>首页<span class="desc">伙伴问候·今日计划·快捷入口</span></span>
-            <span class="tag tag-core">核心</span>
-          </a>
-        </li>
-      </ul>
-    </div>
-
-    <div class="section">
-      <div class="section-title">🏋️ 训练闭环</div>
-      <ul class="page-list">
-        <li>
-          <a class="page-link" href="training-session.html">
-            <span class="icon">⚡</span>
-            <span>训练会话<span class="desc">热身→执行→休息→冷却·自动推进·语音控制</span></span>
-            <span class="tag tag-core">核心</span>
-          </a>
-        </li>
-        <li>
-          <a class="page-link" href="pr-celebration.html">
-            <span class="icon">🎉</span>
-            <span>PR 庆祝<span class="desc">个人记录突破·全屏庆祝</span></span>
-            <span class="tag tag-primary">重要</span>
-          </a>
-        </li>
-        <li>
-          <a class="page-link" href="training-history.html">
-            <span class="icon">📋</span>
-            <span>训练历史<span class="desc">历史记录列表</span></span>
-            <span class="tag tag-primary">重要</span>
-          </a>
-        </li>
-        <li>
-          <a class="page-link" href="rest-day.html">
-            <span class="icon">🌙</span>
-            <span>休息日模式<span class="desc">恢复状态·轻度活动建议</span></span>
-            <span class="tag tag-secondary">次要</span>
-          </a>
-        </li>
-      </ul>
-    </div>
-
-    <div class="section">
-      <div class="section-title">📚 快捷入口</div>
-      <ul class="page-list">
-        <li>
-          <a class="page-link" href="english-practice.html">
-            <span class="icon">🗣️</span>
-            <span>英语练习<span class="desc">语音对话·场景练习</span></span>
-            <span class="tag tag-primary">重要</span>
-          </a>
-        </li>
-        <li>
-          <a class="page-link" href="reading.html">
-            <span class="icon">📖</span>
-            <span>读书<span class="desc">阅读器·Agent 对话</span></span>
-            <span class="tag tag-primary">重要</span>
-          </a>
-        </li>
-      </ul>
-    </div>
-
-    <div class="section">
-      <div class="section-title">👤 我的</div>
-      <ul class="page-list">
-        <li>
-          <a class="page-link" href="dashboard.html">
-            <span class="icon">📊</span>
-            <span>数据仪表盘<span class="desc">训练数据·趋势图表</span></span>
-            <span class="tag tag-primary">重要</span>
-          </a>
-        </li>
-        <li>
-          <a class="page-link" href="profile.html">
-            <span class="icon">⚙️</span>
-            <span>我的·设置<span class="desc">身体档案·伙伴管理·偏好</span></span>
-            <span class="tag tag-primary">重要</span>
-          </a>
-        </li>
-      </ul>
-    </div>
-
-    <div class="section">
-      <div class="section-title">🛠️ 系统</div>
-      <ul class="page-list">
-        <li>
-          <a class="page-link" href="design-system.html">
-            <span class="icon">🎨</span>
-            <span>设计系统<span class="desc">组件库·Token·样式指南</span></span>
-            <span class="tag tag-system">系统</span>
-          </a>
-        </li>
-      </ul>
-    </div>
-
-    <div class="footer">
-      <p>PrimeAtlas Design v2.0 · 移动端优先 · 暗色主题</p>
-      <p style="margin-top:4px">核心原则：训练中语音优先 · 组间休息触控录入 · 免提训练模式</p>
-    </div>
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>原型导航 — PrimeAtlas</title><link rel="stylesheet" href="shared.css"><style>
+  .idx{padding:var(--space-xl);padding-bottom:80px}
+  h2{font-size:var(--text-lg);margin:var(--space-xl) 0 var(--space-md);padding-bottom:var(--space-sm);border-bottom:1px solid var(--bg-divider)}
+  .links{display:flex;flex-direction:column;gap:var(--space-sm)}
+  .link{display:flex;align-items:center;justify-content:space-between;padding:14px var(--space-md);background:var(--bg-card);border-radius:var(--radius-md);text-decoration:none;color:var(--text-primary);border:1px solid var(--bg-divider)}
+  .link:active{background:var(--bg-elevated)}
+  .link-name{font-weight:600}
+  .link-desc{font-size:var(--text-xs);color:var(--text-tertiary)}
+  .link-badge{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600}
+  .b-core{background:rgba(255,92,0,.15);color:var(--color-primary)}
+  .b-sub{background:rgba(74,144,255,.15);color:var(--color-info)}
+  .b-special{background:rgba(244,162,97,.15);color:var(--color-gold)}
+</style></head><body><div class="app"><div class="idx">
+  <div style="text-align:center;padding:var(--space-xl) 0"><div style="font-size:48px;margin-bottom:var(--space-md)">🏋️</div><div style="font-size:var(--text-2xl);font-weight:700">PrimeAtlas</div><div style="color:var(--text-secondary);margin-top:4px">HTML 交互原型 v3.0</div></div>
+  <h2>🔴 核心流程</h2><div class="links">
+    <a href="onboarding.html" class="link"><span><div class="link-name">首次启动</div><div class="link-desc">伙伴召唤 → 目标选择 → 成契</div></span><span class="link-badge b-core">入口</span></a>
+    <a href="home.html" class="link"><span><div class="link-name">首页</div><div class="link-desc">伙伴问候 + 今日计划 + 快捷入口</div></span><span class="link-badge b-core">主页面</span></a>
+    <a href="training-session.html" class="link"><span><div class="link-name">训练会话</div><div class="link-desc">热身→训练→休息→冷却→完成</div></span><span class="link-badge b-core">核心页面</span></a>
   </div>
-</body>
-</html>
+  <h2>🟡 功能页面</h2><div class="links">
+    <a href="english-practice.html" class="link"><span><div class="link-name">英语练习</div><div class="link-desc">AI对话 · 话题：健身训练</div></span><span class="link-badge b-sub">功能</span></a>
+    <a href="reading.html" class="link"><span><div class="link-name">读书</div><div class="link-desc">阅读器 + 伙伴笔记</div></span><span class="link-badge b-sub">功能</span></a>
+    <a href="training-history.html" class="link"><span><div class="link-name">训练历史</div><div class="link-desc">历史记录列表</div></span><span class="link-badge b-sub">功能</span></a>
+    <a href="dashboard.html" class="link"><span><div class="link-name">数据仪表盘</div><div class="link-desc">成长指数 + PR记录</div></span><span class="link-badge b-sub">功能</span></a>
+    <a href="profile.html" class="link"><span><div class="link-name">我的</div><div class="link-desc">设置 + 身体档案 + 伙伴管理</div></span><span class="link-badge b-sub">功能</span></a>
+  </div>
+  <h2>🟠 特殊页面</h2><div class="links">
+    <a href="pr-celebration.html" class="link"><span><div class="link-name">PR 庆祝</div><div class="link-desc">全屏粒子动画</div></span><span class="link-badge b-special">动效</span></a>
+    <a href="rest-day.html" class="link"><span><div class="link-name">休息日</div><div class="link-desc">伙伴关心 + 恢复推荐</div></span><span class="link-badge b-special">场景</span></a>
+  </div>
+  <div style="text-align:center;padding:var(--space-xl);color:var(--text-tertiary);font-size:var(--text-sm)">暗色模式 · 375-414px · 触控≥44pt · 不外放语音</div>
+</div></div></body></html>
