@@ -3,308 +3,367 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>PrimeAtlas — 设计系统</title>
+  <title>PrimeAtlas · 设计系统</title>
+  <link rel="stylesheet" href="shared.css">
   <style>
-    
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', Roboto, sans-serif;
-      background: var(--bg-primary);
-      color: var(--text-primary);
-      line-height: 1.5;
-      -webkit-font-smoothing: antialiased;
+    .ds-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: var(--space-6);
     }
-    .container { max-width: 414px; margin: 0 auto; padding: var(--space-lg); min-height: 100vh; }
-    .page-title { font-size: var(--fs-h1); font-weight: 700; margin-bottom: var(--space-xs); }
-    .page-subtitle { font-size: var(--fs-body-m); color: var(--text-secondary); margin-bottom: var(--space-xl); }
 
-    /* Section */
-    .section { margin-bottom: var(--space-xl); }
-    .section-title { font-size: var(--fs-h3); font-weight: 600; margin-bottom: var(--space-md); padding-bottom: var(--space-sm); border-bottom: 1px solid var(--bg-divider); }
+    .ds-header {
+      margin-bottom: var(--space-8);
+    }
+
+    .ds-header h1 {
+      font-size: 36px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #ff6b35, #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .ds-header p {
+      color: var(--color-text-secondary);
+      margin-top: var(--space-2);
+    }
+
+    .ds-section {
+      margin-bottom: var(--space-8);
+    }
+
+    .ds-section-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: var(--space-4);
+      padding-bottom: var(--space-2);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
 
     /* Color Swatches */
-    .color-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-sm); }
-    .color-item { border-radius: var(--radius-md); padding: var(--space-md); min-height: 80px; display: flex; flex-direction: column; justify-content: flex-end; }
-    .color-name { font-size: var(--fs-caption); font-weight: 600; opacity: 0.9; }
-    .color-value { font-size: var(--fs-caption); font-family: 'SF Mono', 'Roboto Mono', monospace; opacity: 0.7; }
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: var(--space-3);
+    }
+
+    .color-swatch {
+      height: 80px;
+      border-radius: var(--radius-md);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .color-swatch .swatch-name {
+      margin-top: 4px;
+      opacity: 0.7;
+    }
+
+    .color-swatch .swatch-hex {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      opacity: 0.5;
+    }
 
     /* Typography */
-    .type-sample { padding: var(--space-sm) 0; border-bottom: 1px solid var(--bg-divider); display: flex; justify-content: space-between; align-items: baseline; }
-    .type-label { font-size: var(--fs-caption); color: var(--text-tertiary); white-space: nowrap; min-width: 80px; }
+    .type-specimen {
+      margin-bottom: var(--space-4);
+      padding: var(--space-4);
+      background: var(--color-bg-card);
+      border-radius: var(--radius-md);
+    }
 
-    /* Buttons */
-    .btn { display: inline-flex; align-items: center; justify-content: center; border: none; border-radius: var(--radius-md); font-size: var(--fs-body-m); font-weight: 600; padding: 12px 24px; cursor: pointer; transition: transform 0.1s var(--spring), opacity 0.15s var(--ease-out); }
-    .btn:active { transform: scale(0.95); }
-    .btn-primary { background: var(--color-primary); color: #fff; }
-    .btn-secondary { background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--bg-divider); }
-    .btn-ghost { background: transparent; color: var(--text-secondary); }
-    .btn-danger { background: var(--color-danger); color: #fff; }
-    .btn-success { background: var(--color-success); color: #fff; }
-    .btn-block { width: 100%; }
-    .btn-lg { padding: 16px 32px; font-size: var(--fs-body-l); border-radius: var(--radius-lg); }
-    .btn-group { display: flex; gap: var(--space-sm); flex-wrap: wrap; }
+    .type-label {
+      font-size: 11px;
+      color: var(--color-text-tertiary);
+      margin-bottom: var(--space-1);
+      font-family: var(--font-mono);
+    }
 
-    /* Inputs */
-    .input-group { margin-bottom: var(--space-md); }
-    .input-label { display: block; font-size: var(--fs-body-s); color: var(--text-secondary); margin-bottom: var(--space-xs); }
-    .input { width: 100%; padding: 12px 16px; background: var(--bg-card); border: 1px solid var(--bg-divider); border-radius: var(--radius-md); color: var(--text-primary); font-size: var(--fs-body-m); outline: none; transition: border-color 0.2s var(--ease-out); }
-    .input:focus { border-color: var(--color-primary); }
-    .input::placeholder { color: var(--text-disabled); }
+    /* Component Preview */
+    .component-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-3);
+      align-items: center;
+      margin-bottom: var(--space-4);
+    }
 
-    /* Cards */
-    .card { background: var(--bg-card); border-radius: var(--radius-lg); padding: var(--space-lg); margin-bottom: var(--space-md); }
-    .card-title { font-size: var(--fs-h3); font-weight: 600; margin-bottom: var(--space-sm); }
-    .card-body { font-size: var(--fs-body-m); color: var(--text-secondary); }
+    /* Spacing Scale */
+    .spacing-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      margin-bottom: var(--space-2);
+    }
 
-    /* Tab Bar */
-    .tab-bar { display: flex; background: var(--bg-card); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-lg); }
-    .tab-item { flex: 1; text-align: center; padding: 12px 8px; font-size: var(--fs-caption); color: var(--text-tertiary); cursor: pointer; transition: color 0.2s var(--ease-out); position: relative; }
-    .tab-item.active { color: var(--color-primary); }
-    .tab-item.active::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 20px; height: 3px; background: var(--color-primary); border-radius: 2px; }
-    .tab-icon { display: block; font-size: 20px; margin-bottom: 2px; }
+    .spacing-visual {
+      background: var(--color-accent-primary);
+      border-radius: 2px;
+    }
 
-    /* Progress */
-    .progress { width: 100%; height: 6px; background: var(--bg-divider); border-radius: 3px; overflow: hidden; }
-    .progress-fill { height: 100%; background: var(--color-primary); border-radius: 3px; transition: width 0.3s var(--ease-out); }
-    .progress-fill.gold { background: var(--color-gold); }
-    .progress-fill.success { background: var(--color-success); }
-
-    /* Slider */
-    .slider { width: 100%; -webkit-appearance: none; height: 6px; background: var(--bg-divider); border-radius: 3px; outline: none; }
-    .slider::-webkit-slider-thumb { -webkit-appearance: none; width: 24px; height: 24px; background: var(--color-primary); border-radius: 50%; cursor: pointer; }
-
-    /* Tags */
-    .tag { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: var(--fs-caption); font-weight: 500; }
-    .tag-primary { background: rgba(255, 92, 0, 0.15); color: var(--color-primary); }
-    .tag-success { background: rgba(0, 210, 160, 0.15); color: var(--color-success); }
-    .tag-danger { background: rgba(255, 59, 59, 0.15); color: var(--color-danger); }
-    .tag-gold { background: rgba(255, 215, 0, 0.15); color: var(--color-gold); }
-
-    /* Animations */
-    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-    @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
-    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes scaleIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
-    @keyframes countdownPulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.3); opacity: 0.5; } }
-    @keyframes flameFlicker { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.3); } }
-    @keyframes particleFloat { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-100px) scale(0); } }
-    @keyframes glowPulse { 0%, 100% { box-shadow: 0 0 20px rgba(255, 92, 0, 0.3); } 50% { box-shadow: 0 0 40px rgba(255, 92, 0, 0.6); } }
-
-    .animate-pulse { animation: pulse 1.5s ease-in-out infinite; }
-    .animate-slideUp { animation: slideUp 0.4s var(--ease-out); }
-    .animate-scaleIn { animation: scaleIn 0.3s var(--spring); }
-    .animate-glow { animation: glowPulse 2s ease-in-out infinite; }
-
-    .skeleton { background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-divider) 50%, var(--bg-card) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: var(--radius-sm); }
-
-    /* Divider */
-    .divider { height: 1px; background: var(--bg-divider); margin: var(--space-lg) 0; }
-
-    /* Nav back */
-    .nav-back { display: inline-flex; align-items: center; gap: var(--space-xs); color: var(--text-secondary); text-decoration: none; font-size: var(--fs-body-m); margin-bottom: var(--space-lg); transition: color 0.2s; }
-    .nav-back:hover { color: var(--text-primary); }
-    .nav-back::before { content: '←'; font-size: var(--fs-h3); }
-
-    /* Demo sections */
-    .demo-card { background: var(--bg-card); border-radius: var(--radius-lg); padding: var(--space-md); margin-bottom: var(--space-sm); display: flex; align-items: center; gap: var(--space-md); }
-    .demo-avatar { width: 48px; height: 48px; border-radius: 50%; flex-shrink: 0; }
-    .demo-info { flex: 1; }
-    .demo-name { font-size: var(--fs-body-m); font-weight: 600; }
-    .demo-desc { font-size: var(--fs-body-s); color: var(--text-secondary); }
+    .spacing-label {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--color-text-secondary);
+      min-width: 80px;
+    }
   </style>
-  <link rel="stylesheet" href="shared.css">
 </head>
 <body>
-<div class="container">
-
-  <a href="index.html" class="nav-back">返回导航</a>
-
-  <h1 class="page-title">设计系统</h1>
-  <p class="page-subtitle">PrimeAtlas Design System — 暗色主题</p>
-
-  <!-- Colors -->
-  <div class="section">
-    <div class="section-title">色彩系统</div>
-
-    <h4 style="font-size:13px;color:var(--text-tertiary);margin-bottom:8px;">主色调</h4>
-    <div class="color-grid">
-      <div class="color-item" style="background:var(--color-primary);">
-        <span class="color-name">烈焰橙</span>
-        <span class="color-value">#FF5C00</span>
-      </div>
-      <div class="color-item" style="background:var(--color-danger);">
-        <span class="color-name">能量红</span>
-        <span class="color-value">#FF3B3B</span>
-      </div>
-      <div class="color-item" style="background:var(--color-gold);">
-        <span class="color-name">琥珀金</span>
-        <span class="color-value">#FFD700</span>
-      </div>
-    </div>
-    <div class="color-grid" style="margin-top:8px;">
-      <div class="color-item" style="background:var(--color-success);">
-        <span class="color-name">翡翠绿</span>
-        <span class="color-value">#00D2A0</span>
-      </div>
-      <div class="color-item" style="background:var(--color-info);">
-        <span class="color-name">电光蓝</span>
-        <span class="color-value">#4A90FF</span>
-      </div>
+  <div class="ds-container">
+    <div class="ds-header">
+      <h1>PrimeAtlas Design System</h1>
+      <p>移动端优先 · 暗色主题 · 375-414px · 大触控按钮 ≥ 44pt</p>
     </div>
 
-    <h4 style="font-size:13px;color:var(--text-tertiary);margin:16px 0 8px;">伙伴专属色</h4>
-    <div class="color-grid">
-      <div class="color-item" style="background:var(--color-alex);"><span class="color-name">Alex·赤焰</span><span class="color-value">#FF4500</span></div>
-      <div class="color-item" style="background:var(--color-xiaoye);"><span class="color-name">小野·疾风</span><span class="color-value">#00CED1</span></div>
-      <div class="color-item" style="background:var(--color-elena);"><span class="color-name">Elena·晨曦</span><span class="color-value">#E898A8</span></div>
-    </div>
-    <div class="color-grid" style="margin-top:8px;">
-      <div class="color-item" style="background:var(--color-k);"><span class="color-name">K·零</span><span class="color-value">#7B68EE</span></div>
-      <div class="color-item" style="background:var(--color-rin);"><span class="color-name">凛·静流</span><span class="color-value">#2E8B57</span></div>
-    </div>
-
-    <h4 style="font-size:13px;color:var(--text-tertiary);margin:16px 0 8px;">中性色</h4>
-    <div class="color-grid">
-      <div class="color-item" style="background:var(--text-primary);color:#1A1A2E;"><span class="color-name" style="color:#1A1A2E;">文字一级</span><span class="color-value" style="color:#1A1A2E;">#FFFFFF</span></div>
-      <div class="color-item" style="background:var(--text-secondary);"><span class="color-name">文字二级</span><span class="color-value">#B0B0CC</span></div>
-      <div class="color-item" style="background:var(--text-tertiary);"><span class="color-name">文字三级</span><span class="color-value">#6B6B8A</span></div>
-    </div>
-    <div class="color-grid" style="margin-top:8px;">
-      <div class="color-item" style="background:var(--bg-card);"><span class="color-name">卡片背景</span><span class="color-value">#222240</span></div>
-      <div class="color-item" style="background:var(--bg-divider);"><span class="color-name">分割线</span><span class="color-value">#2A2A4A</span></div>
-      <div class="color-item" style="background:var(--bg-primary);border:1px solid var(--bg-divider);"><span class="color-name">页面背景</span><span class="color-value">#1A1A2E</span></div>
-    </div>
-  </div>
-
-  <div class="divider"></div>
-
-  <!-- Typography -->
-  <div class="section">
-    <div class="section-title">字体层级</div>
-    <div class="type-sample"><span class="type-label">Display 48</span><span style="font-size:var(--fs-display);font-weight:700;line-height:1.1;">PR 120</span></div>
-    <div class="type-sample"><span class="type-label">H1 32</span><span style="font-size:var(--fs-h1);font-weight:700;line-height:1.2;">页面主标题</span></div>
-    <div class="type-sample"><span class="type-label">H2 24</span><span style="font-size:var(--fs-h2);font-weight:600;line-height:1.3;">卡片标题</span></div>
-    <div class="type-sample"><span class="type-label">H3 20</span><span style="font-size:var(--fs-h3);font-weight:600;line-height:1.3;">分组标题</span></div>
-    <div class="type-sample"><span class="type-label">Body L 17</span><span style="font-size:var(--fs-body-l);line-height:1.5;">这是正文内容，用于主要阅读文本</span></div>
-    <div class="type-sample"><span class="type-label">Body M 15</span><span style="font-size:var(--fs-body-m);line-height:1.5;">次要正文内容</span></div>
-    <div class="type-sample"><span class="type-label">Body S 13</span><span style="font-size:var(--fs-body-s);line-height:1.4;color:var(--text-secondary);">辅助信息 / 标签文字</span></div>
-    <div class="type-sample"><span class="type-label">Caption 11</span><span style="font-size:var(--fs-caption);font-weight:500;line-height:1.3;color:var(--text-tertiary);">TIMESTAMP · TAG</span></div>
-  </div>
-
-  <div class="divider"></div>
-
-  <!-- Buttons -->
-  <div class="section">
-    <div class="section-title">按钮</div>
-    <div class="btn-group">
-      <button class="btn btn-primary">主按钮</button>
-      <button class="btn btn-secondary">次要按钮</button>
-      <button class="btn btn-ghost">幽灵按钮</button>
-      <button class="btn btn-danger">危险按钮</button>
-      <button class="btn btn-success">成功按钮</button>
-    </div>
-    <div style="margin-top:12px;">
-      <button class="btn btn-primary btn-lg btn-block">大型主按钮（全宽）</button>
-    </div>
-  </div>
-
-  <div class="divider"></div>
-
-  <!-- Inputs -->
-  <div class="section">
-    <div class="section-title">输入框</div>
-    <div class="input-group">
-      <label class="input-label">训练重量 (kg)</label>
-      <input class="input" type="number" placeholder="输入重量..." value="85">
-    </div>
-    <div class="input-group">
-      <label class="input-label">RPE (1-10)</label>
-      <input type="range" class="slider" min="1" max="10" value="7">
-      <div style="display:flex;justify-content:space-between;font-size:var(--fs-caption);color:var(--text-tertiary);margin-top:4px;">
-        <span>1 轻松</span><span>5 中等</span><span>10 极限</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="divider"></div>
-
-  <!-- Cards -->
-  <div class="section">
-    <div class="section-title">卡片</div>
-    <div class="card">
-      <div class="card-title">训练状态卡片</div>
-      <div class="card-body">今日已完成 3/5 组深蹲训练，RPE平均 7.5</div>
-      <div style="margin-top:12px;">
-        <div class="progress"><div class="progress-fill" style="width:60%"></div></div>
-        <div style="font-size:var(--fs-caption);color:var(--text-tertiary);margin-top:4px;">60% 完成</div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">伙伴卡片</div>
-      <div class="demo-card" style="background:transparent;padding:0;">
-        <div class="demo-avatar" style="background:linear-gradient(135deg,var(--color-alex),var(--color-primary));display:flex;align-items:center;justify-content:center;font-size:24px;">🔥</div>
-        <div class="demo-info">
-          <div class="demo-name">Alex · 赤焰</div>
-          <div class="demo-desc">"今天状态不错，深蹲加5kg试试"</div>
+    <!-- Colors -->
+    <div class="ds-section">
+      <div class="ds-section-title">🎨 颜色系统</div>
+      
+      <h4 style="margin-bottom:8px;font-size:14px;color:var(--color-text-secondary);">主色调</h4>
+      <div class="color-grid">
+        <div class="color-swatch" style="background:var(--color-accent-primary);color:#fff;">
+          Primary
+          <span class="swatch-hex">#FF6B35</span>
         </div>
-        <span class="tag tag-primary">Lv.3</span>
+        <div class="color-swatch" style="background:var(--color-accent-secondary);color:#fff;">
+          Secondary
+          <span class="swatch-hex">#FF8C5A</span>
+        </div>
+        <div class="color-swatch" style="background:var(--color-accent-tertiary);color:#fff;">
+          Tertiary
+          <span class="swatch-hex">#E55A2B</span>
+        </div>
+      </div>
+
+      <h4 style="margin:16px 0 8px;font-size:14px;color:var(--color-text-secondary);">语义色</h4>
+      <div class="color-grid">
+        <div class="color-swatch" style="background:var(--color-success);color:#000;">
+          Success
+          <span class="swatch-hex">#4ADE80</span>
+        </div>
+        <div class="color-swatch" style="background:var(--color-warning);color:#000;">
+          Warning
+          <span class="swatch-hex">#FACC15</span>
+        </div>
+        <div class="color-swatch" style="background:var(--color-danger);color:#fff;">
+          Danger
+          <span class="swatch-hex">#EF4444</span>
+        </div>
+        <div class="color-swatch" style="background:var(--color-info);color:#fff;">
+          Info
+          <span class="swatch-hex">#60A5FA</span>
+        </div>
+        <div class="color-swatch" style="background:var(--color-partner-voice);color:#fff;">
+          Partner Voice
+          <span class="swatch-hex">#A78BFA</span>
+        </div>
+      </div>
+
+      <h4 style="margin:16px 0 8px;font-size:14px;color:var(--color-text-secondary);">背景色</h4>
+      <div class="color-grid">
+        <div class="color-swatch" style="background:var(--color-bg-primary);color:var(--color-text-primary);border:1px solid rgba(255,255,255,0.1);">
+          Primary BG
+          <span class="swatch-hex">#0A0A0F</span>
+        </div>
+        <div class="color-swatch" style="background:var(--color-bg-secondary);color:var(--color-text-primary);border:1px solid rgba(255,255,255,0.1);">
+          Secondary BG
+          <span class="swatch-hex">#12121A</span>
+        </div>
+        <div class="color-swatch" style="background:var(--color-bg-card);color:var(--color-text-primary);border:1px solid rgba(255,255,255,0.1);">
+          Card BG
+          <span class="swatch-hex">#1A1A26</span>
+        </div>
+        <div class="color-swatch" style="background:var(--color-bg-elevated);color:var(--color-text-primary);border:1px solid rgba(255,255,255,0.1);">
+          Elevated BG
+          <span class="swatch-hex">#22223A</span>
+        </div>
       </div>
     </div>
-  </div>
 
-  <div class="divider"></div>
+    <!-- Typography -->
+    <div class="ds-section">
+      <div class="ds-section-title">📝 字体系统</div>
+      
+      <div class="type-specimen">
+        <div class="type-label">font-size-hero / 56px / Bold</div>
+        <div class="text-hero">计时器 56px</div>
+      </div>
+      <div class="type-specimen">
+        <div class="type-label">font-size-3xl / 36px / Bold</div>
+        <div class="text-3xl">大标题 36px</div>
+      </div>
+      <div class="type-specimen">
+        <div class="type-label">font-size-2xl / 28px / Bold</div>
+        <div class="text-2xl">动作名 28px</div>
+      </div>
+      <div class="type-specimen">
+        <div class="type-label">font-size-xl / 24px / Semibold</div>
+        <div class="text-xl">卡片标题 24px</div>
+      </div>
+      <div class="type-specimen">
+        <div class="type-label">font-size-lg / 20px / Medium</div>
+        <div class="text-lg">段落标题 20px</div>
+      </div>
+      <div class="type-specimen">
+        <div class="type-label">font-size-md / 17px</div>
+        <div class="text-md">正文 17px</div>
+      </div>
+      <div class="type-specimen">
+        <div class="type-label">font-size-base / 15px</div>
+        <div style="font-size:15px;">次要正文 15px</div>
+      </div>
+      <div class="type-specimen">
+        <div class="type-label">font-size-sm / 13px</div>
+        <div class="text-sm">说明文字 13px</div>
+      </div>
+      <div class="type-specimen">
+        <div class="type-label">font-size-xs / 11px</div>
+        <div class="text-xs">辅助文字 11px</div>
+      </div>
+    </div>
 
-  <!-- Tags -->
-  <div class="section">
-    <div class="section-title">标签</div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;">
-      <span class="tag tag-primary">训练中</span>
-      <span class="tag tag-success">已完成</span>
-      <span class="tag tag-danger">PR突破</span>
-      <span class="tag tag-gold">里程碑</span>
+    <!-- Buttons -->
+    <div class="ds-section">
+      <div class="ds-section-title">🔘 按钮组件</div>
+      
+      <div class="component-row">
+        <button class="btn btn-primary">主按钮</button>
+        <button class="btn btn-secondary">次按钮</button>
+        <button class="btn btn-ghost">幽灵按钮</button>
+        <button class="btn btn-danger">危险按钮</button>
+      </div>
+      <div class="component-row">
+        <button class="btn btn-primary btn-large">大按钮</button>
+        <button class="btn btn-primary btn-huge">超大按钮</button>
+      </div>
+      <div class="component-row">
+        <button class="btn btn-primary btn-full">全宽按钮</button>
+      </div>
+      <div class="component-row">
+        <button class="btn btn-primary" disabled>禁用状态</button>
+      </div>
+    </div>
+
+    <!-- Cards -->
+    <div class="ds-section">
+      <div class="ds-section-title">🃏 卡片组件</div>
+      
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="card">
+          <div class="text-lg" style="margin-bottom:4px;">普通卡片</div>
+          <div class="text-sm text-secondary">默认样式卡片</div>
+        </div>
+        <div class="card card-elevated">
+          <div class="text-lg" style="margin-bottom:4px;">高亮卡片</div>
+          <div class="text-sm text-secondary">elevated 样式</div>
+        </div>
+        <div class="card card-glow">
+          <div class="text-lg" style="margin-bottom:4px;">发光卡片</div>
+          <div class="text-sm text-secondary">带 glow 效果</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Inputs -->
+    <div class="ds-section">
+      <div class="ds-section-title">📥 输入组件</div>
+      
+      <div style="display:flex;flex-direction:column;gap:12px;max-width:300px;">
+        <input type="text" class="input" placeholder="文本输入框">
+        <input type="number" class="input" placeholder="数字输入框" value="75">
+        <input type="email" class="input" placeholder="邮箱输入框">
+      </div>
+    </div>
+
+    <!-- Progress -->
+    <div class="ds-section">
+      <div class="ds-section-title">📊 进度条</div>
+      
+      <div style="display:flex;flex-direction:column;gap:12px;max-width:300px;">
+        <div class="progress-bar">
+          <div class="progress-bar-fill" style="width:25%"></div>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-bar-fill" style="width:60%"></div>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-bar-fill" style="width:100%"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Badges -->
+    <div class="ds-section">
+      <div class="ds-section-title">🏷️ 标签</div>
+      
+      <div class="component-row">
+        <span class="badge badge-accent">PR 突破</span>
+        <span class="badge badge-success">完成</span>
+        <span class="badge" style="background:rgba(96,165,250,0.15);color:#60a5fa;">进行中</span>
+        <span class="badge" style="background:rgba(239,68,68,0.15);color:#ef4444;">失败</span>
+      </div>
+    </div>
+
+    <!-- Spacing -->
+    <div class="ds-section">
+      <div class="ds-section-title">📏 间距系统</div>
+      
+      <div class="spacing-item"><span class="spacing-label">--space-1</span><div class="spacing-visual" style="width:4px;height:4px;"></div><span class="text-sm text-secondary">4px</span></div>
+      <div class="spacing-item"><span class="spacing-label">--space-2</span><div class="spacing-visual" style="width:8px;height:8px;"></div><span class="text-sm text-secondary">8px</span></div>
+      <div class="spacing-item"><span class="spacing-label">--space-3</span><div class="spacing-visual" style="width:12px;height:12px;"></div><span class="text-sm text-secondary">12px</span></div>
+      <div class="spacing-item"><span class="spacing-label">--space-4</span><div class="spacing-visual" style="width:16px;height:16px;"></div><span class="text-sm text-secondary">16px</span></div>
+      <div class="spacing-item"><span class="spacing-label">--space-5</span><div class="spacing-visual" style="width:20px;height:20px;"></div><span class="text-sm text-secondary">20px</span></div>
+      <div class="spacing-item"><span class="spacing-label">--space-6</span><div class="spacing-visual" style="width:24px;height:24px;"></div><span class="text-sm text-secondary">24px</span></div>
+      <div class="spacing-item"><span class="spacing-label">--space-8</span><div class="spacing-visual" style="width:32px;height:32px;"></div><span class="text-sm text-secondary">32px</span></div>
+    </div>
+
+    <!-- Voice Indicator -->
+    <div class="ds-section">
+      <div class="ds-section-title">🎤 语音指示器</div>
+      
+      <div class="component-row">
+        <div class="voice-indicator">
+          <div class="voice-dot"></div>
+          <span>伙伴正在说话...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="ds-section">
+      <div class="ds-section-title">🧭 底部导航</div>
+      
+      <div style="display:flex;gap:24px;padding:12px;background:var(--color-bg-secondary);border-radius:12px;justify-content:space-around;max-width:300px;">
+        <div class="tab-item active">
+          <span class="tab-icon">🏠</span>
+          <span>首页</span>
+        </div>
+        <div class="tab-item">
+          <span class="tab-icon">🏋️</span>
+          <span>训练</span>
+        </div>
+        <div class="tab-item">
+          <span class="tab-icon">👤</span>
+          <span>我的</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align:center;padding:40px 0;color:var(--color-text-tertiary);font-size:12px;">
+      <p>PrimeAtlas Design System v2.0</p>
+      <p style="margin-top:4px;">核心原则：训练中语音优先 · 组间休息触控录入 · 免提训练模式</p>
+      <p style="margin-top:12px;">
+        <a href="index.html" style="color:var(--color-accent-primary);">← 返回原型导航</a>
+      </p>
     </div>
   </div>
-
-  <div class="divider"></div>
-
-  <!-- Tab Bar -->
-  <div class="section">
-    <div class="section-title">底部导航</div>
-    <div class="tab-bar">
-      <div class="tab-item active"><span class="tab-icon">🏠</span>首页</div>
-      <div class="tab-item"><span class="tab-icon">🏋️</span>训练</div>
-      <div class="tab-item"><span class="tab-icon">🗣️</span>英语</div>
-      <div class="tab-item"><span class="tab-icon">👤</span>我的</div>
-    </div>
-  </div>
-
-  <div class="divider"></div>
-
-  <!-- Animations -->
-  <div class="section">
-    <div class="section-title">动效示例</div>
-    <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
-      <div style="width:60px;height:60px;background:var(--color-primary);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;animation:countdownPulse 0.5s ease-in-out infinite;">3</div>
-      <div class="skeleton" style="width:200px;height:40px;"></div>
-      <div class="btn btn-primary animate-glow">发光按钮</div>
-      <div style="width:40px;height:40px;background:var(--color-danger);border-radius:50%;animation:flameFlicker 0.3s ease-in-out infinite;"></div>
-    </div>
-  </div>
-
-  <div class="divider"></div>
-
-  <!-- Skeleton -->
-  <div class="section">
-    <div class="section-title">骨架屏</div>
-    <div style="display:flex;flex-direction:column;gap:8px;">
-      <div class="skeleton" style="width:60%;height:20px;"></div>
-      <div class="skeleton" style="width:100%;height:14px;"></div>
-      <div class="skeleton" style="width:80%;height:14px;"></div>
-      <div class="skeleton" style="width:100%;height:60px;"></div>
-    </div>
-  </div>
-
-</div>
 </body>
 </html>

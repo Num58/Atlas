@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>PrimeAtlas · 休息日</title>
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    .restday-container {
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      background: var(--color-bg-primary);
+    }
+
+    .restday-header {
+      padding: var(--space-5);
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    .restday-back {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-bg-card);
+      border: none;
+      border-radius: var(--radius-md);
+      color: var(--color-text-secondary);
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .restday-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: var(--space-6) var(--space-5);
+      text-align: center;
+    }
+
+    .restday-moon {
+      font-size: 64px;
+      animation: breathe 4s ease-in-out infinite;
+      margin-bottom: var(--space-4);
+    }
+
+    .restday-title {
+      font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-bold);
+      margin-bottom: var(--space-2);
+    }
+
+    .restday-subtitle {
+      font-size: var(--font-size-md);
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-6);
+    }
+
+    .restday-status-card {
+      width: 100%;
+      max-width: 340px;
+      padding: var(--space-5);
+      background: linear-gradient(135deg, rgba(96,165,250,0.08), rgba(96,165,250,0.02));
+      border: 1px solid rgba(96,165,250,0.12);
+      border-radius: var(--radius-xl);
+      margin-bottom: var(--space-6);
+    }
+
+    .restday-status-row {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: var(--space-4);
+    }
+
+    .restday-status-item {
+      text-align: center;
+    }
+
+    .restday-status-value {
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-bold);
+    }
+
+    .restday-status-label {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-tertiary);
+      margin-top: 2px;
+    }
+
+    .restday-bar {
+      width: 100%;
+      height: 6px;
+      background: var(--color-bg-elevated);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+    }
+
+    .restday-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--color-info), var(--color-success));
+      border-radius: var(--radius-full);
+      transition: width 1s ease-out;
+    }
+
+    .restday-actions {
+      width: 100%;
+      max-width: 340px;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .restday-action-card {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      padding: var(--space-4);
+      background: var(--color-bg-card);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(255,255,255,0.06);
+      cursor: pointer;
+      transition: background var(--duration-fast);
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .restday-action-card:active {
+      background: var(--color-bg-elevated);
+    }
+
+    .restday-action-icon {
+      font-size: 28px;
+      width: 44px;
+      text-align: center;
+    }
+
+    .restday-action-info {
+      flex: 1;
+    }
+
+    .restday-action-title {
+      font-weight: var(--font-weight-semibold);
+      font-size: var(--font-size-sm);
+    }
+
+    .restday-action-desc {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-tertiary);
+    }
+
+    .restday-action-arrow {
+      color: var(--color-text-tertiary);
+    }
+
+    .restday-partner {
+      width: 100%;
+      max-width: 340px;
+      padding: var(--space-4);
+      background: rgba(167,139,250,0.08);
+      border: 1px solid rgba(167,139,250,0.12);
+      border-radius: var(--radius-lg);
+      display: flex;
+      gap: var(--space-3);
+      align-items: flex-start;
+      margin-bottom: var(--space-4);
+    }
+
+    .restday-partner-avatar {
+      font-size: 24px;
+    }
+
+    .restday-partner-text {
+      font-size: var(--font-size-sm);
+      color: var(--color-partner-voice);
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="restday-container">
+      <div class="restday-header">
+        <button class="restday-back" onclick="location.href='home.html'">←</button>
+        <div style="font-size:var(--font-size-lg);font-weight:600;">休息日</div>
+      </div>
+
+      <div class="restday-content">
+        <div class="restday-moon">🌙</div>
+        <div class="restday-title">今天是休息日</div>
+        <div class="restday-subtitle">恢复是训练的一部分</div>
+
+        <div class="restday-partner">
+          <div class="restday-partner-avatar">🔥</div>
+          <div class="restday-partner-text">
+            铁牛："好好休息，昨天的腿日很扎实。肌肉在休息时才会生长。今天可以做一些轻度活动帮助恢复。"
+          </div>
+        </div>
+
+        <div class="restday-status-card">
+          <div class="restday-status-row">
+            <div class="restday-status-item">
+              <div class="restday-status-value text-success">85%</div>
+              <div class="restday-status-label">恢复状态</div>
+            </div>
+            <div class="restday-status-item">
+              <div class="restday-status-value">7.5h</div>
+              <div class="restday-status-label">昨晚睡眠</div>
+            </div>
+            <div class="restday-status-item">
+              <div class="restday-status-value">6h</div>
+              <div class="restday-status-label">距上次训练</div>
+            </div>
+          </div>
+          <div class="restday-bar">
+            <div class="restday-bar-fill" style="width:85%"></div>
+          </div>
+          <div style="font-size:var(--font-size-xs);color:var(--color-text-tertiary);margin-top:6px;text-align:right;">
+            预计明天恢复至 92%
+          </div>
+        </div>
+
+        <div class="restday-actions">
+          <div style="font-size:var(--font-size-sm);font-weight:600;color:var(--color-text-secondary);text-align:left;width:100%;margin-bottom:4px;">
+            轻度活动建议
+          </div>
+          
+          <div class="restday-action-card">
+            <div class="restday-action-icon">🚶</div>
+            <div class="restday-action-info">
+              <div class="restday-action-title">散步 30 分钟</div>
+              <div class="restday-action-desc">促进血液循环，加速恢复</div>
+            </div>
+            <span class="restday-action-arrow">→</span>
+          </div>
+
+          <div class="restday-action-card" onclick="location.href='reading.html'">
+            <div class="restday-action-icon">📖</div>
+            <div class="restday-action-info">
+              <div class="restday-action-title">继续读书</div>
+              <div class="restday-action-desc">原子习惯 · 第 3 章</div>
+            </div>
+            <span class="restday-action-arrow">→</span>
+          </div>
+
+          <div class="restday-action-card" onclick="location.href='english-practice.html'">
+            <div class="restday-action-icon">🗣️</div>
+            <div class="restday-action-info">
+              <div class="restday-action-title">英语练习</div>
+              <div class="restday-action-desc">今天来一段旅行对话</div>
+            </div>
+            <span class="restday-action-arrow">→</span>
+          </div>
+
+          <div class="restday-action-card">
+            <div class="restday-action-icon">🧘</div>
+            <div class="restday-action-info">
+              <div class="restday-action-title">泡沫轴放松</div>
+              <div class="restday-action-desc">10 分钟全身筋膜放松</div>
+            </div>
+            <span class="restday-action-arrow">→</span>
+          </div>
+        </div>
+
+        <button class="btn btn-ghost btn-full mt-6" onclick="location.href='home.html'">
+          返回首页
+        </button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

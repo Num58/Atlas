@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>PrimeAtlas · 训练历史</title>
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    .history-header {
+      padding: var(--space-5);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .history-title {
+      font-size: var(--font-size-xl);
+      font-weight: var(--font-weight-bold);
+    }
+
+    .history-summary {
+      display: flex;
+      gap: var(--space-3);
+      padding: 0 var(--space-5);
+      margin-bottom: var(--space-4);
+    }
+
+    .history-summary-item {
+      flex: 1;
+      padding: var(--space-3);
+      background: var(--color-bg-card);
+      border-radius: var(--radius-md);
+      text-align: center;
+    }
+
+    .history-summary-value {
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-accent-primary);
+    }
+
+    .history-summary-label {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-tertiary);
+    }
+
+    .history-list {
+      padding: 0 var(--space-5);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .history-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      padding: var(--space-4);
+      background: var(--color-bg-card);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(255,255,255,0.06);
+      cursor: pointer;
+      transition: background var(--duration-fast);
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .history-item:active {
+      background: var(--color-bg-elevated);
+    }
+
+    .history-date {
+      min-width: 52px;
+      text-align: center;
+    }
+
+    .history-date-day {
+      font-size: var(--font-size-xl);
+      font-weight: var(--font-weight-bold);
+    }
+
+    .history-date-month {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-tertiary);
+    }
+
+    .history-info {
+      flex: 1;
+    }
+
+    .history-info-title {
+      font-weight: var(--font-weight-semibold);
+      margin-bottom: 2px;
+    }
+
+    .history-info-detail {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+    }
+
+    .history-info-tags {
+      display: flex;
+      gap: var(--space-1);
+      margin-top: var(--space-1);
+    }
+
+    .history-arrow {
+      color: var(--color-text-tertiary);
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="page-content">
+      <div class="history-header">
+        <h1 class="history-title">训练历史</h1>
+        <span class="badge badge-accent">本月 12 次</span>
+      </div>
+
+      <div class="history-summary">
+        <div class="history-summary-item">
+          <div class="history-summary-value">48</div>
+          <div class="history-summary-label">总次数</div>
+        </div>
+        <div class="history-summary-item">
+          <div class="history-summary-value">2,150</div>
+          <div class="history-summary-label">总分钟</div>
+        </div>
+        <div class="history-summary-item">
+          <div class="history-summary-value">3</div>
+          <div class="history-summary-label">🏆 PR</div>
+        </div>
+      </div>
+
+      <div class="history-list">
+        <a href="training-session.html" class="history-item">
+          <div class="history-date">
+            <div class="history-date-day">2</div>
+            <div class="history-date-month">7月</div>
+          </div>
+          <div class="history-info">
+            <div class="history-info-title">推胸日</div>
+            <div class="history-info-detail">卧推 75kg · 5个动作 · 42分钟</div>
+            <div class="history-info-tags">
+              <span class="badge badge-success">🏆 PR</span>
+            </div>
+          </div>
+          <span class="history-arrow">→</span>
+        </a>
+
+        <a href="training-session.html" class="history-item">
+          <div class="history-date">
+            <div class="history-date-day">1</div>
+            <div class="history-date-month">7月</div>
+          </div>
+          <div class="history-info">
+            <div class="history-info-title">拉背日</div>
+            <div class="history-info-detail">引体向上 · 4个动作 · 38分钟</div>
+          </div>
+          <span class="history-arrow">→</span>
+        </a>
+
+        <div class="history-item">
+          <div class="history-date">
+            <div class="history-date-day">30</div>
+            <div class="history-date-month">6月</div>
+          </div>
+          <div class="history-info">
+            <div class="history-info-title">腿日</div>
+            <div class="history-info-detail">深蹲 100kg · 5个动作 · 50分钟</div>
+          </div>
+          <span class="history-arrow">→</span>
+        </div>
+
+        <div class="history-item">
+          <div class="history-date">
+            <div class="history-date-day">28</div>
+            <div class="history-date-month">6月</div>
+          </div>
+          <div class="history-info">
+            <div class="history-info-title">推胸日</div>
+            <div class="history-info-detail">卧推 72.5kg · 5个动作 · 40分钟</div>
+          </div>
+          <span class="history-arrow">→</span>
+        </div>
+
+        <div class="history-item">
+          <div class="history-date">
+            <div class="history-date-day">26</div>
+            <div class="history-date-month">6月</div>
+          </div>
+          <div class="history-info">
+            <div class="history-info-title">肩日</div>
+            <div class="history-info-detail">实力推 45kg · 4个动作 · 35分钟</div>
+          </div>
+          <span class="history-arrow">→</span>
+        </div>
+      </div>
+    </div>
+
+    <nav class="tab-bar">
+      <a href="home.html" class="tab-item">
+        <span class="tab-icon">🏠</span>
+        <span>首页</span>
+      </a>
+      <a href="training-history.html" class="tab-item active">
+        <span class="tab-icon">🏋️</span>
+        <span>训练</span>
+      </a>
+      <a href="profile.html" class="tab-item">
+        <span class="tab-icon">👤</span>
+        <span>我的</span>
+      </a>
+    </nav>
+  </div>
+</body>
+</html>

@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>PrimeAtlas · 首页</title>
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    .home-header {
+      padding: var(--space-5) var(--space-5) var(--space-3);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .home-header .greeting {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+    }
+
+    .home-header .username {
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-bold);
+    }
+
+    .header-actions {
+      display: flex;
+      gap: var(--space-2);
+    }
+
+    .icon-btn {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-bg-card);
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 18px;
+      cursor: pointer;
+      color: var(--color-text-secondary);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Partner Log */
+    .partner-log {
+      margin: 0 var(--space-5);
+      padding: var(--space-4);
+      background: linear-gradient(135deg, rgba(167,139,250,0.08), rgba(167,139,250,0.02));
+      border: 1px solid rgba(167,139,250,0.12);
+      border-radius: var(--radius-lg);
+      display: flex;
+      gap: var(--space-3);
+      align-items: flex-start;
+    }
+
+    .partner-log-avatar {
+      width: 40px;
+      height: 40px;
+      min-width: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--color-partner-voice), #7c3aed);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .partner-log-content {
+      flex: 1;
+    }
+
+    .partner-log-name {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-partner-voice);
+      margin-bottom: 2px;
+    }
+
+    .partner-log-text {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+      line-height: var(--line-height-relaxed);
+    }
+
+    .partner-log-time {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-tertiary);
+      margin-top: var(--space-1);
+    }
+
+    /* Today's Training Card */
+    .training-card {
+      margin: var(--space-4) var(--space-5);
+      padding: var(--space-6);
+      background: linear-gradient(135deg, #1a1a2e, #16213e);
+      border: 1px solid rgba(255,107,53,0.15);
+      border-radius: var(--radius-xl);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .training-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -30%;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, rgba(255,107,53,0.1), transparent);
+      border-radius: 50%;
+    }
+
+    .training-card .tc-label {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-accent-primary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: var(--space-2);
+    }
+
+    .training-card .tc-title {
+      font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-bold);
+      margin-bottom: var(--space-1);
+    }
+
+    .training-card .tc-subtitle {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-4);
+    }
+
+    .training-card .tc-meta {
+      display: flex;
+      gap: var(--space-4);
+      margin-bottom: var(--space-5);
+    }
+
+    .tc-meta-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+    }
+
+    .tc-meta-item .meta-value {
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-primary);
+    }
+
+    .streak-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      padding: var(--space-1) var(--space-3);
+      background: rgba(255,107,53,0.12);
+      border-radius: var(--radius-full);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-accent-primary);
+      margin-bottom: var(--space-4);
+    }
+
+    /* Quick Actions */
+    .quick-section {
+      padding: 0 var(--space-5);
+      margin-bottom: var(--space-4);
+    }
+
+    .quick-section .section-label {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-3);
+    }
+
+    /* Today's Status */
+    .status-row {
+      margin: 0 var(--space-5);
+      display: flex;
+      gap: var(--space-3);
+      margin-bottom: var(--space-4);
+    }
+
+    .status-item {
+      flex: 1;
+      padding: var(--space-4);
+      background: var(--color-bg-card);
+      border-radius: var(--radius-lg);
+      text-align: center;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .status-value {
+      font-size: var(--font-size-xl);
+      font-weight: var(--font-weight-bold);
+    }
+
+    .status-label {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-tertiary);
+      margin-top: var(--space-1);
+    }
+  </style>
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="page-content">
+      <!-- Header -->
+      <div class="home-header">
+        <div>
+          <div class="greeting" id="timeGreeting">下午好</div>
+          <div class="username">阿强</div>
+        </div>
+        <div class="header-actions">
+          <button class="icon-btn" onclick="location.href='profile.html'">🔔</button>
+          <button class="icon-btn" onclick="location.href='profile.html'">⚙️</button>
+        </div>
+      </div>
+
+      <!-- Partner Log -->
+      <div class="partner-log">
+        <div class="partner-log-avatar">🔥</div>
+        <div class="partner-log-content">
+          <div class="partner-log-name">铁牛 · 你的训练伙伴</div>
+          <div class="partner-log-text" id="partnerMessage">
+            今天状态不错！昨天的深蹲完成得很扎实，今天继续推胸日。我已经帮你把重量微调了，准备好了吗？
+          </div>
+          <div class="partner-log-time">刚刚</div>
+        </div>
+      </div>
+
+      <!-- Today's Training Card -->
+      <div class="training-card">
+        <div class="tc-label">📅 今日训练</div>
+        <div class="tc-title">推胸日</div>
+        <div class="tc-subtitle">卧推 + 辅助动作 · 预计 45 分钟</div>
+        <div class="tc-meta">
+          <div class="tc-meta-item">
+            🏋️ <span class="meta-value">5</span> 个动作
+          </div>
+          <div class="tc-meta-item">
+            🔥 <span class="meta-value">~380</span> kcal
+          </div>
+          <div class="tc-meta-item">
+            ⭐ <span class="meta-value">PR</span> 可能
+          </div>
+        </div>
+        <div class="streak-badge">🔥 连续训练 12 天</div>
+        <button class="btn btn-primary btn-full btn-huge" onclick="location.href='training-session.html'">
+          开始训练 →
+        </button>
+      </div>
+
+      <!-- Today's Status -->
+      <div class="status-row">
+        <div class="status-item">
+          <div class="status-value text-accent">85%</div>
+          <div class="status-label">今日恢复</div>
+        </div>
+        <div class="status-item">
+          <div class="status-value">6.5h</div>
+          <div class="status-label">昨晚睡眠</div>
+        </div>
+        <div class="status-item">
+          <div class="status-value">72</div>
+          <div class="status-label">静息心率</div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="quick-section">
+        <div class="section-label">快捷入口</div>
+        <div class="quick-actions">
+          <a href="english-practice.html" class="quick-action-card">
+            <span class="qa-icon">🗣️</span>
+            <span class="qa-label">英语练习</span>
+          </a>
+          <a href="reading.html" class="quick-action-card">
+            <span class="qa-icon">📖</span>
+            <span class="qa-label">读书</span>
+          </a>
+          <a href="dashboard.html" class="quick-action-card">
+            <span class="qa-icon">📊</span>
+            <span class="qa-label">数据</span>
+          </a>
+          <a href="rest-day.html" class="quick-action-card">
+            <span class="qa-icon">🌙</span>
+            <span class="qa-label">休息日</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Tab Bar -->
+    <nav class="tab-bar">
+      <a href="home.html" class="tab-item active">
+        <span class="tab-icon">🏠</span>
+        <span>首页</span>
+      </a>
+      <a href="training-history.html" class="tab-item">
+        <span class="tab-icon">🏋️</span>
+        <span>训练</span>
+      </a>
+      <a href="profile.html" class="tab-item">
+        <span class="tab-icon">👤</span>
+        <span>我的</span>
+      </a>
+    </nav>
+  </div>
+
+  <script>
+    // Dynamic greeting based on time
+    (function() {
+      const hour = new Date().getHours();
+      let greeting;
+      if (hour < 6) greeting = '夜深了';
+      else if (hour < 12) greeting = '早上好';
+      else if (hour < 14) greeting = '中午好';
+      else if (hour < 18) greeting = '下午好';
+      else greeting = '晚上好';
+      document.getElementById('timeGreeting').textContent = greeting;
+    })();
+
+    // Partner messages rotation
+    const messages = [
+      '今天状态不错！昨天的深蹲完成得很扎实，今天继续推胸日。我已经帮你把重量微调了，准备好了吗？',
+      '早上好！今天的训练计划是拉背日，引体向上和划船为主。记得先热身肩关节。',
+      '今天是腿日！准备好了吗？深蹲的重量我帮你加了 2.5kg，你有这个实力。',
+      '恢复得不错，今天可以冲一下。卧推目标 80kg 3x5，我会在你身边。'
+    ];
+    const randomMsg = messages[Math.floor(Math.random() * messages.length)];
+    document.getElementById('partnerMessage').textContent = randomMsg;
+  </script>
+</body>
+</html>

@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>PrimeAtlas · 训练中</title>
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    .session-container {
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      background: var(--color-bg-primary);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Top Bar */
+    .session-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-3) var(--space-5);
+      z-index: 10;
+    }
+
+    .session-exit {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.05);
+      border: none;
+      border-radius: var(--radius-md);
+      color: var(--color-text-tertiary);
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .session-phase-label {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .session-mute {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.05);
+      border: none;
+      border-radius: var(--radius-md);
+      color: var(--color-text-tertiary);
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    /* Phase Screens */
+    .phase-screen {
+      display: none;
+      flex-direction: column;
+      flex: 1;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-6);
+      text-align: center;
+    }
+
+    .phase-screen.active {
+      display: flex;
+    }
+
+    /* Warmup / Cooldown Phase */
+    .wc-exercise-name {
+      font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-bold);
+      margin-bottom: var(--space-2);
+    }
+
+    .wc-instruction {
+      font-size: var(--font-size-md);
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-6);
+      max-width: 280px;
+    }
+
+    .wc-duration {
+      font-size: var(--font-size-hero);
+      font-weight: var(--font-weight-bold);
+      font-family: var(--font-mono);
+      color: var(--color-accent-primary);
+      margin-bottom: var(--space-6);
+    }
+
+    .wc-progress {
+      width: 100%;
+      max-width: 280px;
+      margin-bottom: var(--space-4);
+    }
+
+    .wc-sequence {
+      display: flex;
+      gap: var(--space-2);
+      margin-top: var(--space-4);
+    }
+
+    .wc-seq-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--color-bg-elevated);
+    }
+
+    .wc-seq-dot.done {
+      background: var(--color-success);
+    }
+
+    .wc-seq-dot.current {
+      background: var(--color-accent-primary);
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    .wc-partner-voice {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-4);
+      background: rgba(167,139,250,0.08);
+      border-radius: var(--radius-full);
+      font-size: var(--font-size-sm);
+      color: var(--color-partner-voice);
+      margin-top: var(--space-4);
+    }
+
+    /* Countdown (3-2-1-GO) */
+    .countdown-number {
+      font-size: var(--font-size-mega);
+      font-weight: var(--font-weight-bold);
+      font-family: var(--font-mono);
+      color: var(--color-accent-primary);
+      animation: countIn 0.8s ease-out;
+    }
+
+    /* Execute Phase */
+    .exec-exercise {
+      font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-bold);
+      margin-bottom: var(--space-2);
+    }
+
+    .exec-target {
+      font-size: var(--font-size-lg);
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-1);
+    }
+
+    .exec-set {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-tertiary);
+      margin-bottom: var(--space-6);
+    }
+
+    .exec-timer {
+      font-size: var(--font-size-hero);
+      font-weight: var(--font-weight-bold);
+      font-family: var(--font-mono);
+      color: var(--color-accent-primary);
+      margin-bottom: var(--space-6);
+    }
+
+    .exec-partner-msg {
+      font-size: var(--font-size-md);
+      color: var(--color-partner-voice);
+      padding: var(--space-3) var(--space-5);
+      background: rgba(167,139,250,0.08);
+      border-radius: var(--radius-lg);
+      max-width: 300px;
+      margin-bottom: var(--space-4);
+      animation: fadeIn var(--duration-normal) var(--ease-out);
+    }
+
+    /* Voice Commands */
+    .voice-commands {
+      display: flex;
+      gap: var(--space-2);
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .voice-cmd {
+      padding: var(--space-2) var(--space-4);
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: var(--radius-full);
+      font-size: var(--font-size-sm);
+      color: var(--color-text-tertiary);
+      cursor: pointer;
+      transition: all var(--duration-fast);
+    }
+
+    .voice-cmd:active {
+      background: rgba(255,107,53,0.1);
+      border-color: var(--color-accent-primary);
+      color: var(--color-accent-primary);
+    }
+
+    /* Rest Phase */
+    .rest-timer {
+      font-size: var(--font-size-hero);
+      font-weight: var(--font-weight-bold);
+      font-family: var(--font-mono);
+      color: var(--color-info);
+      margin-bottom: var(--space-2);
+    }
+
+    .rest-label {
+      font-size: var(--font-size-md);
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-6);
+    }
+
+    .rest-log-form {
+      width: 100%;
+      max-width: 300px;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+
+    .rest-weight-input {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      background: var(--color-bg-card);
+      border-radius: var(--radius-lg);
+      padding: var(--space-2);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .rest-weight-btn {
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-bg-elevated);
+      border: none;
+      border-radius: var(--radius-md);
+      color: var(--color-text-primary);
+      font-size: 20px;
+      font-weight: var(--font-weight-bold);
+      cursor: pointer;
+    }
+
+    .rest-weight-value {
+      flex: 1;
+      text-align: center;
+      font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-bold);
+      font-family: var(--font-mono);
+      color: var(--color-accent-primary);
+    }
+
+    .rest-reps-row {
+      display: flex;
+      gap: var(--space-2);
+      justify-content: center;
+    }
+
+    .rest-rep-btn {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-bg-card);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: var(--radius-md);
+      color: var(--color-text-primary);
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-semibold);
+      cursor: pointer;
+      transition: all var(--duration-fast);
+    }
+
+    .rest-rep-btn.selected {
+      background: rgba(255,107,53,0.15);
+      border-color: var(--color-accent-primary);
+      color: var(--color-accent-primary);
+    }
+
+    .rest-rpe-row {
+      display: flex;
+      gap: var(--space-2);
+      justify-content: center;
+    }
+
+    .rest-rpe-btn {
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-bg-card);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: var(--radius-md);
+      color: var(--color-text-secondary);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
+      cursor: pointer;
+      transition: all var(--duration-fast);
+    }
+
+    .rest-rpe-btn.selected {
+      background: rgba(74,222,128,0.15);
+      border-color: var(--color-success);
+      color: var(--color-success);
+    }
+
+    .rest-next-btn {
+      margin-top: var(--space-4);
+    }
+
+    .rest-english {
+      margin-top: var(--space-4);
+      padding: var(--space-3);
+      background: rgba(96,165,250,0.08);
+      border-radius: var(--radius-md);
+      font-size: var(--font-size-sm);
+      color: var(--color-info);
+      text-align: center;
+      cursor: pointer;
+    }
+
+    /* Summary Phase */
+    .summary-header {
+      font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-bold);
+      margin-bottom: var(--space-2);
+    }
+
+    .summary-subtitle {
+      font-size: var(--font-size-md);
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-6);
+    }
+
+    .summary-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-3);
+      width: 100%;
+      max-width: 300px;
+      margin-bottom: var(--space-6);
+    }
+
+    .summary-stat {
+      padding: var(--space-4);
+      background: var(--color-bg-card);
+      border-radius: var(--radius-lg);
+      text-align: center;
+    }
+
+    .summary-stat-value {
+      font-size: var(--font-size-xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-accent-primary);
+    }
+
+    .summary-stat-label {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-tertiary);
+      margin-top: var(--space-1);
+    }
+
+    .summary-exercises {
+      width: 100%;
+      max-width: 300px;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      margin-bottom: var(--space-6);
+    }
+
+    .summary-exercise {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-3) var(--space-4);
+      background: var(--color-bg-card);
+      border-radius: var(--radius-md);
+      font-size: var(--font-size-sm);
+    }
+
+    .summary-exercise .se-name {
+      font-weight: var(--font-weight-medium);
+    }
+
+    .summary-exercise .se-result {
+      color: var(--color-text-secondary);
+    }
+
+    .summary-exercise .se-pr {
+      color: var(--color-success);
+      font-weight: var(--font-weight-semibold);
+    }
+
+    /* Voice Overlay */
+    .voice-overlay {
+      display: none;
+      position: fixed;
+      bottom: 120px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: var(--space-3) var(--space-5);
+      background: rgba(167,139,250,0.15);
+      border: 1px solid rgba(167,139,250,0.3);
+      border-radius: var(--radius-full);
+      font-size: var(--font-size-sm);
+      color: var(--color-partner-voice);
+      z-index: 50;
+      animation: fadeIn var(--duration-normal) var(--ease-out);
+    }
+
+    .voice-overlay.active {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    /* Exit Confirm */
+    .exit-confirm {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: var(--color-bg-overlay);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+
+    .exit-confirm.active {
+      display: flex;
+    }
+
+    .exit-confirm-card {
+      background: var(--color-bg-card);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
+      width: calc(100% - var(--space-8));
+      max-width: 320px;
+      text-align: center;
+    }
+
+    /* Breathing Animation */
+    .breathing-circle {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,107,53,0.2), transparent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--font-size-hero);
+      animation: breathe 4s ease-in-out infinite;
+    }
+  </style>
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="session-container" id="sessionApp">
+      <!-- Top Bar -->
+      <div class="session-topbar">
+        <button class="session-exit" onclick="showExitConfirm()">✕</button>
+        <div class="session-phase-label" id="phaseLabel">热身</div>
+        <button class="session-mute" id="muteBtn" onclick="toggleMute()">🔊</button>
+      </div>
+
+      <!-- WARMUP Phase -->
+      <div class="phase-screen active" id="phaseWarmup">
+        <div class="wc-exercise-name" id="warmupName">肩关节环绕</div>
+        <div class="wc-instruction" id="warmupInstruction">双臂大圈环绕，向前 15 秒，向后 15 秒</div>
+        <div class="wc-duration" id="warmupTimer">0:30</div>
+        <div class="wc-progress">
+          <div class="progress-bar">
+            <div class="progress-bar-fill" id="warmupProgress" style="width:0%"></div>
+          </div>
+        </div>
+        <div class="wc-sequence" id="warmupDots"></div>
+        <div class="wc-partner-voice">
+          <div class="voice-dot"></div>
+          <span id="warmupVoice">铁牛：慢慢来，把肩膀活动开</span>
+        </div>
+      </div>
+
+      <!-- COUNTDOWN Phase -->
+      <div class="phase-screen" id="phaseCountdown">
+        <div class="countdown-number" id="countdownNum">3</div>
+        <p class="text-lg text-secondary mt-4">准备开始</p>
+      </div>
+
+      <!-- EXECUTE Phase -->
+      <div class="phase-screen" id="phaseExecute">
+        <div class="exec-exercise" id="execExercise">卧推</div>
+        <div class="exec-target" id="execTarget">目标 75kg × 8 次</div>
+        <div class="exec-set" id="execSet">第 1 组 / 共 3 组</div>
+        <div class="exec-timer" id="execTimer">0:00</div>
+        <div class="exec-partner-msg" id="execPartnerMsg">铁牛：稳住节奏，控制离心</div>
+        <div class="voice-commands">
+          <div class="voice-cmd" onclick="voiceCommand('complete')">🎤 完成</div>
+          <div class="voice-cmd" onclick="voiceCommand('fail')">🎤 失败</div>
+          <div class="voice-cmd" onclick="voiceCommand('skip')">🎤 跳过</div>
+          <div class="voice-cmd" onclick="voiceCommand('pain')">🎤 痛</div>
+        </div>
+      </div>
+
+      <!-- REST Phase -->
+      <div class="phase-screen" id="phaseRest">
+        <div class="rest-timer" id="restTimer">1:30</div>
+        <div class="rest-label">组间休息 · 录入数据</div>
+        
+        <div class="rest-log-form">
+          <div>
+            <label class="form-label" style="text-align:center;display:block;margin-bottom:8px;">实际重量 (kg)</label>
+            <div class="rest-weight-input">
+              <button class="rest-weight-btn" onclick="adjustWeight(-2.5)">−</button>
+              <div class="rest-weight-value" id="restWeight">75</div>
+              <button class="rest-weight-btn" onclick="adjustWeight(2.5)">+</button>
+            </div>
+          </div>
+          
+          <div>
+            <label class="form-label" style="text-align:center;display:block;margin-bottom:8px;">完成次数</label>
+            <div class="rest-reps-row" id="repsRow">
+              <div class="rest-rep-btn selected" onclick="selectReps(this)">6</div>
+              <div class="rest-rep-btn" onclick="selectReps(this)">7</div>
+              <div class="rest-rep-btn" onclick="selectReps(this)">8</div>
+              <div class="rest-rep-btn" onclick="selectReps(this)">9</div>
+              <div class="rest-rep-btn" onclick="selectReps(this)">10</div>
+            </div>
+          </div>
+          
+          <div>
+            <label class="form-label" style="text-align:center;display:block;margin-bottom:8px;">RPE (自感强度)</label>
+            <div class="rest-rpe-row" id="rpeRow">
+              <div class="rest-rpe-btn" onclick="selectRPE(this)">5</div>
+              <div class="rest-rpe-btn" onclick="selectRPE(this)">6</div>
+              <div class="rest-rpe-btn" onclick="selectRPE(this)">7</div>
+              <div class="rest-rpe-btn selected" onclick="selectRPE(this)">8</div>
+              <div class="rest-rpe-btn" onclick="selectRPE(this)">9</div>
+              <div class="rest-rpe-btn" onclick="selectRPE(this)">10</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="rest-next-btn">
+          <button class="btn btn-primary btn-full btn-large" id="restNextBtn" onclick="startNextSet()">
+            下一组 →
+          </button>
+        </div>
+        
+        <div class="rest-english" onclick="location.href='english-practice.html'">
+          🗣️ 30秒英语微对话
+        </div>
+      </div>
+
+      <!-- COOLDOWN Phase -->
+      <div class="phase-screen" id="phaseCooldown">
+        <div class="wc-exercise-name" id="cooldownName">胸部拉伸</div>
+        <div class="wc-instruction" id="cooldownInstruction">手臂后伸，感受胸部拉伸，保持 30 秒</div>
+        <div class="wc-duration" id="cooldownTimer">0:30</div>
+        <div class="wc-progress">
+          <div class="progress-bar">
+            <div class="progress-bar-fill" id="cooldownProgress" style="width:0%"></div>
+          </div>
+        </div>
+        <div class="wc-sequence" id="cooldownDots"></div>
+        <div class="wc-partner-voice">
+          <div class="voice-dot"></div>
+          <span id="cooldownVoice">铁牛：深呼吸，慢慢拉伸</span>
+        </div>
+      </div>
+
+      <!-- SUMMARY Phase -->
+      <div class="phase-screen" id="phaseSummary">
+        <div class="summary-header">训练完成！</div>
+        <div class="summary-subtitle">推胸日 · 铁牛为你骄傲</div>
+        
+        <div class="summary-stats">
+          <div class="summary-stat">
+            <div class="summary-stat-value">42:15</div>
+            <div class="summary-stat-label">总时长</div>
+          </div>
+          <div class="summary-stat">
+            <div class="summary-stat-value">365</div>
+            <div class="summary-stat-label">消耗 kcal</div>
+          </div>
+          <div class="summary-stat">
+            <div class="summary-stat-value">3,250</div>
+            <div class="summary-stat-label">总容量 kg</div>
+          </div>
+          <div class="summary-stat">
+            <div class="summary-stat-value">1</div>
+            <div class="summary-stat-label text-success">🏆 新 PR</div>
+          </div>
+        </div>
+        
+        <div class="summary-exercises">
+          <div class="summary-exercise">
+            <span class="se-name">卧推</span>
+            <span class="se-result">75kg × 8,8,7</span>
+          </div>
+          <div class="summary-exercise">
+            <span class="se-name">上斜哑铃推举</span>
+            <span class="se-result se-pr">30kg × 10 🏆 PR</span>
+          </div>
+          <div class="summary-exercise">
+            <span class="se-name">绳索飞鸟</span>
+            <span class="se-result">15kg × 12,12,10</span>
+          </div>
+          <div class="summary-exercise">
+            <span class="se-name">三头下压</span>
+            <span class="se-result">20kg × 15,12</span>
+          </div>
+        </div>
+        
+        <button class="btn btn-primary btn-full btn-large" onclick="location.href='home.html'">
+          返回首页
+        </button>
+        <button class="btn btn-secondary btn-full btn-large mt-3" onclick="location.href='dashboard.html'">
+          查看详细数据
+        </button>
+      </div>
+
+      <!-- Voice Overlay -->
+      <div class="voice-overlay" id="voiceOverlay">
+        <div class="voice-dot"></div>
+        <span id="voiceOverlayText">铁牛正在说话...</span>
+      </div>
+
+      <!-- Exit Confirm -->
+      <div class="exit-confirm" id="exitConfirm">
+        <div class="exit-confirm-card">
+          <h3 class="text-xl mb-3">结束训练？</h3>
+          <p class="text-secondary mb-4">当前进度将被保存，你可以稍后继续。</p>
+          <button class="btn btn-danger btn-full mb-2" onclick="location.href='home.html'">结束训练</button>
+          <button class="btn btn-ghost btn-full" onclick="hideExitConfirm()">继续训练</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ============================================
+    // Training Session State Machine
+    // ============================================
+    
+    const PHASES = {
+      WARMUP: 'warmup',
+      COUNTDOWN: 'countdown',
+      EXECUTE: 'execute',
+      REST: 'rest',
+      COOLDOWN: 'cooldown',
+      SUMMARY: 'summary'
+    };
+
+    const state = {
+      currentPhase: PHASES.WARMUP,
+      warmupIndex: 0,
+      cooldownIndex: 0,
+      currentSet: 1,
+      totalSets: 3,
+      currentExerciseIndex: 0,
+      timerSeconds: 0,
+      timerInterval: null,
+      isMuted: false,
+      weight: 75,
+      reps: 8,
+      rpe: 8
+    };
+
+    const warmupExercises = [
+      { name: '肩关节环绕', instruction: '双臂大圈环绕，向前 15 秒，向后 15 秒', duration: 30, voice: '铁牛：慢慢来，把肩膀活动开' },
+      { name: '手臂交叉拉伸', instruction: '手臂水平交叉，感受肩后侧拉伸', duration: 30, voice: '铁牛：保持呼吸，不要憋气' },
+      { name: '胸部动态拉伸', instruction: '双手抱头，肘部向后打开', duration: 20, voice: '铁牛：打开胸腔，准备推胸' },
+      { name: '空杠热身', instruction: '空杠卧推 15 次，激活神经', duration: 45, voice: '铁牛：感受杠铃轨迹，找到最佳路径' }
+    ];
+
+    const exercises = [
+      { name: '卧推', target: '目标 75kg × 8 次', sets: 3 },
+      { name: '上斜哑铃推举', target: '目标 30kg × 10 次', sets: 3 },
+      { name: '绳索飞鸟', target: '目标 15kg × 12 次', sets: 3 },
+      { name: '三头下压', target: '目标 20kg × 15 次', sets: 2 },
+      { name: '钻石俯卧撑', target: '目标 自重 × 力竭', sets: 2 }
+    ];
+
+    const cooldownExercises = [
+      { name: '胸部拉伸', instruction: '手臂后伸，感受胸部拉伸', duration: 30, voice: '铁牛：深呼吸，慢慢拉伸' },
+      { name: '肩前侧拉伸', instruction: '手臂后伸交握，缓缓上抬', duration: 30, voice: '铁牛：感受肩膀前侧的伸展' },
+      { name: '三头肌拉伸', instruction: '手臂上举屈肘，另一手轻拉', duration: 30, voice: '铁牛：每侧保持 30 秒' },
+      { name: '深呼吸放松', instruction: '闭眼，鼻吸口呼，放慢节奏', duration: 45, voice: '铁牛：今天练得很好，好好恢复' }
+    ];
+
+    const partnerMessages = [
+      '铁牛：稳住节奏，控制离心',
+      '铁牛：很好！就是这个节奏',
+      '铁牛：还有 3 个，咬住！',
+      '铁牛：呼吸！推的时候呼气',
+      '铁牛：感受胸肌发力',
+      '铁牛：你是最棒的，坚持住'
+    ];
+
+    // --- Phase Switching ---
+    function switchPhase(phase) {
+      document.querySelectorAll('.phase-screen').forEach(el => el.classList.remove('active'));
+      const phaseMap = {
+        [PHASES.WARMUP]: 'phaseWarmup',
+        [PHASES.COUNTDOWN]: 'phaseCountdown',
+        [PHASES.EXECUTE]: 'phaseExecute',
+        [PHASES.REST]: 'phaseRest',
+        [PHASES.COOLDOWN]: 'phaseCooldown',
+        [PHASES.SUMMARY]: 'phaseSummary'
+      };
+      const el = document.getElementById(phaseMap[phase]);
+      if (el) el.classList.add('active');
+      
+      state.currentPhase = phase;
+      
+      const labelMap = {
+        [PHASES.WARMUP]: '热身',
+        [PHASES.COUNTDOWN]: '准备',
+        [PHASES.EXECUTE]: '训练中',
+        [PHASES.REST]: '组间休息',
+        [PHASES.COOLDOWN]: '冷却拉伸',
+        [PHASES.SUMMARY]: '训练总结'
+      };
+      document.getElementById('phaseLabel').textContent = labelMap[phase] || '';
+      
+      clearInterval(state.timerInterval);
+      
+      switch (phase) {
+        case PHASES.WARMUP: startWarmup(); break;
+        case PHASES.COUNTDOWN: startCountdown(); break;
+        case PHASES.EXECUTE: startExecute(); break;
+        case PHASES.REST: startRest(); break;
+        case PHASES.COOLDOWN: startCooldown(); break;
+        case PHASES.SUMMARY: break;
+      }
+    }
+
+    // --- Warmup ---
+    function startWarmup() {
+      const ex = warmupExercises[state.warmupIndex];
+      if (!ex) {
+        switchPhase(PHASES.COUNTDOWN);
+        return;
+      }
+      
+      document.getElementById('warmupName').textContent = ex.name;
+      document.getElementById('warmupInstruction').textContent = ex.instruction;
+      document.getElementById('warmupVoice').textContent = ex.voice;
+      document.getElementById('warmupProgress').style.width = '0%';
+      
+      state.timerSeconds = ex.duration;
+      updateWarmupDisplay();
+      
+      // Build dots
+      const dotsContainer = document.getElementById('warmupDots');
+      dotsContainer.innerHTML = '';
+      warmupExercises.forEach((_, i) => {
+        const dot = document.createElement('div');
+        dot.className = 'wc-seq-dot';
+        if (i < state.warmupIndex) dot.classList.add('done');
+        if (i === state.warmupIndex) dot.classList.add('current');
+        dotsContainer.appendChild(dot);
+      });
+      
+      state.timerInterval = setInterval(() => {
+        state.timerSeconds--;
+        updateWarmupDisplay();
+        if (state.timerSeconds <= 0) {
+          clearInterval(state.timerInterval);
+          state.warmupIndex++;
+          startWarmup();
+        }
+      }, 1000);
+    }
+
+    function updateWarmupDisplay() {
+      const ex = warmupExercises[state.warmupIndex];
+      if (!ex) return;
+      const mins = Math.floor(state.timerSeconds / 60);
+      const secs = state.timerSeconds % 60;
+      document.getElementById('warmupTimer').textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+      const progress = ((ex.duration - state.timerSeconds) / ex.duration) * 100;
+      document.getElementById('warmupProgress').style.width = progress + '%';
+    }
+
+    // --- Countdown ---
+    function startCountdown() {
+      let count = 3;
+      document.getElementById('countdownNum').textContent = count;
+      
+      // Voice announcement
+      if (!state.isMuted) speakText('准备开始');
+      
+      const interval = setInterval(() => {
+        count--;
+        if (count > 0) {
+          document.getElementById('countdownNum').textContent = count;
+          document.getElementById('countdownNum').style.animation = 'none';
+          void document.getElementById('countdownNum').offsetWidth;
+          document.getElementById('countdownNum').style.animation = 'countIn 0.8s ease-out';
+          if (!state.isMuted) speakText(count.toString());
+        } else {
+          document.getElementById('countdownNum').textContent = 'GO!';
+          if (!state.isMuted) speakText('开始');
+          clearInterval(interval);
+          setTimeout(() => switchPhase(PHASES.EXECUTE), 800);
+        }
+      }, 1000);
+    }
+
+    // --- Execute ---
+    function startExecute() {
+      const ex = exercises[state.currentExerciseIndex];
+      if (!ex) {
+        switchPhase(PHASES.COOLDOWN);
+        return;
+      }
+      
+      document.getElementById('execExercise').textContent = ex.name;
+      document.getElementById('execTarget').textContent = ex.target;
+      document.getElementById('execSet').textContent = `第 ${state.currentSet} 组 / 共 ${ex.sets} 组`;
+      document.getElementById('execPartnerMsg').textContent = 
+        partnerMessages[Math.floor(Math.random() * partnerMessages.length)];
+      document.getElementById('execPartnerMsg').style.animation = 'none';
+      void document.getElementById('execPartnerMsg').offsetWidth;
+      document.getElementById('execPartnerMsg').style.animation = 'fadeIn 300ms ease-out';
+      
+      state.timerSeconds = 0;
+      updateExecTimer();
+      
+      // Show voice overlay briefly
+      showVoiceOverlay('铁牛：开始！控制节奏');
+      
+      state.timerInterval = setInterval(() => {
+        state.timerSeconds++;
+        updateExecTimer();
+        
+        // Partner speaks at key moments
+        if (state.timerSeconds === 15 && !state.isMuted) {
+          showVoiceOverlay('铁牛：还有一半，稳住');
+        }
+        if (state.timerSeconds === 30 && !state.isMuted) {
+          showVoiceOverlay('铁牛：最后几个，冲！');
+        }
+      }, 1000);
+    }
+
+    function updateExecTimer() {
+      const mins = Math.floor(state.timerSeconds / 60);
+      const secs = state.timerSeconds % 60;
+      document.getElementById('execTimer').textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    // --- Rest ---
+    function startRest() {
+      state.timerSeconds = 90;
+      updateRestTimer();
+      
+      document.getElementById('restWeight').textContent = state.weight;
+      
+      // Reset selections
+      document.querySelectorAll('#repsRow .rest-rep-btn').forEach(b => b.classList.remove('selected'));
+      const repBtn = document.querySelector(`#repsRow .rest-rep-btn:nth-child(${Math.min(state.reps - 5, 4)})`);
+      if (repBtn) repBtn.classList.add('selected');
+      
+      document.querySelectorAll('#rpeRow .rest-rpe-btn').forEach(b => b.classList.remove('selected'));
+      const rpeBtn = document.querySelector(`#rpeRow .rest-rpe-btn:nth-child(${state.rpe - 4})`);
+      if (rpeBtn) rpeBtn.classList.add('selected');
+      
+      state.timerInterval = setInterval(() => {
+        state.timerSeconds--;
+        updateRestTimer();
+        if (state.timerSeconds <= 0) {
+          clearInterval(state.timerInterval);
+          if (!state.isMuted) showVoiceOverlay('铁牛：休息时间到，准备下一组');
+        }
+      }, 1000);
+    }
+
+    function updateRestTimer() {
+      const mins = Math.floor(state.timerSeconds / 60);
+      const secs = state.timerSeconds % 60;
+      document.getElementById('restTimer').textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    function startNextSet() {
+      state.currentSet++;
+      const ex = exercises[state.currentExerciseIndex];
+      
+      if (state.currentSet > ex.sets) {
+        // Move to next exercise
+        state.currentExerciseIndex++;
+        state.currentSet = 1;
+        
+        if (state.currentExerciseIndex >= exercises.length) {
+          switchPhase(PHASES.COOLDOWN);
+          return;
+        }
+      }
+      
+      switchPhase(PHASES.EXECUTE);
+    }
+
+    // --- Cooldown ---
+    function startCooldown() {
+      const ex = cooldownExercises[state.cooldownIndex];
+      if (!ex) {
+        switchPhase(PHASES.SUMMARY);
+        return;
+      }
+      
+      document.getElementById('cooldownName').textContent = ex.name;
+      document.getElementById('cooldownInstruction').textContent = ex.instruction;
+      document.getElementById('cooldownVoice').textContent = ex.voice;
+      document.getElementById('cooldownProgress').style.width = '0%';
+      
+      state.timerSeconds = ex.duration;
+      updateCooldownDisplay();
+      
+      // Build dots
+      const dotsContainer = document.getElementById('cooldownDots');
+      dotsContainer.innerHTML = '';
+      cooldownExercises.forEach((_, i) => {
+        const dot = document.createElement('div');
+        dot.className = 'wc-seq-dot';
+        if (i < state.cooldownIndex) dot.classList.add('done');
+        if (i === state.cooldownIndex) dot.classList.add('current');
+        dotsContainer.appendChild(dot);
+      });
+      
+      state.timerInterval = setInterval(() => {
+        state.timerSeconds--;
+        updateCooldownDisplay();
+        if (state.timerSeconds <= 0) {
+          clearInterval(state.timerInterval);
+          state.cooldownIndex++;
+          startCooldown();
+        }
+      }, 1000);
+    }
+
+    function updateCooldownDisplay() {
+      const ex = cooldownExercises[state.cooldownIndex];
+      if (!ex) return;
+      const mins = Math.floor(state.timerSeconds / 60);
+      const secs = state.timerSeconds % 60;
+      document.getElementById('cooldownTimer').textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+      const progress = ((ex.duration - state.timerSeconds) / ex.duration) * 100;
+      document.getElementById('cooldownProgress').style.width = progress + '%';
+    }
+
+    // --- Voice Commands ---
+    function voiceCommand(cmd) {
+      if (state.currentPhase !== PHASES.EXECUTE) return;
+      
+      switch (cmd) {
+        case 'complete':
+          showVoiceOverlay('识别到：完成 ✓');
+          // Move to rest to log data
+          state.timerSeconds = 0;
+          clearInterval(state.timerInterval);
+          setTimeout(() => switchPhase(PHASES.REST), 800);
+          break;
+        case 'fail':
+          showVoiceOverlay('铁牛：没关系，休息一下，下一组再来');
+          state.timerSeconds = 0;
+          clearInterval(state.timerInterval);
+          state.reps = Math.max(1, state.reps - 2);
+          setTimeout(() => switchPhase(PHASES.REST), 1000);
+          break;
+        case 'skip':
+          showVoiceOverlay('铁牛：好，跳过这个动作');
+          state.currentSet = exercises[state.currentExerciseIndex].sets; // skip to next
+          clearInterval(state.timerInterval);
+          setTimeout(() => startNextSet(), 800);
+          break;
+        case 'pain':
+          showVoiceOverlay('铁牛：马上停下来！是哪里不舒服？');
+          clearInterval(state.timerInterval);
+          setTimeout(() => switchPhase(PHASES.REST), 500);
+          break;
+      }
+    }
+
+    // --- Rest Phase Controls ---
+    function adjustWeight(delta) {
+      state.weight = Math.max(0, state.weight + delta);
+      document.getElementById('restWeight').textContent = state.weight;
+    }
+
+    function selectReps(el) {
+      document.querySelectorAll('#repsRow .rest-rep-btn').forEach(b => b.classList.remove('selected'));
+      el.classList.add('selected');
+      state.reps = parseInt(el.textContent);
+    }
+
+    function selectRPE(el) {
+      document.querySelectorAll('#rpeRow .rest-rpe-btn').forEach(b => b.classList.remove('selected'));
+      el.classList.add('selected');
+      state.rpe = parseInt(el.textContent);
+    }
+
+    // --- Voice Overlay ---
+    function showVoiceOverlay(text) {
+      const overlay = document.getElementById('voiceOverlay');
+      document.getElementById('voiceOverlayText').textContent = text;
+      overlay.classList.add('active');
+      setTimeout(() => overlay.classList.remove('active'), 2500);
+    }
+
+    // --- Mute ---
+    function toggleMute() {
+      state.isMuted = !state.isMuted;
+      document.getElementById('muteBtn').textContent = state.isMuted ? '🔇' : '🔊';
+    }
+
+    // --- Exit ---
+    function showExitConfirm() {
+      document.getElementById('exitConfirm').classList.add('active');
+    }
+
+    function hideExitConfirm() {
+      document.getElementById('exitConfirm').classList.remove('active');
+    }
+
+    // --- TTS (simulated) ---
+    function speakText(text) {
+      // In production, use Web Speech API or custom TTS
+      showVoiceOverlay(text);
+    }
+
+    // --- Init ---
+    switchPhase(PHASES.WARMUP);
+  </script>
+</body>
+</html>

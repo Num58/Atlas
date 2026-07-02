@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>PrimeAtlas · 读书</title>
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    .reading-container {
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      background: var(--color-bg-primary);
+    }
+
+    .reading-header {
+      padding: var(--space-4) var(--space-5);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .reading-back {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-bg-card);
+      border: none;
+      border-radius: var(--radius-md);
+      color: var(--color-text-secondary);
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .reading-title {
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-bold);
+    }
+
+    .reading-actions {
+      display: flex;
+      gap: var(--space-2);
+    }
+
+    .reading-action-btn {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-bg-card);
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    /* Reading Content */
+    .reading-content {
+      flex: 1;
+      padding: var(--space-5);
+      overflow-y: auto;
+      font-size: var(--font-size-md);
+      line-height: 1.8;
+      color: var(--color-text-primary);
+    }
+
+    .reading-content h2 {
+      font-size: var(--font-size-xl);
+      font-weight: var(--font-weight-bold);
+      margin-bottom: var(--space-4);
+      color: var(--color-accent-primary);
+    }
+
+    .reading-content h3 {
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-semibold);
+      margin-top: var(--space-6);
+      margin-bottom: var(--space-3);
+    }
+
+    .reading-content p {
+      margin-bottom: var(--space-4);
+      color: var(--color-text-secondary);
+    }
+
+    .reading-highlight {
+      background: rgba(255,107,53,0.1);
+      border-left: 3px solid var(--color-accent-primary);
+      padding: var(--space-3) var(--space-4);
+      margin: var(--space-4) 0;
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      font-style: italic;
+    }
+
+    /* Progress */
+    .reading-progress-bar {
+      margin: 0 var(--space-5);
+      margin-bottom: var(--space-3);
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    .reading-progress-bar .progress-bar {
+      flex: 1;
+    }
+
+    .reading-progress-text {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-tertiary);
+      white-space: nowrap;
+    }
+
+    /* Agent Chat Toggle */
+    .agent-toggle {
+      margin: 0 var(--space-5);
+      margin-bottom: var(--space-4);
+    }
+
+    .agent-chat-panel {
+      display: none;
+      margin: 0 var(--space-5);
+      margin-bottom: var(--space-4);
+      padding: var(--space-4);
+      background: var(--color-bg-card);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(167,139,250,0.15);
+    }
+
+    .agent-chat-panel.active {
+      display: block;
+    }
+
+    .agent-chat-messages {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      max-height: 200px;
+      overflow-y: auto;
+      margin-bottom: var(--space-3);
+    }
+
+    .agent-msg {
+      display: flex;
+      gap: var(--space-2);
+      font-size: var(--font-size-sm);
+    }
+
+    .agent-msg-icon {
+      width: 24px;
+      height: 24px;
+      min-width: 24px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--color-partner-voice), #7c3aed);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
+
+    .agent-msg-text {
+      color: var(--color-text-secondary);
+      line-height: 1.5;
+    }
+
+    .agent-input-row {
+      display: flex;
+      gap: var(--space-2);
+    }
+
+    .agent-input {
+      flex: 1;
+      min-height: 40px;
+      padding: var(--space-2) var(--space-3);
+      background: var(--color-bg-elevated);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: var(--radius-md);
+      color: var(--color-text-primary);
+      font-size: var(--font-size-sm);
+    }
+
+    .agent-send {
+      width: 40px;
+      height: 40px;
+      min-width: 40px;
+      border-radius: var(--radius-md);
+      background: var(--color-partner-voice);
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      color: #fff;
+    }
+
+    .reading-bottom-nav {
+      padding: var(--space-4) var(--space-5);
+      padding-bottom: calc(var(--space-4) + env(safe-area-inset-bottom, 0px));
+      display: flex;
+      gap: var(--space-3);
+    }
+  </style>
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="reading-container">
+      <div class="reading-header">
+        <button class="reading-back" onclick="location.href='home.html'">←</button>
+        <div class="reading-title">原子习惯</div>
+        <div class="reading-actions">
+          <button class="reading-action-btn">🔖</button>
+          <button class="reading-action-btn">Aa</button>
+        </div>
+      </div>
+
+      <div class="reading-progress-bar">
+        <div class="progress-bar">
+          <div class="progress-bar-fill" style="width:35%"></div>
+        </div>
+        <span class="reading-progress-text">35% · 第 3 章</span>
+      </div>
+
+      <div class="reading-content">
+        <h2>第 3 章：如何培养更好的习惯</h2>
+        
+        <p>习惯的形成是一个渐进的过程。就像水滴石穿一样，微小的改变日积月累，最终会产生惊人的效果。</p>
+        
+        <div class="reading-highlight">
+          "你不需要在每一天都做到完美，你只需要比昨天进步 1%。"
+        </div>
+        
+        <h3>习惯循环</h3>
+        
+        <p>每一个习惯都可以分解为四个步骤：提示、渴求、反应和奖励。理解这个循环是改变习惯的关键。</p>
+        
+        <p>提示触发你的大脑开始某个行为。它是一段信息，预示着你即将获得的奖励。你的大脑在不断分析内外环境，寻找那些与奖励密切相关的线索。</p>
+        
+        <p>渴求是每一个习惯背后的动力。没有某种程度的动机或欲望——没有对改变的渴望——我们就没有行动的理由。你渴求的不是习惯本身，而是它带来的状态变化。</p>
+        
+        <div class="reading-highlight">
+          "环境是塑造人类行为的无形之手。"
+        </div>
+        
+        <p>反应是你实际执行的习惯，它可以以思想或行动的形式出现。反应是否发生取决于你的动力大小以及与行为相关的阻力大小。</p>
+        
+        <p>奖励是每一个习惯的最终目标。提示的作用是让你注意到奖励的存在，渴求是想要得到奖励，反应则是获取奖励的行动。</p>
+      </div>
+
+      <div class="agent-toggle">
+        <button class="btn btn-secondary btn-full" onclick="toggleAgentChat()">
+          💬 与铁牛讨论这段内容
+        </button>
+      </div>
+
+      <div class="agent-chat-panel" id="agentChat">
+        <div class="agent-chat-messages" id="agentMessages">
+          <div class="agent-msg">
+            <div class="agent-msg-icon">🔥</div>
+            <div class="agent-msg-text">这段关于习惯循环的内容，其实和训练非常相似。每次你来到健身房，都是"提示"在起作用。</div>
+          </div>
+          <div class="agent-msg">
+            <div class="agent-msg-icon">🔥</div>
+            <div class="agent-msg-text">你注意到了吗？1% 进步法则在我们训练中同样适用。每次训练加 2.5kg 就是 1% 的进步。</div>
+          </div>
+        </div>
+        <div class="agent-input-row">
+          <input type="text" class="agent-input" placeholder="问铁牛关于这段内容..." id="agentInput" onkeydown="if(event.key==='Enter')sendAgentMsg()">
+          <button class="agent-send" onclick="sendAgentMsg()">↑</button>
+        </div>
+      </div>
+
+      <div class="reading-bottom-nav">
+        <button class="btn btn-secondary btn-full" onclick="location.href='home.html'">← 返回首页</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function toggleAgentChat() {
+      document.getElementById('agentChat').classList.toggle('active');
+    }
+
+    function sendAgentMsg() {
+      const input = document.getElementById('agentInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const container = document.getElementById('agentMessages');
+      
+      // User message
+      const userMsg = document.createElement('div');
+      userMsg.className = 'agent-msg';
+      userMsg.innerHTML = `<div class="agent-msg-icon">👤</div><div class="agent-msg-text">${text}</div>`;
+      container.appendChild(userMsg);
+      
+      input.value = '';
+      container.scrollTop = container.scrollHeight;
+
+      // Agent response
+      setTimeout(() => {
+        const responses = [
+          '这是个好问题！书里其实也有类似的逻辑...',
+          '让我想想，这和我们训练中遇到的情况很像。',
+          '你说得对。习惯和训练都遵循复利效应。'
+        ];
+        const agentMsg = document.createElement('div');
+        agentMsg.className = 'agent-msg';
+        agentMsg.innerHTML = `<div class="agent-msg-icon">🔥</div><div class="agent-msg-text">${responses[Math.floor(Math.random() * responses.length)]}</div>`;
+        container.appendChild(agentMsg);
+        container.scrollTop = container.scrollHeight;
+      }, 800);
+    }
+  </script>
+</body>
+</html>

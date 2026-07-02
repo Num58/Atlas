@@ -3,374 +3,313 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>效能仪表盘 — PrimeAtlas</title>
-  <style>
-    
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', Roboto, sans-serif;
-      background: var(--bg-primary);
-      color: var(--text-primary);
-      line-height: 1.5;
-      -webkit-font-smoothing: antialiased;
-    }
-    .container { max-width: 414px; margin: 0 auto; min-height: 100vh; padding-bottom: 90px; }
-
-    /* Header */
-    .header { padding: 20px 16px 16px; display: flex; align-items: center; justify-content: space-between; }
-    .header-title { font-size: 24px; font-weight: 700; }
-    .header-period { font-size: 13px; color: var(--text-tertiary); }
-    .header-actions { display: flex; gap: 12px; }
-    .header-action {
-      width: 36px; height: 36px; border-radius: 50%; background: var(--bg-card);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 16px; cursor: pointer; transition: transform 0.15s var(--spring);
-      text-decoration: none; color: var(--text-primary);
-    }
-    .header-action:active { transform: scale(0.9); }
-
-    /* Growth Index */
-    .growth-card {
-      margin: 0 16px 20px; background: var(--bg-card);
-      border-radius: var(--radius-xl); padding: 24px;
-      text-align: center; position: relative; overflow: hidden;
-    }
-    .growth-card::before {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-      background: radial-gradient(circle at 50% 0%, rgba(123, 104, 238, 0.08), transparent 60%);
-    }
-    .growth-label { font-size: 13px; color: var(--text-tertiary); margin-bottom: 8px; position: relative; }
-    .growth-value { font-size: 64px; font-weight: 900; color: var(--color-k); position: relative; line-height: 1; }
-    .growth-change { font-size: 14px; color: var(--color-success); margin-top: 8px; position: relative; }
-    .growth-subtitle { font-size: 12px; color: var(--text-tertiary); margin-top: 4px; position: relative; }
-
-    /* Section */
-    .section { padding: 0 16px; margin-bottom: 24px; }
-    .section-title { font-size: 17px; font-weight: 700; margin-bottom: 12px; }
-
-    /* Module cards */
-    .module-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-    .module-card {
-      background: var(--bg-card); border-radius: var(--radius-lg);
-      padding: 16px 12px; text-align: center; cursor: pointer;
-      transition: transform 0.15s var(--spring); text-decoration: none; color: var(--text-primary);
-    }
-    .module-card:active { transform: scale(0.95); }
-    .module-icon { font-size: 32px; margin-bottom: 8px; }
-    .module-name { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
-    .module-stat { font-size: 20px; font-weight: 700; }
-    .module-stat.orange { color: var(--color-primary); }
-    .module-stat.blue { color: var(--color-info); }
-    .module-stat.green { color: var(--color-success); }
-    .module-change { font-size: 11px; color: var(--text-tertiary); margin-top: 2px; }
-
-    /* Charts */
-    .chart-card {
-      background: var(--bg-card); border-radius: var(--radius-xl);
-      padding: 20px; margin-bottom: 12px;
-    }
-    .chart-title { font-size: 15px; font-weight: 600; margin-bottom: 16px; }
-
-    /* Bar chart */
-    .bar-chart { display: flex; align-items: flex-end; gap: 8px; height: 120px; padding-top: 8px; }
-    .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; }
-    .bar-value { font-size: 11px; color: var(--text-tertiary); }
-    .bar-fill { width: 100%; border-radius: 4px 4px 0 0; transition: height 1s var(--ease-out); }
-    .bar-fill.orange { background: linear-gradient(to top, var(--color-primary), rgba(255,92,0,0.3)); }
-    .bar-fill.blue { background: linear-gradient(to top, var(--color-info), rgba(74,144,255,0.3)); }
-    .bar-fill.green { background: linear-gradient(to top, var(--color-success), rgba(0,210,160,0.3)); }
-    .bar-label { font-size: 10px; color: var(--text-tertiary); }
-
-    /* Radar chart (Canvas-based) */
-    .radar-placeholder {
-      width: 160px; height: 160px; margin: 0 auto;
-      position: relative;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .radar-canvas {
-      position: absolute;
-      top: 0; left: 0;
-    }
-    .radar-inner {
-      width: 100px; height: 100px; border-radius: 50%;
-      background: var(--bg-card);
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-    }
-    .radar-score { font-size: 28px; font-weight: 700; }
-    .radar-label { font-size: 11px; color: var(--text-tertiary); }
-
-    /* List items */
-    .list-item {
-      display: flex; align-items: center; gap: 12px;
-      background: var(--bg-card); padding: 14px 16px;
-      border-radius: var(--radius-md); margin-bottom: 8px;
-    }
-    .list-icon { font-size: 20px; flex-shrink: 0; }
-    .list-info { flex: 1; }
-    .list-title { font-size: 14px; font-weight: 600; }
-    .list-desc { font-size: 12px; color: var(--text-tertiary); }
-    .list-value { font-size: 16px; font-weight: 700; color: var(--color-gold); }
-
-    /* PR list */
-    .pr-item {
-      display: flex; align-items: center; gap: 10px;
-      background: var(--bg-card); padding: 12px 16px;
-      border-radius: var(--radius-md); margin-bottom: 8px;
-    }
-    .pr-date { font-size: 11px; color: var(--text-tertiary); white-space: nowrap; }
-    .pr-name { font-size: 14px; font-weight: 600; flex: 1; }
-    .pr-detail { font-size: 12px; color: var(--text-secondary); }
-    .pr-badge { padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; background: rgba(255, 215, 0, 0.15); color: var(--color-gold); }
-
-    /* Tab Bar */
-    .tab-bar {
-      position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-      width: 100%; max-width: 414px; display: flex; background: var(--bg-card);
-      padding: 8px 0 max(8px, env(safe-area-inset-bottom));
-      border-top: 1px solid var(--bg-divider);
-    }
-    .tab-item { flex: 1; text-align: center; font-size: 11px; color: var(--text-tertiary); cursor: pointer; text-decoration: none; }
-    .tab-item.active { color: var(--color-primary); }
-    .tab-icon { display: block; font-size: 20px; margin-bottom: 2px; }
-
-    .nav-back { display: inline-flex; align-items: center; gap: 4px; color: var(--text-tertiary); text-decoration: none; font-size: 12px; padding: 12px 16px 0; }
-
-    /* Flame animation */
-    @keyframes scorePulse { 0%,100%{filter:brightness(1)} 50%{filter:brightness(1.2)} }
-    .pulse { animation: scorePulse 2s ease-in-out infinite; }
-  </style>
+  <title>PrimeAtlas · 数据仪表盘</title>
   <link rel="stylesheet" href="shared.css">
+  <style>
+    .dash-header {
+      padding: var(--space-5);
+    }
+
+    .dash-title {
+      font-size: var(--font-size-xl);
+      font-weight: var(--font-weight-bold);
+      margin-bottom: var(--space-1);
+    }
+
+    .dash-period {
+      display: flex;
+      gap: var(--space-2);
+      margin-top: var(--space-3);
+    }
+
+    .period-tag {
+      padding: var(--space-1) var(--space-3);
+      background: var(--color-bg-card);
+      border-radius: var(--radius-full);
+      font-size: var(--font-size-sm);
+      cursor: pointer;
+      color: var(--color-text-secondary);
+    }
+
+    .period-tag.active {
+      background: rgba(255,107,53,0.15);
+      color: var(--color-accent-primary);
+    }
+
+    .dash-section {
+      padding: 0 var(--space-5);
+      margin-bottom: var(--space-6);
+    }
+
+    .dash-section-title {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-3);
+    }
+
+    /* Stat Grid */
+    .dash-stat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-3);
+    }
+
+    .dash-stat-card {
+      padding: var(--space-4);
+      background: var(--color-bg-card);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .dash-stat-value {
+      font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-bold);
+    }
+
+    .dash-stat-label {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-tertiary);
+      margin-top: var(--space-1);
+    }
+
+    .dash-stat-trend {
+      font-size: var(--font-size-xs);
+      margin-top: var(--space-1);
+    }
+
+    /* Chart Placeholder */
+    .dash-chart {
+      width: 100%;
+      height: 160px;
+      background: var(--color-bg-card);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(255,255,255,0.06);
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-around;
+      padding: var(--space-4) var(--space-3);
+      gap: var(--space-2);
+    }
+
+    .chart-bar {
+      flex: 1;
+      background: linear-gradient(to top, var(--color-accent-primary), var(--color-accent-secondary));
+      border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+      min-height: 4px;
+      transition: height var(--duration-slow) var(--ease-out);
+      position: relative;
+    }
+
+    .chart-bar .bar-label {
+      position: absolute;
+      bottom: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 9px;
+      color: var(--color-text-tertiary);
+    }
+
+    /* PR List */
+    .pr-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    .pr-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3) var(--space-4);
+      background: var(--color-bg-card);
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(74,222,128,0.15);
+    }
+
+    .pr-item .pr-icon {
+      font-size: 24px;
+    }
+
+    .pr-item .pr-info {
+      flex: 1;
+    }
+
+    .pr-item .pr-name {
+      font-weight: var(--font-weight-semibold);
+      font-size: var(--font-size-sm);
+    }
+
+    .pr-item .pr-detail {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-tertiary);
+    }
+
+    .pr-item .pr-value {
+      font-weight: var(--font-weight-bold);
+      color: var(--color-success);
+      font-size: var(--font-size-md);
+    }
+
+    /* Body Trends */
+    .body-trends {
+      display: flex;
+      gap: var(--space-3);
+    }
+
+    .body-trend-item {
+      flex: 1;
+      padding: var(--space-4);
+      background: var(--color-bg-card);
+      border-radius: var(--radius-lg);
+      text-align: center;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .body-trend-value {
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-bold);
+    }
+
+    .body-trend-label {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-tertiary);
+    }
+
+    .body-trend-change {
+      font-size: var(--font-size-xs);
+      margin-top: var(--space-1);
+    }
+  </style>
 </head>
 <body>
-<div class="container">
-
-  <a href="index.html" class="nav-back">← 返回导航</a>
-
-  <!-- Header -->
-  <div class="header">
-    <div>
-      <div class="header-title">效能仪表盘</div>
-      <div class="header-period">2026年 · 第 27 周</div>
-    </div>
-    <div class="header-actions">
-      <a href="partner-home.html" class="header-action">🏠</a>
-    </div>
-  </div>
-
-  <!-- Growth Index -->
-  <div class="growth-card">
-    <div class="growth-label">成长指数</div>
-    <div class="growth-value pulse">742</div>
-    <div class="growth-change">↑ +23 本周</div>
-    <div class="growth-subtitle">训练 380 · 英语 185 · 读书 120 · 坚持 57</div>
-  </div>
-
-  <!-- Module Overview -->
-  <div class="section">
-    <div class="section-title">模块总览</div>
-    <div class="module-cards">
-      <a href="training-home.html" class="module-card">
-        <div class="module-icon">🏋️</div>
-        <div class="module-name">训练</div>
-        <div class="module-stat orange">32</div>
-        <div class="module-change">总次数</div>
-      </a>
-      <a href="english-dialogue.html" class="module-card">
-        <div class="module-icon">🗣️</div>
-        <div class="module-name">英语</div>
-        <div class="module-stat blue">187</div>
-        <div class="module-change">对话分钟</div>
-      </a>
-      <a href="reading-reader.html" class="module-card">
-        <div class="module-icon">📖</div>
-        <div class="module-name">读书</div>
-        <div class="module-stat green">2.4</div>
-        <div class="module-change">万字/周</div>
-      </a>
-    </div>
-  </div>
-
-  <!-- Weekly Volume Chart -->
-  <div class="section">
-    <div class="chart-card">
-      <div class="chart-title">本周训练容量 (NVU)</div>
-      <div class="bar-chart" id="weeklyChart">
-        <div class="bar-col"><span class="bar-value">320</span><div class="bar-fill orange" style="height:0%"></div><span class="bar-label">周一</span></div>
-        <div class="bar-col"><span class="bar-value">0</span><div class="bar-fill orange" style="height:0%"></div><span class="bar-label">周二</span></div>
-        <div class="bar-col"><span class="bar-value">260</span><div class="bar-fill orange" style="height:0%"></div><span class="bar-label">周三</span></div>
-        <div class="bar-col"><span class="bar-value">320</span><div class="bar-fill orange" style="height:0%"></div><span class="bar-label">周四</span></div>
-        <div class="bar-col"><span class="bar-value">—</span><div class="bar-fill orange" style="height:0%"></div><span class="bar-label">周五</span></div>
-        <div class="bar-col"><span class="bar-value">—</span><div class="bar-fill orange" style="height:0%"></div><span class="bar-label">周六</span></div>
-        <div class="bar-col"><span class="bar-value">—</span><div class="bar-fill orange" style="height:0%"></div><span class="bar-label">周日</span></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- English Radar -->
-  <div class="section">
-    <div class="chart-card" style="text-align:center;">
-      <div class="chart-title">LISA 英语四维能力</div>
-      <div class="radar-placeholder">
-        <canvas class="radar-canvas" id="radarCanvas" width="160" height="160"></canvas>
-        <div class="radar-inner">
-          <div class="radar-score">B1</div>
-          <div class="radar-label">CEFR 估计</div>
+  <div class="phone-frame">
+    <div class="page-content">
+      <div class="dash-header">
+        <h1 class="dash-title">数据仪表盘</h1>
+        <div class="dash-period">
+          <div class="period-tag active" onclick="switchPeriod(this)">本周</div>
+          <div class="period-tag" onclick="switchPeriod(this)">本月</div>
+          <div class="period-tag" onclick="switchPeriod(this)">本年</div>
         </div>
       </div>
-      <div style="display:flex;justify-content:center;gap:16px;margin-top:16px;font-size:12px;color:var(--text-tertiary);">
-        <span>🟠 听力 65%</span>
-        <span>🟢 发音 78%</span>
-        <span>🔵 表达 58%</span>
-        <span>🟣 充分度 62%</span>
-        <span>🟡 坚持 85%</span>
+
+      <!-- Overview Stats -->
+      <div class="dash-section">
+        <div class="dash-section-title">训练概览</div>
+        <div class="dash-stat-grid">
+          <div class="dash-stat-card">
+            <div class="dash-stat-value">4</div>
+            <div class="dash-stat-label">本周训练次数</div>
+            <div class="dash-stat-trend text-success">↑ 1 次 vs 上周</div>
+          </div>
+          <div class="dash-stat-card">
+            <div class="dash-stat-value text-accent">12,450</div>
+            <div class="dash-stat-label">总容量 (kg)</div>
+            <div class="dash-stat-trend text-success">↑ 8%</div>
+          </div>
+          <div class="dash-stat-card">
+            <div class="dash-stat-value">1,520</div>
+            <div class="dash-stat-label">消耗热量 (kcal)</div>
+            <div class="dash-stat-trend text-success">↑ 5%</div>
+          </div>
+          <div class="dash-stat-card">
+            <div class="dash-stat-value">3</div>
+            <div class="dash-stat-label">🏆 本周 PR</div>
+            <div class="dash-stat-trend text-success">新高!</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Volume Chart -->
+      <div class="dash-section">
+        <div class="dash-section-title">训练容量趋势</div>
+        <div class="dash-chart">
+          <div class="chart-bar" style="height:60%"><div class="bar-label">一</div></div>
+          <div class="chart-bar" style="height:45%"><div class="bar-label">二</div></div>
+          <div class="chart-bar" style="height:80%"><div class="bar-label">三</div></div>
+          <div class="chart-bar" style="height:55%"><div class="bar-label">四</div></div>
+          <div class="chart-bar" style="height:90%"><div class="bar-label">五</div></div>
+          <div class="chart-bar" style="height:40%"><div class="bar-label">六</div></div>
+          <div class="chart-bar" style="height:70%"><div class="bar-label">日</div></div>
+        </div>
+      </div>
+
+      <!-- Personal Records -->
+      <div class="dash-section">
+        <div class="dash-section-title">个人纪录 (PR)</div>
+        <div class="pr-list">
+          <div class="pr-item">
+            <div class="pr-icon">🏆</div>
+            <div class="pr-info">
+              <div class="pr-name">卧推 1RM</div>
+              <div class="pr-detail">2024.7.2 创造</div>
+            </div>
+            <div class="pr-value">92.5kg</div>
+          </div>
+          <div class="pr-item">
+            <div class="pr-icon">⭐</div>
+            <div class="pr-info">
+              <div class="pr-name">深蹲 1RM</div>
+              <div class="pr-detail">2024.6.28 创造</div>
+            </div>
+            <div class="pr-value">130kg</div>
+          </div>
+          <div class="pr-item">
+            <div class="pr-icon">🔥</div>
+            <div class="pr-info">
+              <div class="pr-name">引体向上最多次数</div>
+              <div class="pr-detail">2024.6.25 创造</div>
+            </div>
+            <div class="pr-value">15 次</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Body Trends -->
+      <div class="dash-section">
+        <div class="dash-section-title">身体趋势</div>
+        <div class="body-trends">
+          <div class="body-trend-item">
+            <div class="body-trend-value">72.5</div>
+            <div class="body-trend-label">体重 (kg)</div>
+            <div class="body-trend-change text-success">↓ 1.5kg</div>
+          </div>
+          <div class="body-trend-item">
+            <div class="body-trend-value">16.5</div>
+            <div class="body-trend-label">体脂率 (%)</div>
+            <div class="body-trend-change text-success">↓ 0.5%</div>
+          </div>
+          <div class="body-trend-item">
+            <div class="body-trend-value">68</div>
+            <div class="body-trend-label">静息心率</div>
+            <div class="body-trend-change text-success">↓ 2</div>
+          </div>
+        </div>
       </div>
     </div>
+
+    <nav class="tab-bar">
+      <a href="home.html" class="tab-item">
+        <span class="tab-icon">🏠</span>
+        <span>首页</span>
+      </a>
+      <a href="training-history.html" class="tab-item">
+        <span class="tab-icon">🏋️</span>
+        <span>训练</span>
+      </a>
+      <a href="profile.html" class="tab-item">
+        <span class="tab-icon">👤</span>
+        <span>我的</span>
+      </a>
+    </nav>
   </div>
 
-  <!-- PR Records -->
-  <div class="section">
-    <div class="section-title">PR 记录</div>
-    <div class="pr-item">
-      <span class="pr-date">7月2日</span>
-      <span class="pr-name">深蹲</span>
-      <span class="pr-detail">85→90kg</span>
-      <span class="pr-badge">+5.9%</span>
-    </div>
-    <div class="pr-item">
-      <span class="pr-date">6月18日</span>
-      <span class="pr-name">卧推</span>
-      <span class="pr-detail">70→75kg</span>
-      <span class="pr-badge">+7.1%</span>
-    </div>
-    <div class="pr-item">
-      <span class="pr-date">6月5日</span>
-      <span class="pr-name">硬拉</span>
-      <span class="pr-detail">110→120kg</span>
-      <span class="pr-badge">+9.1%</span>
-    </div>
-  </div>
-
-  <!-- Recent Activity -->
-  <div class="section">
-    <div class="section-title">最近活动</div>
-    <div class="list-item">
-      <span class="list-icon">🏋️</span>
-      <div class="list-info">
-        <div class="list-title">下肢力量训练</div>
-        <div class="list-desc">今天 14:30 · 52分钟 · PR突破</div>
-      </div>
-      <span class="list-value">320</span>
-    </div>
-    <div class="list-item">
-      <span class="list-icon">🗣️</span>
-      <div class="list-info">
-        <div class="list-title">英语自由对话</div>
-        <div class="list-desc">今天 14:45 · 8轮对话</div>
-      </div>
-      <span class="list-value">5min</span>
-    </div>
-    <div class="list-item">
-      <span class="list-icon">📖</span>
-      <div class="list-info">
-        <div class="list-title">《原子习惯》阅读</div>
-        <div class="list-desc">今天 · 第7章 · 至62%</div>
-      </div>
-      <span class="list-value">12页</span>
-    </div>
-  </div>
-
-  <!-- Tab Bar -->
-  <div class="tab-bar">
-    <a href="partner-home.html" class="tab-item"><span class="tab-icon">🏠</span>首页</a>
-    <a href="training-home.html" class="tab-item"><span class="tab-icon">🏋️</span>训练</a>
-    <a href="english-dialogue.html" class="tab-item"><span class="tab-icon">🗣️</span>英语</a>
-    <a href="dashboard.html" class="tab-item active"><span class="tab-icon">👤</span>我的</a>
-  </div>
-
-</div>
-
-<script>
-// Animate bars on load
-setTimeout(() => {
-  const values = [100, 0, 81, 100, 0, 0, 0];
-  const fills = document.querySelectorAll('.bar-fill.orange');
-  fills.forEach((fill, i) => {
-    setTimeout(() => {
-      fill.style.height = values[i] + '%';
-    }, i * 80);
-  });
-}, 300);
-
-// Animate growth number
-const growthEl = document.querySelector('.growth-value');
-if (growthEl) {
-  const target = parseInt(growthEl.textContent);
-  let current = 0;
-  const duration = 1500;
-  const steps = 60;
-  const increment = target / steps;
-  const interval = duration / steps;
-
-  const counter = setInterval(() => {
-    current += increment;
-    if (current >= target) {
-      current = target;
-      clearInterval(counter);
+  <script>
+    function switchPeriod(el) {
+      document.querySelectorAll('.period-tag').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
     }
-    growthEl.textContent = Math.floor(current);
-  }, interval);
-}
-
-// Canvas radar chart
-(function drawRadar() {
-  const canvas = document.getElementById('radarCanvas');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const cx = 80, cy = 80, r = 65;
-  const labels = ['听力', '发音', '自发度', '充分度'];
-  const values = [0.82, 0.75, 0.68, 0.60]; // 示例数据
-  const color = '#FF5C00';
-
-  // Grid
-  [0.25, 0.5, 0.75, 1.0].forEach(level => {
-    ctx.beginPath();
-    for (let i = 0; i <= 4; i++) {
-      const angle = (Math.PI * 2 * i / 4) - Math.PI / 2;
-      const x = cx + r * level * Math.cos(angle);
-      const y = cy + r * level * Math.sin(angle);
-      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-    }
-    ctx.closePath();
-    ctx.strokeStyle = 'rgba(255,255,255,0.1)';
-    ctx.stroke();
-  });
-
-  // Data
-  ctx.beginPath();
-  values.forEach((v, i) => {
-    const angle = (Math.PI * 2 * i / 4) - Math.PI / 2;
-    const x = cx + r * v * Math.cos(angle);
-    const y = cy + r * v * Math.sin(angle);
-    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-  });
-  ctx.closePath();
-  ctx.fillStyle = 'rgba(255,92,0,0.2)';
-  ctx.fill();
-  ctx.strokeStyle = color;
-  ctx.lineWidth = 2;
-  ctx.stroke();
-
-  // Labels
-  ctx.fillStyle = '#B0B0CC';
-  ctx.font = '10px PingFang SC, sans-serif';
-  ctx.textAlign = 'center';
-  labels.forEach((label, i) => {
-    const angle = (Math.PI * 2 * i / 4) - Math.PI / 2;
-    const x = cx + (r + 15) * Math.cos(angle);
-    const y = cy + (r + 15) * Math.sin(angle) + 4;
-    ctx.fillText(label, x, y);
-  });
-})();
-</script>
+  </script>
 </body>
 </html>

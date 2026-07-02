@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>PrimeAtlas · PR 庆祝</title>
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    .pr-container {
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(180deg, #0a0a0f 0%, #1a0a0a 50%, #0a0a0f 100%);
+      text-align: center;
+      padding: var(--space-6);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Confetti */
+    .confetti-container {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .confetti-piece {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      animation: confettiFall 3s ease-in-out forwards;
+    }
+
+    @keyframes confettiFall {
+      0% { transform: translateY(-10vh) rotate(0deg) scale(1); opacity: 1; }
+      100% { transform: translateY(110vh) rotate(720deg) scale(0.5); opacity: 0; }
+    }
+
+    .pr-icon {
+      font-size: 80px;
+      animation: prBounce 0.6s ease-out;
+      margin-bottom: var(--space-4);
+    }
+
+    @keyframes prBounce {
+      0% { transform: scale(0); }
+      50% { transform: scale(1.2); }
+      70% { transform: scale(0.9); }
+      100% { transform: scale(1); }
+    }
+
+    .pr-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-5);
+      background: linear-gradient(135deg, rgba(74,222,128,0.2), rgba(74,222,128,0.05));
+      border: 1px solid rgba(74,222,128,0.3);
+      border-radius: var(--radius-full);
+      font-size: var(--font-size-md);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-success);
+      margin-bottom: var(--space-4);
+      animation: fadeInUp 0.6s ease-out 0.2s both;
+    }
+
+    .pr-exercise {
+      font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-bold);
+      margin-bottom: var(--space-2);
+      animation: fadeInUp 0.6s ease-out 0.4s both;
+    }
+
+    .pr-value {
+      font-size: var(--font-size-hero);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-accent-primary);
+      font-family: var(--font-mono);
+      margin-bottom: var(--space-2);
+      animation: fadeInUp 0.6s ease-out 0.5s both;
+    }
+
+    .pr-old-value {
+      font-size: var(--font-size-md);
+      color: var(--color-text-tertiary);
+      text-decoration: line-through;
+      margin-bottom: var(--space-2);
+      animation: fadeInUp 0.6s ease-out 0.55s both;
+    }
+
+    .pr-improvement {
+      font-size: var(--font-size-lg);
+      color: var(--color-success);
+      font-weight: var(--font-weight-semibold);
+      margin-bottom: var(--space-6);
+      animation: fadeInUp 0.6s ease-out 0.6s both;
+    }
+
+    .pr-partner-msg {
+      padding: var(--space-4);
+      background: rgba(167,139,250,0.08);
+      border: 1px solid rgba(167,139,250,0.12);
+      border-radius: var(--radius-lg);
+      font-size: var(--font-size-md);
+      color: var(--color-partner-voice);
+      max-width: 300px;
+      margin-bottom: var(--space-6);
+      animation: fadeInUp 0.6s ease-out 0.7s both;
+    }
+
+    .pr-stats {
+      display: flex;
+      gap: var(--space-4);
+      margin-bottom: var(--space-6);
+      animation: fadeInUp 0.6s ease-out 0.8s both;
+    }
+
+    .pr-stat {
+      text-align: center;
+    }
+
+    .pr-stat-value {
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-bold);
+    }
+
+    .pr-stat-label {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-tertiary);
+    }
+
+    .pr-actions {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      width: 100%;
+      max-width: 300px;
+      animation: fadeInUp 0.6s ease-out 1s both;
+    }
+
+    /* Timeline */
+    .pr-timeline {
+      width: 100%;
+      max-width: 300px;
+      margin-bottom: var(--space-6);
+      animation: fadeInUp 0.6s ease-out 0.9s both;
+    }
+
+    .pr-timeline-title {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-3);
+    }
+
+    .pr-timeline-row {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-around;
+      height: 80px;
+      gap: var(--space-2);
+    }
+
+    .pr-timeline-bar {
+      flex: 1;
+      background: var(--color-bg-elevated);
+      border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+      position: relative;
+      max-width: 40px;
+    }
+
+    .pr-timeline-bar.current {
+      background: linear-gradient(to top, var(--color-success), rgba(74,222,128,0.3));
+    }
+
+    .pr-timeline-bar .bar-date {
+      position: absolute;
+      bottom: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 9px;
+      color: var(--color-text-tertiary);
+      white-space: nowrap;
+    }
+
+    .pr-timeline-bar .bar-value {
+      position: absolute;
+      top: -18px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 10px;
+      font-weight: var(--font-weight-bold);
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="pr-container">
+      <!-- Confetti -->
+      <div class="confetti-container" id="confetti"></div>
+
+      <div class="pr-icon">🏆</div>
+      <div class="pr-badge">🎉 新个人纪录！</div>
+      
+      <div class="pr-exercise">上斜哑铃推举</div>
+      <div class="pr-value">30kg × 10</div>
+      <div class="pr-old-value">之前最佳：27.5kg × 8</div>
+      <div class="pr-improvement">↑ 提升 9.1%</div>
+
+      <div class="pr-partner-msg">
+        <div class="voice-dot" style="display:inline-block;margin-right:6px;"></div>
+        铁牛："太强了！我就知道你能突破！今天的重量感很顺，这就是坚持的力量。"
+      </div>
+
+      <div class="pr-timeline">
+        <div class="pr-timeline-title">上斜哑铃推举 · 历史进展</div>
+        <div class="pr-timeline-row">
+          <div class="pr-timeline-bar" style="height:40%">
+            <div class="bar-value">20kg</div>
+            <div class="bar-date">5月</div>
+          </div>
+          <div class="pr-timeline-bar" style="height:50%">
+            <div class="bar-value">22.5kg</div>
+            <div class="bar-date">6月初</div>
+          </div>
+          <div class="pr-timeline-bar" style="height:60%">
+            <div class="bar-value">25kg</div>
+            <div class="bar-date">6月中</div>
+          </div>
+          <div class="pr-timeline-bar" style="height:70%">
+            <div class="bar-value">27.5kg</div>
+            <div class="bar-date">6月底</div>
+          </div>
+          <div class="pr-timeline-bar current" style="height:100%">
+            <div class="bar-value" style="color:var(--color-success)">30kg</div>
+            <div class="bar-date">今天</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pr-stats">
+        <div class="pr-stat">
+          <div class="pr-stat-value text-accent">12</div>
+          <div class="pr-stat-label">天连续训练</div>
+        </div>
+        <div class="pr-stat">
+          <div class="pr-stat-value text-success">第 5 个</div>
+          <div class="pr-stat-label">本月 PR</div>
+        </div>
+        <div class="pr-stat">
+          <div class="pr-stat-value">+25%</div>
+          <div class="pr-stat-label">本月进步</div>
+        </div>
+      </div>
+
+      <div class="pr-actions">
+        <button class="btn btn-primary btn-full btn-large" onclick="location.href='training-session.html'">
+          继续训练 →
+        </button>
+        <button class="btn btn-secondary btn-full" onclick="location.href='home.html'">
+          返回首页
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Generate confetti
+    (function() {
+      const container = document.getElementById('confetti');
+      const colors = ['#ff6b35', '#4ade80', '#a78bfa', '#60a5fa', '#facc15', '#f472b6'];
+      
+      for (let i = 0; i < 60; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'confetti-piece';
+        piece.style.left = Math.random() * 100 + '%';
+        piece.style.top = -(Math.random() * 20) + 'px';
+        piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.animationDelay = Math.random() * 2 + 's';
+        piece.style.animationDuration = (2 + Math.random() * 3) + 's';
+        piece.style.width = (6 + Math.random() * 10) + 'px';
+        piece.style.height = (6 + Math.random() * 10) + 'px';
+        container.appendChild(piece);
+      }
+    })();
+  </script>
+</body>
+</html>
