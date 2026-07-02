@@ -265,32 +265,40 @@
     </div>
 
     <!-- 伙伴卡片 -->
-    <div class="buddy-card">
-      <div class="buddy-avatar-lg">🦊</div>
-      <div class="buddy-info">
-        <div class="buddy-name">Atlas</div>
-        <div class="buddy-status">
-          <span class="buddy-status-dot"></span> 在线
-        </div>
-        <div class="buddy-msg">昨天硬拉进步了5kg，今天继续深蹲！</div>
+    <div class="buddy-card" id="buddyCard">
+      <div class="partner-avatar partner-md partner-alex idle" id="buddyAvatar">
+        <img src="assets/partners/alex.svg" alt="Alex">
       </div>
-      <span style="font-size: 20px; color: var(--color-text-muted);">›</span>
+      <div class="buddy-info">
+        <div class="buddy-name" id="buddyName">Alex·赤焰</div>
+        <div class="buddy-status">
+          <span class="buddy-status-dot"></span> <span id="buddyStatusText">在线</span>
+        </div>
+        <div class="buddy-msg" id="buddyMsg">昨天硬拉进步了5kg，今天继续深蹲！</div>
+      </div>
+      <span style="font-size: 20px; color: var(--color-text-muted); cursor: pointer;" onclick="cycleBuddy()">›</span>
     </div>
 
     <!-- 模块入口卡片 -->
     <div class="module-cards">
       <div class="module-card highlight" onclick="switchToModule('training')">
-        <div class="module-card-icon">🏋️</div>
+        <div class="module-card-icon">
+          <svg class="module-icon-svg" style="color: var(--color-accent);" viewBox="0 0 24 24"><path d="M6.5 6.5h11v11h-11z" stroke="currentColor" stroke-width="2" fill="none"/><line x1="6.5" y1="6.5" x2="3" y2="3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="17.5" y1="6.5" x2="21" y2="3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="6.5" y1="17.5" x2="3" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="17.5" y1="17.5" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
         <div class="module-card-title">动作训练库</div>
         <div class="module-card-stat">今日待训练</div>
       </div>
       <div class="module-card" onclick="switchToModule('english')">
-        <div class="module-card-icon">🗣️</div>
+        <div class="module-card-icon">
+          <svg class="module-icon-svg" style="color: var(--color-info);" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
         <div class="module-card-title">英语口语</div>
         <div class="module-card-stat">每日15分钟</div>
       </div>
       <div class="module-card" onclick="switchToModule('reading')">
-        <div class="module-card-icon">📚</div>
+        <div class="module-card-icon">
+          <svg class="module-icon-svg" style="color: var(--color-warning);" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/></svg>
+        </div>
         <div class="module-card-title">读书</div>
         <div class="module-card-stat">《原子习惯》</div>
       </div>
@@ -306,7 +314,7 @@
       <!-- 早上时段 — 已过期折叠 -->
       <div class="time-block expired-block" id="morningBlock">
         <div class="collapsed-header" onclick="toggleCollapse('morningCollapse')">
-          <span>🌅</span>
+          <svg class="icon icon-sm" viewBox="0 0 24 24" style="color: var(--color-warning);"><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2" fill="none"/><line x1="12" y1="2" x2="12" y2="4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="20" x2="12" y2="22" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="4.93" y1="4.93" x2="6.34" y2="6.34" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="17.66" y1="17.66" x2="19.07" y2="19.07" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="2" y1="12" x2="4" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="20" y1="12" x2="22" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
           <span>早上</span>
           <span style="color: var(--color-text-muted);">6:00 - 9:00</span>
           <span class="badge badge-expired">已过期</span>
@@ -315,20 +323,21 @@
         <div class="collapsed-content" id="morningCollapse">
           <div class="time-block-card" style="margin: 0 var(--space-lg) var(--space-md);">
             <div class="time-block-header-row">
-              <span class="time-block-title">🧘 晨间拉伸</span>
+              <span class="time-block-title">
+              <svg class="icon icon-sm" viewBox="0 0 24 24" style="color: var(--color-primary);"><path d="M8 20C8 14 10 10 12 8c2 2 4 6 4 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M12 8V4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M8 4l4-1 4 1" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg> 晨间拉伸</span>
               <span class="time-block-time">6:30</span>
             </div>
             <div class="task-list">
               <div class="task-item">
-                <span class="task-status-icon">✅</span>
+                <svg class="icon icon-sm status-icon-done" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" fill="none"/><polyline points="8,12 11,15 16,9" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 <span class="task-label done">猫牛式 2组</span>
               </div>
               <div class="task-item">
-                <span class="task-status-icon">✅</span>
+                <svg class="icon icon-sm status-icon-done" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" fill="none"/><polyline points="8,12 11,15 16,9" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 <span class="task-label done">肩部环绕 2组</span>
               </div>
               <div class="task-item">
-                <span class="task-status-icon">⬜</span>
+                <svg class="icon icon-sm status-icon-expired" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" fill="none"/><line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="16" x2="12.01" y2="16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
                 <span class="task-label expired">泡沫轴放松</span>
               </div>
             </div>
@@ -340,22 +349,23 @@
       <div class="time-block" id="noonBlock">
         <div class="time-block-card">
           <div class="time-block-header-row">
-            <span class="time-block-title">☀️ 中午</span>
+            <span class="time-block-title">
+              <svg class="icon icon-sm" viewBox="0 0 24 24" style="color: var(--color-warning);"><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2" fill="none"/><line x1="12" y1="2" x2="12" y2="4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="20" x2="12" y2="22" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="4.93" y1="4.93" x2="6.34" y2="6.34" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="17.66" y1="17.66" x2="19.07" y2="19.07" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="2" y1="12" x2="4" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="20" y1="12" x2="22" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> 中午</span>
             <span class="time-block-time">11:00 - 14:00</span>
           </div>
           <div class="task-list">
             <div class="task-item">
-              <span class="task-status-icon">✅</span>
-              <span class="task-label done">午餐蛋白补充</span>
-            </div>
-            <div class="task-item">
-              <span class="task-status-icon">⏳</span>
-              <span class="task-label pending">午休小憩 20min</span>
-            </div>
-            <div class="task-item">
-              <span class="task-status-icon">⏳</span>
-              <span class="task-label pending">办公桌拉伸</span>
-            </div>
+                <svg class="icon icon-sm status-icon-done" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" fill="none"/><polyline points="8,12 11,15 16,9" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span class="task-label done">午餐蛋白补充</span>
+              </div>
+              <div class="task-item">
+                <svg class="icon icon-sm status-icon-pending" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" fill="none"/><polyline points="12,6 12,12 16,14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span class="task-label pending">午休小憩 20min</span>
+              </div>
+              <div class="task-item">
+                <svg class="icon icon-sm status-icon-pending" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" fill="none"/><polyline points="12,6 12,12 16,14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span class="task-label pending">办公桌拉伸</span>
+              </div>
           </div>
         </div>
       </div>
@@ -364,22 +374,23 @@
       <div class="time-block" id="eveningBlock">
         <div class="time-block-card">
           <div class="time-block-header-row">
-            <span class="time-block-title">🌆 傍晚</span>
+            <span class="time-block-title">
+              <svg class="icon icon-sm" viewBox="0 0 24 24" style="color: var(--color-warning);"><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2" fill="none"/><line x1="12" y1="2" x2="12" y2="4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="20" x2="12" y2="22" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> 傍晚</span>
             <span class="time-block-time">17:00 - 20:00</span>
           </div>
           <div class="task-list">
             <div class="task-item">
-              <span class="task-status-icon">⏳</span>
-              <span class="task-label pending">🏋️ 力量训练 — 深蹲日</span>
-            </div>
-            <div class="task-item">
-              <span class="task-status-icon">⏳</span>
-              <span class="task-label pending">🧘 训练后拉伸</span>
-            </div>
-            <div class="task-item">
-              <span class="task-status-icon">⏳</span>
-              <span class="task-label pending">💧 补水 500ml</span>
-            </div>
+                <svg class="icon icon-sm status-icon-pending" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" fill="none"/><polyline points="12,6 12,12 16,14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span class="task-label pending">力量训练 — 深蹲日</span>
+              </div>
+              <div class="task-item">
+                <svg class="icon icon-sm status-icon-pending" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" fill="none"/><polyline points="12,6 12,12 16,14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span class="task-label pending">训练后拉伸</span>
+              </div>
+              <div class="task-item">
+                <svg class="icon icon-sm status-icon-pending" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" fill="none"/><polyline points="12,6 12,12 16,14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span class="task-label pending">补水 500ml</span>
+              </div>
           </div>
         </div>
       </div>
@@ -388,22 +399,23 @@
       <div class="time-block" id="fragmentBlock">
         <div class="time-block-card">
           <div class="time-block-header-row">
-            <span class="time-block-title">⏱️ 碎片时间</span>
+            <span class="time-block-title">
+              <svg class="icon icon-sm" viewBox="0 0 24 24" style="color: var(--color-info);"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" fill="none"/><polyline points="12,6 12,12 16,14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg> 碎片时间</span>
             <span class="time-block-time">全天</span>
           </div>
           <div class="task-list">
             <div class="task-item">
-              <span class="task-status-icon">✅</span>
-              <span class="task-label done">🗣️ 英语跟读 5min</span>
-            </div>
-            <div class="task-item">
-              <span class="task-status-icon">⏳</span>
-              <span class="task-label pending">📖 读书 10min</span>
-            </div>
-            <div class="task-item">
-              <span class="task-status-icon">⏳</span>
-              <span class="task-label pending">🚶 散步 3000步</span>
-            </div>
+                <svg class="icon icon-sm status-icon-done" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" fill="none"/><polyline points="8,12 11,15 16,9" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span class="task-label done">英语跟读 5min</span>
+              </div>
+              <div class="task-item">
+                <svg class="icon icon-sm status-icon-pending" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" fill="none"/><polyline points="12,6 12,12 16,14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span class="task-label pending">读书 10min</span>
+              </div>
+              <div class="task-item">
+                <svg class="icon icon-sm status-icon-pending" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" fill="none"/><polyline points="12,6 12,12 16,14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span class="task-label pending">散步 3000步</span>
+              </div>
           </div>
         </div>
       </div>
@@ -415,15 +427,18 @@
       <div class="summary-stats">
         <div class="summary-stat">
           <div class="summary-stat-value done-color">4</div>
-          <div class="summary-stat-label">✅ 已完成</div>
+          <div class="summary-stat-label">
+            <svg class="icon icon-xs status-icon-done" viewBox="0 0 24 24" style="vertical-align: middle; margin-right: 2px;"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" fill="none"/><polyline points="8,12 11,15 16,9" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg> 已完成</div>
         </div>
         <div class="summary-stat">
           <div class="summary-stat-value pending-color">5</div>
-          <div class="summary-stat-label">⏳ 待完成</div>
+          <div class="summary-stat-label">
+            <svg class="icon icon-xs status-icon-pending" viewBox="0 0 24 24" style="vertical-align: middle; margin-right: 2px;"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" fill="none"/><polyline points="12,6 12,12 16,14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg> 待完成</div>
         </div>
         <div class="summary-stat">
           <div class="summary-stat-value warning-color">1</div>
-          <div class="summary-stat-label">⬜ 已过期</div>
+          <div class="summary-stat-label">
+            <svg class="icon icon-xs status-icon-expired" viewBox="0 0 24 24" style="vertical-align: middle; margin-right: 2px;"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" fill="none"/><line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="16" x2="12.01" y2="16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> 已过期</div>
         </div>
       </div>
     </div>
@@ -433,21 +448,107 @@
   <!-- 底部Tab导航 -->
   <nav class="tab-bar">
     <a href="home.html" class="tab-item active">
-      <span class="tab-icon">🏠</span>
+      <svg class="tab-icon-svg" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1m-2 0h2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
       <span class="tab-label">首页</span>
     </a>
     <a href="module-training.html" class="tab-item" id="moduleTab">
-      <span class="tab-icon">📦</span>
+      <svg class="tab-icon-svg" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2" fill="none"/><rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2" fill="none"/><rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2" fill="none"/><rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="2" fill="none"/></svg>
       <span class="tab-label">模块</span>
     </a>
     <a href="profile.html" class="tab-item">
-      <span class="tab-icon">👤</span>
+      <svg class="tab-icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2" fill="none"/><path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
       <span class="tab-label">我的</span>
     </a>
   </nav>
 </div>
 
 <script>
+  // 伙伴数据
+  const buddies = [
+    {
+      id: 'alex',
+      name: 'Alex·赤焰',
+      avatar: 'assets/partners/alex.svg',
+      avatarClass: 'partner-alex',
+      msgs: [
+        '昨天硬拉进步了5kg，今天继续深蹲！',
+        'PR就在眼前，再来一组！',
+        '燃起来，今天状态很棒！',
+      ],
+      status: '在线',
+    },
+    {
+      id: 'elena',
+      name: 'Elena·晨曦',
+      avatar: 'assets/partners/elena.svg',
+      avatarClass: 'partner-elena',
+      msgs: [
+        '早安，今天的晨间拉伸准备好了吗？',
+        '慢慢来，每一个伸展都在滋养身体。',
+        '你已经坚持7天了，真了不起！',
+      ],
+      status: '在线',
+    },
+    {
+      id: 'xiaoye',
+      name: '小野·疾风',
+      avatar: 'assets/partners/xiaoye.svg',
+      avatarClass: 'partner-xiaoye',
+      msgs: [
+        '冲冲冲！今天速度拉满！',
+        '上次PR是上周，今天要不要破？',
+        '闪电模式开启，热身准备好了吗？',
+      ],
+      status: '在线',
+    },
+  ];
+
+  let currentBuddyIdx = 0;
+
+  function renderBuddy() {
+    const b = buddies[currentBuddyIdx];
+    const avatar = document.getElementById('buddyAvatar');
+    const img = avatar.querySelector('img');
+    const nameEl = document.getElementById('buddyName');
+    const msgEl = document.getElementById('buddyMsg');
+    const statusText = document.getElementById('buddyStatusText');
+
+    // 添加切换动画
+    avatar.classList.add('partner-switch-out');
+
+    setTimeout(() => {
+      // 更新内容
+      img.src = b.avatar;
+      img.alt = b.name;
+      avatar.className = 'partner-avatar partner-md ' + b.avatarClass + ' idle';
+      nameEl.textContent = b.name;
+      msgEl.textContent = b.msgs[Math.floor(Math.random() * b.msgs.length)];
+      statusText.textContent = b.status;
+
+      // 入场动画
+      avatar.classList.add('partner-switch-in');
+
+      setTimeout(() => {
+        avatar.classList.remove('partner-switch-in');
+      }, 400);
+    }, 300);
+
+    // 短暂兴奋状态
+    setTimeout(() => {
+      avatar.classList.remove('idle');
+      avatar.classList.add('excited');
+      setTimeout(() => {
+        avatar.classList.remove('excited');
+        avatar.classList.add('idle');
+      }, 800);
+    }, 700);
+  }
+
+  function cycleBuddy() {
+    currentBuddyIdx = (currentBuddyIdx + 1) % buddies.length;
+    renderBuddy();
+  }
+
   // 时段感知
   function updateGreeting() {
     const hour = new Date().getHours();
@@ -468,7 +569,6 @@
     document.getElementById('greetingTime').textContent = greeting;
     document.getElementById('greetingMsg').textContent = msg;
 
-    // 模拟时段折叠：如果超过14点，折叠早上
     if (hour >= 14) {
       document.getElementById('morningBlock').classList.add('expired-block');
     }
@@ -482,7 +582,7 @@
     header.classList.toggle('expanded');
   }
 
-  // 模块切换：点击卡片 → 跳转对应模块Tab
+  // 模块切换
   function switchToModule(type) {
     sessionStorage.setItem('primeatlas_module', type);
     const pages = { training: 'module-training.html', english: 'module-english.html', reading: 'module-reading.html' };

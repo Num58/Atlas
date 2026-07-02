@@ -1,0 +1,120 @@
+/* ============================================================
+   PrimeAtlas 图标系统 CSS
+   线性图标，2px描边，圆角端点，暗色模式协调
+   ============================================================ */
+
+/* ---- 图标基础样式 ---- */
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  color: currentColor;
+  vertical-align: middle;
+}
+
+.icon svg {
+  width: 100%;
+  height: 100%;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}
+
+/* 尺寸变体 */
+.icon-xs { width: 16px; height: 16px; }
+.icon-sm { width: 20px; height: 20px; }
+.icon-md { width: 24px; height: 24px; }
+.icon-lg { width: 28px; height: 28px; }
+.icon-xl { width: 36px; height: 36px; }
+
+/* 颜色变体 */
+.icon-primary { color: var(--color-primary); }
+.icon-accent { color: var(--color-accent); }
+.icon-warning { color: var(--color-warning); }
+.icon-danger { color: var(--color-danger); }
+.icon-info { color: var(--color-info); }
+.icon-muted { color: var(--color-text-muted); }
+.icon-secondary { color: var(--color-text-secondary); }
+
+/* Tab导航图标 */
+.tab-icon-svg {
+  width: 24px;
+  height: 24px;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+  transition: stroke var(--transition-fast);
+}
+
+.tab-item.active .tab-icon-svg {
+  color: var(--color-primary);
+}
+
+/* 图标按钮 */
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--touch-min);
+  height: var(--touch-min);
+  border-radius: var(--radius-full);
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.icon-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--color-text);
+}
+
+.icon-btn:active {
+  transform: scale(0.9);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* 带标签的图标 */
+.icon-with-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+/* 模块卡片图标 */
+.module-icon-svg {
+  width: 32px;
+  height: 32px;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}
+
+/* 状态图标颜色映射 */
+.status-icon-done { color: var(--color-done); }
+.status-icon-pending { color: var(--color-pending); }
+.status-icon-expired { color: var(--color-expired); }
+.status-icon-follow { color: var(--color-need-follow); }
+
+/* 图标动画 */
+.icon-spin {
+  animation: spin 1s linear infinite;
+}
+
+.icon-pulse {
+  animation: pulse 2s ease infinite;
+}
+
+.icon-bounce {
+  animation: bounce 1s var(--ease-bounce) infinite;
+}

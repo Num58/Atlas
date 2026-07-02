@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <radialGradient id="xiaoyeBg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#6DE0FF"/>
+      <stop offset="100%" stop-color="#2E9ED4"/>
+    </radialGradient>
+    <radialGradient id="xiaoyeEye" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#00E5FF"/>
+      <stop offset="100%" stop-color="#0088CC"/>
+    </radialGradient>
+    <filter id="xiaoyeGlow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- 背景圆 -->
+  <circle cx="100" cy="100" r="95" fill="url(#xiaoyeBg)" opacity="0.9"/>
+
+  <!-- 速度线光晕 -->
+  <ellipse cx="100" cy="100" rx="85" ry="85" fill="none" stroke="#00E5FF" stroke-width="2" opacity="0.3"/>
+  <ellipse cx="100" cy="100" rx="75" ry="75" fill="none" stroke="#4FC3F7" stroke-width="1.5" opacity="0.2" stroke-dasharray="8 4"/>
+
+  <!-- 闪电粒子 -->
+  <g opacity="0">
+    <polygon points="50,30 56,50 46,50 60,75 54,55 64,55 48,30" fill="#00E5FF" opacity="0.8">
+      <animate attributeName="opacity" dur="1.5s" repeatCount="indefinite" values="0;0.8;0"/>
+    </polygon>
+    <polygon points="145,25 149,40 141,40 152,58 147,45 155,45 141,25" fill="#00E5FF" opacity="0.8">
+      <animate attributeName="opacity" dur="2s" repeatCount="indefinite" values="0;0.8;0" begin="0.5s"/>
+    </polygon>
+    <polygon points="155,120 158,132 152,132 160,145 157,136 163,136 153,120" fill="#4FC3F7" opacity="0.7">
+      <animate attributeName="opacity" dur="1.8s" repeatCount="indefinite" values="0;0.7;0" begin="1s"/>
+    </polygon>
+  </g>
+
+  <!-- 头部 — 圆润有活力 -->
+  <path d="M100,48 C130,48 148,65 148,92 C148,120 135,142 100,145 C65,142 52,120 52,92 C52,65 70,48 100,48Z" fill="#B8E6FF" stroke="#7EC8E3" stroke-width="2"/>
+
+  <!-- 刺猬头/运动发型 -->
+  <path d="M65,52 Q70,35 85,30 Q95,26 100,26 Q105,26 115,30 Q130,35 135,52" fill="#4FC3F7" stroke="#2E9ED4" stroke-width="1.5"/>
+  <path d="M60,55 Q58,40 70,32" fill="none" stroke="#4FC3F7" stroke-width="3" stroke-linecap="round"/>
+  <path d="M75,32 Q72,20 82,18" fill="none" stroke="#00E5FF" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M100,24 Q100,14 108,16" fill="none" stroke="#00E5FF" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M125,32 Q128,20 118,18" fill="none" stroke="#4FC3F7" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M140,55 Q142,40 130,32" fill="none" stroke="#4FC3F7" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- 眉毛 — 灵动上扬 -->
+  <line x1="72" y1="78" x2="88" y2="75" stroke="#1A5276" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="128" y1="78" x2="112" y2="75" stroke="#1A5276" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- 眼睛 — 大而有神 -->
+  <ellipse cx="80" cy="89" rx="11" ry="12" fill="white"/>
+  <ellipse cx="120" cy="89" rx="11" ry="12" fill="white"/>
+  <circle cx="80" cy="89" r="7" fill="url(#xiaoyeEye)" filter="url(#xiaoyeGlow)"/>
+  <circle cx="120" cy="89" r="7" fill="url(#xiaoyeEye)" filter="url(#xiaoyeGlow)"/>
+  <circle cx="78" cy="87" r="2.5" fill="white"/>
+  <circle cx="118" cy="87" r="2.5" fill="white"/>
+
+  <!-- 嘴 — 开朗笑容 -->
+  <path d="M88,112 Q100,126 112,112" fill="none" stroke="#1A5276" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- 脸颊红晕 -->
+  <ellipse cx="64" cy="100" rx="7" ry="3.5" fill="#7EC8E3" opacity="0.3"/>
+  <ellipse cx="136" cy="100" rx="7" ry="3.5" fill="#7EC8E3" opacity="0.3"/>
+
+  <!-- 速度装饰线 -->
+  <path d="M45,65 Q40,85 45,105" fill="none" stroke="#00E5FF" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+  <path d="M155,65 Q160,85 155,105" fill="none" stroke="#00E5FF" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+</svg>

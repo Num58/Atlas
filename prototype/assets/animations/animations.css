@@ -1,0 +1,518 @@
+/* ============================================================
+   PrimeAtlas 全局动画系统
+   定义全局动画Token、缓动曲线、时长规范、关键帧库
+   ============================================================ */
+
+/* ---- 动画时长Token ---- */
+:root {
+  --anim-instant: 100ms;
+  --anim-fast: 200ms;
+  --anim-normal: 400ms;
+  --anim-slow: 600ms;
+  --anim-epic: 1000ms;
+
+  /* 缓动曲线 */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ============================================================
+   关键帧库
+   ============================================================ */
+
+/* 淡入 */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* 上滑淡入 */
+@keyframes slideUpIn {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideDownIn {
+  from { opacity: 0; transform: translateY(-24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 缩放弹入 */
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes scaleBounce {
+  0% { transform: scale(0.3); opacity: 0; }
+  50% { transform: scale(1.05); }
+  70% { transform: scale(0.95); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* 脉冲 */
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.05); opacity: 0.8; }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 8px rgba(124, 92, 252, 0.3); }
+  50% { box-shadow: 0 0 24px rgba(124, 92, 252, 0.6); }
+}
+
+/* 闪烁/Shimmer */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* 旋转 */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* 摇摆 */
+@keyframes swing {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-8deg); }
+  75% { transform: rotate(8deg); }
+}
+
+/* 弹跳 */
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-12px); }
+  60% { transform: translateY(-4px); }
+}
+
+/* ============================================================
+   训练专用动画
+   ============================================================ */
+
+/* 3-2-1-GO 倒计时动画 */
+
+@keyframes countdownNumber {
+  0% { transform: scale(2); opacity: 0; }
+  40% { transform: scale(1); opacity: 1; }
+  60% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(0.5); opacity: 0; }
+}
+
+@keyframes countdownRing {
+  0% { transform: scale(0.8); opacity: 0; box-shadow: 0 0 0 0 rgba(124, 92, 252, 0.5); }
+  40% { transform: scale(1); opacity: 0.6; box-shadow: 0 0 0 20px rgba(124, 92, 252, 0); }
+  100% { transform: scale(1.2); opacity: 0; box-shadow: 0 0 0 40px rgba(124, 92, 252, 0); }
+}
+
+@keyframes goBurst {
+  0% { transform: scale(0.5); opacity: 0; }
+  30% { transform: scale(1.4); opacity: 1; }
+  60% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.8; }
+}
+
+@keyframes goGlowExpand {
+  0% { box-shadow: 0 0 0 0 rgba(0, 229, 160, 0.8); }
+  100% { box-shadow: 0 0 60px 30px rgba(0, 229, 160, 0); }
+}
+
+.countdown-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+}
+
+.countdown-number {
+  font-size: 120px;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  color: var(--color-primary);
+  animation: countdownNumber var(--anim-epic) var(--ease-out) forwards;
+  text-shadow: 0 0 40px rgba(124, 92, 252, 0.5);
+}
+
+.countdown-ring {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 3px solid var(--color-primary);
+  animation: countdownRing var(--anim-epic) var(--ease-out) forwards;
+}
+
+.countdown-go {
+  font-size: 80px;
+  font-weight: 900;
+  color: var(--color-accent);
+  animation: goBurst var(--anim-slow) var(--ease-spring) forwards;
+  text-shadow: 0 0 60px rgba(0, 229, 160, 0.6);
+}
+
+/* PR庆祝粒子系统 */
+
+#pr-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 300;
+}
+
+@keyframes prFloat {
+  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(-200px) rotate(360deg); opacity: 0; }
+}
+
+/* 组进度点填充动画 */
+
+@keyframes setDotFill {
+  from { transform: scale(0); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.set-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--color-bg-input);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  transition: all var(--anim-normal) var(--ease-spring);
+}
+
+.set-dot.completed {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  box-shadow: 0 0 8px rgba(0, 229, 160, 0.4);
+  animation: setDotFill var(--anim-fast) var(--ease-spring) forwards;
+}
+
+.set-dot.current {
+  background: var(--color-primary);
+  border-color: var(--color-primary-light);
+  box-shadow: 0 0 8px rgba(124, 92, 252, 0.4);
+  animation: pulse 1.5s ease infinite;
+}
+
+.set-dot.failed {
+  background: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
+.set-dots {
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: center;
+}
+
+/* 计时器数字跳动 */
+
+@keyframes timerTick {
+  0% { transform: translateY(0); }
+  20% { transform: translateY(-4px); }
+  40% { transform: translateY(0); }
+  100% { transform: translateY(0); }
+}
+
+.timer-digit {
+  display: inline-block;
+  animation: timerTick var(--anim-instant) var(--ease-out);
+}
+
+/* ============================================================
+   伙伴动画系统
+   ============================================================ */
+
+/* 呼吸待机动画 */
+
+@keyframes partnerBreathe {
+  0%, 100% { transform: scale(1) translateY(0); }
+  50% { transform: scale(1.03) translateY(-3px); }
+}
+
+@keyframes partnerBreatheDeep {
+  0%, 100% { transform: scale(1) translateY(0); }
+  25% { transform: scale(1.02) translateY(-2px); }
+  75% { transform: scale(0.98) translateY(1px); }
+}
+
+.partner-idle {
+  animation: partnerBreathe 4s var(--ease-in-out) infinite;
+}
+
+.partner-idle-deep {
+  animation: partnerBreatheDeep 3s var(--ease-in-out) infinite;
+}
+
+/* 兴奋跳跃动画 */
+
+@keyframes partnerExcited {
+  0%, 100% { transform: translateY(0) scale(1); }
+  20% { transform: translateY(-10px) scale(1.05); }
+  40% { transform: translateY(0) scale(1.02); }
+  60% { transform: translateY(-6px) scale(1.04); }
+  80% { transform: translateY(0) scale(1.01); }
+}
+
+.partner-excited {
+  animation: partnerExcited 0.8s var(--ease-bounce) infinite;
+}
+
+/* Alex 火焰粒子 */
+
+@keyframes alexFlameFlicker {
+  0%, 100% { opacity: 0.8; transform: translateY(0) scale(1); }
+  50% { opacity: 1; transform: translateY(-3px) scale(1.1); }
+}
+
+@keyframes alexEyesGlow {
+  0%, 100% { filter: drop-shadow(0 0 3px #FF8C00); }
+  50% { filter: drop-shadow(0 0 10px #FFD700); }
+}
+
+.partner-alex .flame-particle {
+  animation: alexFlameFlicker 0.5s ease infinite;
+}
+
+.partner-alex.excited .flame-particle {
+  animation: alexFlameFlicker 0.2s ease infinite;
+}
+
+/* Elena 星光粒子 */
+
+@keyframes elenaStarSparkle {
+  0% { opacity: 0; transform: scale(0) translateY(0); }
+  50% { opacity: 1; transform: scale(1) translateY(-8px); }
+  100% { opacity: 0; transform: scale(0) translateY(-20px); }
+}
+
+@keyframes elenaGlassShine {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}
+
+.partner-elena .star-particle {
+  animation: elenaStarSparkle 2s ease infinite;
+}
+
+.partner-elena.excited .star-particle {
+  animation: elenaStarSparkle 0.8s ease infinite;
+}
+
+/* 小野 闪电粒子 */
+
+@keyframes xiaoyeZapFlash {
+  0% { opacity: 0; transform: scale(0.5); }
+  30% { opacity: 1; transform: scale(1); }
+  60% { opacity: 0.5; transform: scale(0.8); }
+  100% { opacity: 0; transform: scale(0.5); }
+}
+
+@keyframes xiaoyeBounce {
+  0%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-6px); }
+  60% { transform: translateY(-2px); }
+}
+
+.partner-xiaoye .zap-particle {
+  animation: xiaoyeZapFlash 0.6s ease infinite;
+}
+
+.partner-xiaoye.idle {
+  animation: xiaoyeBounce 2s var(--ease-in-out) infinite;
+}
+
+/* 鼓励时微表情变化 */
+
+@keyframes partnerCheerFace {
+  0% { transform: scale(1); }
+  25% { transform: scale(1.08); }
+  50% { transform: scale(0.97); }
+  75% { transform: scale(1.04); }
+  100% { transform: scale(1); }
+}
+
+.partner-cheer {
+  animation: partnerCheerFace 0.6s var(--ease-spring);
+}
+
+/* 切换伙伴过渡动画 */
+
+@keyframes partnerSlideOut {
+  from { transform: translateX(0) scale(1); opacity: 1; }
+  to { transform: translateX(-60px) scale(0.8); opacity: 0; }
+}
+
+@keyframes partnerSlideIn {
+  from { transform: translateX(60px) scale(0.8); opacity: 0; }
+  to { transform: translateX(0) scale(1); opacity: 1; }
+}
+
+.partner-switch-out {
+  animation: partnerSlideOut var(--anim-normal) var(--ease-smooth) forwards;
+}
+
+.partner-switch-in {
+  animation: partnerSlideIn var(--anim-normal) var(--ease-spring) forwards;
+}
+
+/* 伙伴消息出现动画 */
+
+@keyframes buddyMsgSlide {
+  from { opacity: 0; transform: translateY(10px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.buddy-msg-new {
+  animation: buddyMsgSlide var(--anim-normal) var(--ease-spring);
+}
+
+/* 担心/紧张微表情 */
+
+@keyframes partnerWorry {
+  0%, 100% { transform: translateY(0); }
+  25% { transform: translateY(-2px); }
+  50% { transform: translateY(1px); }
+  75% { transform: translateY(-1px); }
+}
+
+.partner-worry {
+  animation: partnerWorry 0.3s ease;
+  animation-iteration-count: 3;
+}
+
+/* ============================================================
+   页面转场动画
+   ============================================================ */
+
+/* 首页→模块Tab切换 */
+
+@keyframes pageSlideIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes pageSlideOut {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(-20px); }
+}
+
+.page-enter {
+  animation: pageSlideIn var(--anim-normal) var(--ease-out) forwards;
+}
+
+.page-exit {
+  animation: pageSlideOut var(--anim-normal) var(--ease-smooth) forwards;
+}
+
+/* 模块内容切换 */
+
+@keyframes moduleFadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.module-content-enter {
+  animation: moduleFadeIn var(--anim-normal) var(--ease-out) forwards;
+}
+
+/* Tab切换高亮过渡 */
+.tab-indicator {
+  transition: transform var(--anim-normal) var(--ease-spring);
+}
+
+/* 卡片入场错开 */
+.card-stagger > * {
+  opacity: 0;
+  animation: slideUpIn var(--anim-slow) var(--ease-out) forwards;
+}
+
+.card-stagger > *:nth-child(1) { animation-delay: 0ms; }
+.card-stagger > *:nth-child(2) { animation-delay: 60ms; }
+.card-stagger > *:nth-child(3) { animation-delay: 120ms; }
+.card-stagger > *:nth-child(4) { animation-delay: 180ms; }
+.card-stagger > *:nth-child(5) { animation-delay: 240ms; }
+.card-stagger > *:nth-child(6) { animation-delay: 300ms; }
+
+/* ============================================================
+   粒子系统基础样式
+   ============================================================ */
+
+.particle {
+  position: absolute;
+  pointer-events: none;
+  animation: prFloat 1.5s ease-out forwards;
+}
+
+.particle-gold {
+  background: radial-gradient(circle, #FFD700, #FF8C00);
+  border-radius: 50%;
+}
+
+.particle-red {
+  background: radial-gradient(circle, #FF6B6B, #FF4444);
+  border-radius: 50%;
+}
+
+.particle-star {
+  width: 6px;
+  height: 6px;
+  background: #FFD700;
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+
+.particle-spark {
+  width: 4px;
+  height: 4px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 0 6px white;
+}
+
+/* ============================================================
+   通用动画工具类
+   ============================================================ */
+
+.anim-fadeIn { animation: fadeIn var(--anim-normal) var(--ease-out) forwards; }
+.anim-fadeOut { animation: fadeOut var(--anim-fast) var(--ease-smooth) forwards; }
+.anim-slideUp { animation: slideUpIn var(--anim-normal) var(--ease-out) forwards; }
+.anim-slideDown { animation: slideDownIn var(--anim-normal) var(--ease-out) forwards; }
+.anim-scaleIn { animation: scaleIn var(--anim-normal) var(--ease-spring) forwards; }
+.anim-scaleBounce { animation: scaleBounce var(--anim-slow) var(--ease-bounce) forwards; }
+.anim-pulse { animation: pulse 2s var(--ease-in-out) infinite; }
+.anim-pulseGlow { animation: pulseGlow 2s var(--ease-in-out) infinite; }
+.anim-spin { animation: spin 1s linear infinite; }
+.anim-swing { animation: swing 1s var(--ease-in-out) infinite; }
+.anim-bounce { animation: bounce 1s var(--ease-bounce) infinite; }
+
+/* Shimmer loading效果 */
+.shimmer {
+  background: linear-gradient(90deg,
+    var(--color-bg-input) 25%,
+    rgba(255,255,255,0.06) 50%,
+    var(--color-bg-input) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease infinite;
+}
+
+/* 延迟工具 */
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+.delay-500 { animation-delay: 500ms; }
+.delay-600 { animation-delay: 600ms; }
