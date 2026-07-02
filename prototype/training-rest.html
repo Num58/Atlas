@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>组间休息 — PrimeAtlas</title>
+  <style>
+    :root {
+      --bg-primary: #1A1A2E;
+      --bg-card: #222240;
+      --bg-divider: #2A2A4A;
+      --text-primary: #FFFFFF;
+      --text-secondary: #B0B0CC;
+      --text-tertiary: #6B6B8A;
+      --color-primary: #FF5C00;
+      --color-gold: #FFD700;
+      --color-success: #00D2A0;
+      --color-info: #4A90FF;
+      --color-danger: #FF3B3B;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+      --ease-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      --ease-in: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+      --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', Roboto, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+    .container { max-width: 414px; margin: 0 auto; min-height: 100vh; padding: 16px; }
+
+    /* Header */
+    .rest-header { text-align: center; padding: 8px 0 20px; }
+    .rest-label { font-size: 13px; color: var(--text-tertiary); margin-bottom: 4px; }
+    .rest-timer { font-size: 64px; font-weight: 900; font-variant-numeric: tabular-nums; color: var(--color-info); }
+    .rest-timer.warning { color: var(--color-primary); animation: timerPulse 0.5s ease-in-out infinite; }
+    .rest-timer.urgent { color: var(--color-danger); animation: timerPulse 0.3s ease-in-out infinite; }
+    @keyframes timerPulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+
+    .rest-progress { width: 100%; height: 4px; background: var(--bg-divider); border-radius: 2px; margin-top: 8px; overflow: hidden; }
+    .rest-progress-fill { height: 100%; background: var(--color-info); transition: width 1s linear; border-radius: 2px; }
+    .rest-progress-fill.warning { background: var(--color-primary); }
+    .rest-progress-fill.urgent { background: var(--color-danger); }
+
+    /* Data Entry */
+    .data-entry { background: var(--bg-card); border-radius: var(--radius-xl); padding: 20px; margin-bottom: 16px; }
+    .data-title { font-size: 15px; font-weight: 600; margin-bottom: 16px; }
+    .data-row { display: flex; gap: 12px; margin-bottom: 16px; }
+    .data-field { flex: 1; }
+    .data-label { font-size: 12px; color: var(--text-tertiary); margin-bottom: 6px; }
+    .data-input {
+      width: 100%; padding: 12px 14px; background: var(--bg-primary);
+      border: 1px solid var(--bg-divider); border-radius: var(--radius-md);
+      color: var(--text-primary); font-size: 18px; font-weight: 600;
+      text-align: center; outline: none; transition: border-color 0.2s var(--ease-out);
+    }
+    .data-input:focus { border-color: var(--color-primary); }
+    .data-input::placeholder { color: var(--text-disabled, #3D3D5C); font-weight: 400; font-size: 14px; }
+
+    /* RPE Slider */
+    .rpe-section { margin-bottom: 20px; }
+    .rpe-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .rpe-label { font-size: 12px; color: var(--text-tertiary); }
+    .rpe-value { font-size: 24px; font-weight: 700; color: var(--color-primary); }
+    .rpe-slider {
+      width: 100%; -webkit-appearance: none; height: 8px;
+      background: linear-gradient(to right, var(--color-success) 0%, #FFB800 50%, var(--color-danger) 100%);
+      border-radius: 4px; outline: none;
+    }
+    .rpe-slider::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 32px; height: 32px;
+      background: #fff; border: 3px solid var(--color-primary);
+      border-radius: 50%; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+    .rpe-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-tertiary); margin-top: 4px; }
+
+    /* Pain toggle */
+    .pain-section { display: flex; align-items: center; gap: 8px; padding: 12px 0; border-top: 1px solid var(--bg-divider); }
+    .pain-label { font-size: 14px; color: var(--text-secondary); flex: 1; }
+    .pain-toggle {
+      width: 44px; height: 26px; border-radius: 13px;
+      background: var(--bg-divider); cursor: pointer;
+      position: relative; transition: background 0.3s var(--ease-out);
+    }
+    .pain-toggle.active { background: var(--color-danger); }
+    .pain-toggle::after {
+      content: ''; position: absolute; top: 3px; left: 3px;
+      width: 20px; height: 20px; border-radius: 50%;
+      background: #fff; transition: transform 0.3s var(--ease-out);
+    }
+    .pain-toggle.active::after { transform: translateX(18px); }
+
+    /* Pain severity */
+    .pain-severity { display: none; margin-top: 12px; }
+    .pain-severity.active { display: block; }
+    .pain-buttons { display: flex; gap: 8px; }
+    .pain-btn {
+      flex: 1; padding: 8px; border: 1px solid var(--bg-divider);
+      border-radius: var(--radius-md); background: var(--bg-primary);
+      color: var(--text-secondary); font-size: 12px; text-align: center;
+      cursor: pointer; transition: all 0.2s var(--ease-out);
+    }
+    .pain-btn:hover { border-color: var(--color-danger); }
+    .pain-btn.selected { background: rgba(255, 59, 59, 0.15); border-color: var(--color-danger); color: var(--color-danger); }
+
+    /* Next Exercise Preview */
+    .next-preview { background: var(--bg-card); border-radius: var(--radius-xl); padding: 20px; margin-bottom: 16px; }
+    .next-label { font-size: 12px; color: var(--text-tertiary); margin-bottom: 8px; }
+    .next-exercise { display: flex; align-items: center; gap: 12px; }
+    .next-icon { width: 48px; height: 48px; border-radius: var(--radius-md); background: var(--bg-divider); display: flex; align-items: center; justify-content: center; font-size: 24px; }
+    .next-name { font-size: 16px; font-weight: 600; }
+    .next-detail { font-size: 13px; color: var(--text-secondary); }
+
+    /* Partner tip */
+    .partner-tip {
+      background: rgba(255, 69, 0, 0.08); border-radius: var(--radius-lg);
+      padding: 14px 16px; display: flex; gap: 10px; align-items: flex-start;
+      margin-bottom: 16px; border: 1px solid rgba(255, 69, 0, 0.1);
+    }
+    .partner-tip-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #FF4500, var(--color-primary)); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+    .partner-tip-text { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+    .partner-tip-text strong { color: var(--text-primary); }
+
+    /* English micro */
+    .english-micro {
+      background: var(--bg-card); border-radius: var(--radius-xl);
+      padding: 16px; text-align: center; margin-bottom: 16px;
+      border: 1px solid rgba(74, 144, 255, 0.2); cursor: pointer;
+      transition: transform 0.15s var(--spring);
+    }
+    .english-micro:active { transform: scale(0.97); }
+    .english-micro-icon { font-size: 24px; margin-bottom: 4px; }
+    .english-micro-text { font-size: 13px; color: var(--text-secondary); }
+    .english-micro-time { font-size: 11px; color: var(--text-tertiary); }
+
+    /* Confirm button */
+    .btn-confirm {
+      width: 100%; padding: 16px; background: var(--color-success);
+      color: #fff; border: none; border-radius: var(--radius-lg);
+      font-size: 17px; font-weight: 700; cursor: pointer;
+      transition: transform 0.15s var(--spring);
+    }
+    .btn-confirm:active { transform: scale(0.95); }
+
+    /* Skip */
+    .btn-skip { text-align: center; padding: 12px; font-size: 13px; color: var(--text-tertiary); cursor: pointer; }
+    .btn-skip:hover { color: var(--text-secondary); }
+
+    .nav-back { display: inline-flex; align-items: center; gap: 4px; color: var(--text-tertiary); text-decoration: none; font-size: 12px; }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <a href="index.html" class="nav-back">← 返回导航</a>
+
+  <!-- Rest Timer -->
+  <div class="rest-header">
+    <div class="rest-label">组间休息</div>
+    <div class="rest-timer" id="restTimer">03:00</div>
+    <div class="rest-progress">
+      <div class="rest-progress-fill" id="restProgress" style="width:100%"></div>
+    </div>
+  </div>
+
+  <!-- Data Entry -->
+  <div class="data-entry">
+    <div class="data-title">📝 记录本组数据</div>
+    <div class="data-row">
+      <div class="data-field">
+        <div class="data-label">重量 (kg)</div>
+        <input class="data-input" type="number" id="weightInput" value="85" placeholder="0">
+      </div>
+      <div class="data-field">
+        <div class="data-label">次数</div>
+        <input class="data-input" type="number" id="repsInput" value="5" placeholder="0">
+      </div>
+    </div>
+
+    <!-- RPE -->
+    <div class="rpe-section">
+      <div class="rpe-header">
+        <span class="rpe-label">RPE (自觉费力程度)</span>
+        <span class="rpe-value" id="rpeDisplay">7</span>
+      </div>
+      <input type="range" class="rpe-slider" id="rpeSlider" min="1" max="10" value="7" oninput="updateRPE(this.value)">
+      <div class="rpe-labels">
+        <span>1 轻松</span><span>3 中等</span><span>5 有些费力</span><span>7 很费力</span><span>9 极限</span><span>10 力竭</span>
+      </div>
+    </div>
+
+    <!-- Pain -->
+    <div class="pain-section">
+      <span class="pain-label">🩹 标记疼痛</span>
+      <div class="pain-toggle" id="painToggle" onclick="togglePain()"></div>
+    </div>
+    <div class="pain-severity" id="painSeverity">
+      <div class="data-label" style="margin-bottom:8px;">疼痛程度</div>
+      <div class="pain-buttons">
+        <div class="pain-btn" onclick="selectPain(this, 1)">轻微 1-2</div>
+        <div class="pain-btn" onclick="selectPain(this, 2)">中等 3-4</div>
+        <div class="pain-btn" onclick="selectPain(this, 3)">严重 ≥5</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Next Exercise -->
+  <div class="next-preview">
+    <div class="next-label">下一个动作</div>
+    <div class="next-exercise">
+      <div class="next-icon">🏋️</div>
+      <div>
+        <div class="next-name">罗马尼亚硬拉</div>
+        <div class="next-detail">70kg × 8 reps × 3 组 · RPE 7</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Partner Tip -->
+  <div class="partner-tip">
+    <div class="partner-tip-avatar">🔥</div>
+    <div class="partner-tip-text">
+      <strong>Alex：</strong>"深蹲完成得不错。下一个动作注意保持髋铰链，不要弓背。休息 3 分钟，喝口水。"
+    </div>
+  </div>
+
+  <!-- English Micro -->
+  <div class="english-micro" onclick="window.location.href='english-dialogue.html'">
+    <div class="english-micro-icon">🗣️</div>
+    <div class="english-micro-text">30秒英语微对话</div>
+    <div class="english-micro-time">话题：Gym spotting · B1</div>
+  </div>
+
+  <!-- Confirm -->
+  <button class="btn-confirm" onclick="confirmRest()">确认记录，准备下一组 ✓</button>
+  <div class="btn-skip" onclick="skipRest()">跳过，直接开始</div>
+
+</div>
+
+<script>
+let restSeconds = 180; // 3 minutes
+let restInterval = null;
+let painActive = false;
+let painLevel = null;
+
+function updateRPE(val) {
+  document.getElementById('rpeDisplay').textContent = val;
+  // Color change based on RPE
+  const rpeVal = parseInt(val);
+  const display = document.getElementById('rpeDisplay');
+  if (rpeVal <= 4) display.style.color = 'var(--color-success)';
+  else if (rpeVal <= 7) display.style.color = 'var(--color-primary)';
+  else display.style.color = 'var(--color-danger)';
+}
+
+function togglePain() {
+  painActive = !painActive;
+  document.getElementById('painToggle').classList.toggle('active', painActive);
+  document.getElementById('painSeverity').classList.toggle('active', painActive);
+  if (!painActive) {
+    painLevel = null;
+    document.querySelectorAll('.pain-btn').forEach(b => b.classList.remove('selected'));
+  }
+}
+
+function selectPain(el, level) {
+  document.querySelectorAll('.pain-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  painLevel = level;
+  if (level >= 3) {
+    alert('⚠️ 疼痛程度较高！建议暂停训练，评估伤势。');
+  }
+}
+
+function updateTimer() {
+  const m = Math.floor(restSeconds / 60);
+  const s = restSeconds % 60;
+  const display = document.getElementById('restTimer');
+  display.textContent = String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+
+  const progress = document.getElementById('restProgress');
+  const pct = (restSeconds / 180) * 100;
+  progress.style.width = pct + '%';
+
+  // Warnings
+  display.classList.remove('warning', 'urgent');
+  progress.classList.remove('warning', 'urgent');
+  if (restSeconds <= 30 && restSeconds > 10) {
+    display.classList.add('warning');
+    progress.classList.add('warning');
+  } else if (restSeconds <= 10) {
+    display.classList.add('urgent');
+    progress.classList.add('urgent');
+  }
+}
+
+function startRestTimer() {
+  restInterval = setInterval(() => {
+    restSeconds--;
+    updateTimer();
+    if (restSeconds <= 0) {
+      clearInterval(restInterval);
+      document.getElementById('restTimer').textContent = '00:00';
+      document.getElementById('restProgress').style.width = '0%';
+    }
+  }, 1000);
+}
+
+function confirmRest() {
+  const weight = document.getElementById('weightInput').value;
+  const reps = document.getElementById('repsInput').value;
+  const rpe = document.getElementById('rpeSlider').value;
+
+  if (painLevel >= 3) {
+    if (!confirm('疼痛程度较高，确定要继续训练吗？')) return;
+  }
+
+  // Check if potential PR
+  if (parseInt(weight) >= 90 && parseInt(reps) >= 5) {
+    window.location.href = 'training-pr-celebration.html';
+    return;
+  }
+
+  // Check if last set from URL
+  const params = new URLSearchParams(window.location.search);
+  const isLast = params.get('lastSet');
+  if (isLast === 'true') {
+    window.location.href = 'training-summary.html';
+  } else {
+    window.location.href = 'training-execute.html';
+  }
+}
+
+function skipRest() {
+  window.location.href = 'training-execute.html';
+}
+
+// Parse URL params
+const params = new URLSearchParams(window.location.search);
+const currentSet = parseInt(params.get('set')) || 3;
+const totalSets = parseInt(params.get('total')) || 5;
+const isLast = params.get('lastSet') === 'true';
+
+// Update rest timer based on set
+if (isLast) {
+  restSeconds = 0;
+  document.getElementById('restTimer').textContent = '--:--';
+  document.getElementById('restTimer').style.color = 'var(--color-gold)';
+}
+
+startRestTimer();
+updateTimer();
+updateRPE(7);
+</script>
+</body>
+</html>

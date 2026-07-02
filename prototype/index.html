@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>PrimeAtlas 交互原型</title>
+  <style>
+    :root {
+      --bg-primary: #1A1A2E;
+      --bg-card: #222240;
+      --bg-divider: #2A2A4A;
+      --text-primary: #FFFFFF;
+      --text-secondary: #B0B0CC;
+      --text-tertiary: #6B6B8A;
+      --color-primary: #FF5C00;
+      --color-gold: #FFD700;
+      --color-success: #00D2A0;
+      --color-info: #4A90FF;
+      --color-danger: #FF3B3B;
+      --color-alex: #FF4500;
+      --color-xiaoye: #00CED1;
+      --color-elena: #FFB6C1;
+      --color-k: #7B68EE;
+      --color-rin: #2E8B57;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --ease-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', Roboto, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+    .container { max-width: 414px; margin: 0 auto; padding: 24px 16px; min-height: 100vh; }
+
+    /* Header */
+    .header { text-align: center; padding: 32px 0 24px; position: relative; }
+    .logo { font-size: 48px; margin-bottom: 8px; animation: logoFloat 3s ease-in-out infinite; }
+    @keyframes logoFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+    .title { font-size: 28px; font-weight: 700; background: linear-gradient(135deg, var(--color-primary), var(--color-gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .subtitle { font-size: 14px; color: var(--text-tertiary); margin-top: 4px; }
+
+    /* Module */
+    .module { margin-bottom: 28px; }
+    .module-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+    .module-icon { font-size: 22px; }
+    .module-name { font-size: 18px; font-weight: 700; }
+    .module-count { font-size: 12px; color: var(--text-tertiary); margin-left: auto; }
+
+    /* Page links */
+    .page-links { display: flex; flex-direction: column; gap: 8px; }
+    .page-link {
+      display: flex; align-items: center; gap: 12px;
+      background: var(--bg-card);
+      padding: 14px 16px;
+      border-radius: var(--radius-md);
+      text-decoration: none;
+      color: var(--text-primary);
+      transition: transform 0.15s var(--spring), background 0.2s var(--ease-out);
+      position: relative;
+      overflow: hidden;
+    }
+    .page-link:hover { background: #2A2A50; }
+    .page-link:active { transform: scale(0.97); }
+    .page-link::after {
+      content: '→';
+      margin-left: auto;
+      color: var(--text-tertiary);
+      font-size: 14px;
+      transition: transform 0.2s var(--ease-out);
+    }
+    .page-link:hover::after { transform: translateX(4px); color: var(--color-primary); }
+
+    .page-link-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+    .page-link-info { flex: 1; min-width: 0; }
+    .page-link-name { font-size: 15px; font-weight: 600; }
+    .page-link-desc { font-size: 12px; color: var(--text-tertiary); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .page-link-badge { font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: 600; flex-shrink: 0; }
+
+    /* Module colors */
+    .module-companion .page-link-icon { background: rgba(255, 69, 0, 0.15); }
+    .module-companion .page-link-badge { background: rgba(255, 69, 0, 0.2); color: var(--color-alex); }
+    .module-training .page-link-icon { background: rgba(255, 92, 0, 0.15); }
+    .module-training .page-link-badge { background: rgba(255, 92, 0, 0.2); color: var(--color-primary); }
+    .module-english .page-link-icon { background: rgba(74, 144, 255, 0.15); }
+    .module-english .page-link-badge { background: rgba(74, 144, 255, 0.2); color: var(--color-info); }
+    .module-reading .page-link-icon { background: rgba(0, 210, 160, 0.15); }
+    .module-reading .page-link-badge { background: rgba(0, 210, 160, 0.2); color: var(--color-success); }
+    .module-data .page-link-icon { background: rgba(123, 104, 238, 0.15); }
+    .module-data .page-link-badge { background: rgba(123, 104, 238, 0.2); color: var(--color-k); }
+    .module-global .page-link-icon { background: rgba(255, 215, 0, 0.15); }
+    .module-global .page-link-badge { background: rgba(255, 215, 0, 0.2); color: var(--color-gold); }
+
+    /* Footer */
+    .footer { text-align: center; padding: 32px 0 48px; }
+    .footer-text { font-size: 12px; color: var(--text-tertiary); }
+    .footer-brand { font-size: 13px; font-weight: 700; color: var(--text-secondary); margin-top: 4px; }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="logo">🗺️</div>
+    <div class="title">PrimeAtlas</div>
+    <div class="subtitle">全量交互原型 V1.0 · 暗色主题 · 移动端 375-414px</div>
+  </div>
+
+  <!-- 伙伴系统 -->
+  <div class="module module-companion">
+    <div class="module-header">
+      <span class="module-icon">🤝</span>
+      <span class="module-name">伙伴系统</span>
+      <span class="module-count">2 pages</span>
+    </div>
+    <div class="page-links">
+      <a href="partner-onboarding.html" class="page-link">
+        <span class="page-link-icon">🎯</span>
+        <span class="page-link-info">
+          <div class="page-link-name">伙伴召唤流程</div>
+          <div class="page-link-desc">灵魂三问 → 选择伙伴 → 起名 → 成契</div>
+        </span>
+        <span class="page-link-badge">Onboarding</span>
+      </a>
+      <a href="partner-home.html" class="page-link">
+        <span class="page-link-icon">🏠</span>
+        <span class="page-link-info">
+          <div class="page-link-name">伙伴首页</div>
+          <div class="page-link-desc">今日伙伴日志 + 训练预告 + 每日金句</div>
+        </span>
+        <span class="page-link-badge">Home</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- 训练模块 -->
+  <div class="module module-training">
+    <div class="module-header">
+      <span class="module-icon">🏋️</span>
+      <span class="module-name">训练模块</span>
+      <span class="module-count">5 pages</span>
+    </div>
+    <div class="page-links">
+      <a href="training-home.html" class="page-link">
+        <span class="page-link-icon">📋</span>
+        <span class="page-link-info">
+          <div class="page-link-name">训练首页</div>
+          <div class="page-link-desc">今日计划预览 + 快速开始 + 肌群热力图</div>
+        </span>
+        <span class="page-link-badge">Plan</span>
+      </a>
+      <a href="training-execute.html" class="page-link">
+        <span class="page-link-icon">⚡</span>
+        <span class="page-link-info">
+          <div class="page-link-name">训练执行 — 训练中</div>
+          <div class="page-link-desc">3-2-1-GO倒计时 + 计时器 + 动作提示 + 伙伴小窗</div>
+        </span>
+        <span class="page-link-badge">Active</span>
+      </a>
+      <a href="training-rest.html" class="page-link">
+        <span class="page-link-icon">⏸️</span>
+        <span class="page-link-info">
+          <div class="page-link-name">训练执行 — 组间休息</div>
+          <div class="page-link-desc">数据录入 + 下一动作预览 + 伙伴提示</div>
+        </span>
+        <span class="page-link-badge">Rest</span>
+      </a>
+      <a href="training-pr-celebration.html" class="page-link">
+        <span class="page-link-icon">🏆</span>
+        <span class="page-link-info">
+          <div class="page-link-name">PR突破庆祝</div>
+          <div class="page-link-desc">全屏金色粒子 + 号角音效 + 伙伴欢呼</div>
+        </span>
+        <span class="page-link-badge">Celebration</span>
+      </a>
+      <a href="training-summary.html" class="page-link">
+        <span class="page-link-icon">📊</span>
+        <span class="page-link-info">
+          <div class="page-link-name">训练总结</div>
+          <div class="page-link-desc">故事化呈现 + 亮点时刻 + 伙伴评价</div>
+        </span>
+        <span class="page-link-badge">Summary</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- 英语模块 -->
+  <div class="module module-english">
+    <div class="module-header">
+      <span class="module-icon">🗣️</span>
+      <span class="module-name">英语模块</span>
+      <span class="module-count">1 page</span>
+    </div>
+    <div class="page-links">
+      <a href="english-dialogue.html" class="page-link">
+        <span class="page-link-icon">💬</span>
+        <span class="page-link-info">
+          <div class="page-link-name">AI 自由对话</div>
+          <div class="page-link-desc">语音输入 + 实时字幕 + 纠错标注</div>
+        </span>
+        <span class="page-link-badge">Dialogue</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- 读书模块 -->
+  <div class="module module-reading">
+    <div class="module-header">
+      <span class="module-icon">📖</span>
+      <span class="module-name">读书模块</span>
+      <span class="module-count">2 pages</span>
+    </div>
+    <div class="page-links">
+      <a href="reading-reader.html" class="page-link">
+        <span class="page-link-icon">📚</span>
+        <span class="page-link-info">
+          <div class="page-link-name">书籍阅读器</div>
+          <div class="page-link-desc">伙伴共读笔记 + 划线标注 + 章节导航</div>
+        </span>
+        <span class="page-link-badge">Reader</span>
+      </a>
+      <a href="reading-agent-chat.html" class="page-link">
+        <span class="page-link-icon">🤖</span>
+        <span class="page-link-info">
+          <div class="page-link-name">书籍 Agent 对话</div>
+          <div class="page-link-desc">以书中专家口吻对话 + 4层深度</div>
+        </span>
+        <span class="page-link-badge">Chat</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- 数据模块 -->
+  <div class="module module-data">
+    <div class="module-header">
+      <span class="module-icon">📈</span>
+      <span class="module-name">数据模块</span>
+      <span class="module-count">1 page</span>
+    </div>
+    <div class="page-links">
+      <a href="dashboard.html" class="page-link">
+        <span class="page-link-icon">🎯</span>
+        <span class="page-link-info">
+          <div class="page-link-name">综合效能仪表盘</div>
+          <div class="page-link-desc">成长指数 + 训练/英语/读书数据总览</div>
+        </span>
+        <span class="page-link-badge">Dashboard</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- 全局 -->
+  <div class="module module-global">
+    <div class="module-header">
+      <span class="module-icon">🎨</span>
+      <span class="module-name">全局组件</span>
+      <span class="module-count">1 page</span>
+    </div>
+    <div class="page-links">
+      <a href="design-system.html" class="page-link">
+        <span class="page-link-icon">🎨</span>
+        <span class="page-link-info">
+          <div class="page-link-name">设计系统展示</div>
+          <div class="page-link-desc">色彩 / 字体 / 按钮 / 输入框 / 卡片 / 动效</div>
+        </span>
+        <span class="page-link-badge">Design</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="footer-text">共 12 个交互原型页面</div>
+    <div class="footer-brand">PrimeAtlas Prototype V1.0</div>
+  </div>
+
+</div>
+</body>
+</html>

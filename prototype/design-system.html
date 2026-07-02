@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>PrimeAtlas — 设计系统</title>
+  <style>
+    :root {
+      /* 主色调 */
+      --color-primary: #FF5C00;
+      --color-danger: #FF3B3B;
+      --color-gold: #FFD700;
+      --color-success: #00D2A0;
+      --color-info: #4A90FF;
+      /* 伙伴专属色 */
+      --color-alex: #FF4500;
+      --color-xiaoye: #00CED1;
+      --color-elena: #FFB6C1;
+      --color-k: #7B68EE;
+      --color-rin: #2E8B57;
+      /* 中性色(暗色) */
+      --bg-primary: #1A1A2E;
+      --bg-card: #222240;
+      --bg-divider: #2A2A4A;
+      --text-primary: #FFFFFF;
+      --text-secondary: #B0B0CC;
+      --text-tertiary: #6B6B8A;
+      --text-disabled: #3D3D5C;
+      /* 字号 */
+      --fs-display: 48px;
+      --fs-h1: 32px;
+      --fs-h2: 24px;
+      --fs-h3: 20px;
+      --fs-body-l: 17px;
+      --fs-body-m: 15px;
+      --fs-body-s: 13px;
+      --fs-caption: 11px;
+      /* 圆角 */
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+      /* 间距 */
+      --space-xs: 4px;
+      --space-sm: 8px;
+      --space-md: 16px;
+      --space-lg: 24px;
+      --space-xl: 32px;
+      /* 动效 */
+      --ease-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      --ease-in: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+      --ease-in-out: cubic-bezier(0.42, 0, 0.58, 1);
+      --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', Roboto, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+    .container { max-width: 414px; margin: 0 auto; padding: var(--space-lg); min-height: 100vh; }
+    .page-title { font-size: var(--fs-h1); font-weight: 700; margin-bottom: var(--space-xs); }
+    .page-subtitle { font-size: var(--fs-body-m); color: var(--text-secondary); margin-bottom: var(--space-xl); }
+
+    /* Section */
+    .section { margin-bottom: var(--space-xl); }
+    .section-title { font-size: var(--fs-h3); font-weight: 600; margin-bottom: var(--space-md); padding-bottom: var(--space-sm); border-bottom: 1px solid var(--bg-divider); }
+
+    /* Color Swatches */
+    .color-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-sm); }
+    .color-item { border-radius: var(--radius-md); padding: var(--space-md); min-height: 80px; display: flex; flex-direction: column; justify-content: flex-end; }
+    .color-name { font-size: var(--fs-caption); font-weight: 600; opacity: 0.9; }
+    .color-value { font-size: var(--fs-caption); font-family: 'SF Mono', 'Roboto Mono', monospace; opacity: 0.7; }
+
+    /* Typography */
+    .type-sample { padding: var(--space-sm) 0; border-bottom: 1px solid var(--bg-divider); display: flex; justify-content: space-between; align-items: baseline; }
+    .type-label { font-size: var(--fs-caption); color: var(--text-tertiary); white-space: nowrap; min-width: 80px; }
+
+    /* Buttons */
+    .btn { display: inline-flex; align-items: center; justify-content: center; border: none; border-radius: var(--radius-md); font-size: var(--fs-body-m); font-weight: 600; padding: 12px 24px; cursor: pointer; transition: transform 0.1s var(--spring), opacity 0.15s var(--ease-out); }
+    .btn:active { transform: scale(0.95); }
+    .btn-primary { background: var(--color-primary); color: #fff; }
+    .btn-secondary { background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--bg-divider); }
+    .btn-ghost { background: transparent; color: var(--text-secondary); }
+    .btn-danger { background: var(--color-danger); color: #fff; }
+    .btn-success { background: var(--color-success); color: #fff; }
+    .btn-block { width: 100%; }
+    .btn-lg { padding: 16px 32px; font-size: var(--fs-body-l); border-radius: var(--radius-lg); }
+    .btn-group { display: flex; gap: var(--space-sm); flex-wrap: wrap; }
+
+    /* Inputs */
+    .input-group { margin-bottom: var(--space-md); }
+    .input-label { display: block; font-size: var(--fs-body-s); color: var(--text-secondary); margin-bottom: var(--space-xs); }
+    .input { width: 100%; padding: 12px 16px; background: var(--bg-card); border: 1px solid var(--bg-divider); border-radius: var(--radius-md); color: var(--text-primary); font-size: var(--fs-body-m); outline: none; transition: border-color 0.2s var(--ease-out); }
+    .input:focus { border-color: var(--color-primary); }
+    .input::placeholder { color: var(--text-disabled); }
+
+    /* Cards */
+    .card { background: var(--bg-card); border-radius: var(--radius-lg); padding: var(--space-lg); margin-bottom: var(--space-md); }
+    .card-title { font-size: var(--fs-h3); font-weight: 600; margin-bottom: var(--space-sm); }
+    .card-body { font-size: var(--fs-body-m); color: var(--text-secondary); }
+
+    /* Tab Bar */
+    .tab-bar { display: flex; background: var(--bg-card); border-radius: var(--radius-xl); overflow: hidden; margin-bottom: var(--space-lg); }
+    .tab-item { flex: 1; text-align: center; padding: 12px 8px; font-size: var(--fs-caption); color: var(--text-tertiary); cursor: pointer; transition: color 0.2s var(--ease-out); position: relative; }
+    .tab-item.active { color: var(--color-primary); }
+    .tab-item.active::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 20px; height: 3px; background: var(--color-primary); border-radius: 2px; }
+    .tab-icon { display: block; font-size: 20px; margin-bottom: 2px; }
+
+    /* Progress */
+    .progress { width: 100%; height: 6px; background: var(--bg-divider); border-radius: 3px; overflow: hidden; }
+    .progress-fill { height: 100%; background: var(--color-primary); border-radius: 3px; transition: width 0.3s var(--ease-out); }
+    .progress-fill.gold { background: var(--color-gold); }
+    .progress-fill.success { background: var(--color-success); }
+
+    /* Slider */
+    .slider { width: 100%; -webkit-appearance: none; height: 6px; background: var(--bg-divider); border-radius: 3px; outline: none; }
+    .slider::-webkit-slider-thumb { -webkit-appearance: none; width: 24px; height: 24px; background: var(--color-primary); border-radius: 50%; cursor: pointer; }
+
+    /* Tags */
+    .tag { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: var(--fs-caption); font-weight: 500; }
+    .tag-primary { background: rgba(255, 92, 0, 0.15); color: var(--color-primary); }
+    .tag-success { background: rgba(0, 210, 160, 0.15); color: var(--color-success); }
+    .tag-danger { background: rgba(255, 59, 59, 0.15); color: var(--color-danger); }
+    .tag-gold { background: rgba(255, 215, 0, 0.15); color: var(--color-gold); }
+
+    /* Animations */
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes scaleIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+    @keyframes countdownPulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.3); opacity: 0.5; } }
+    @keyframes flameFlicker { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.3); } }
+    @keyframes particleFloat { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-100px) scale(0); } }
+    @keyframes glowPulse { 0%, 100% { box-shadow: 0 0 20px rgba(255, 92, 0, 0.3); } 50% { box-shadow: 0 0 40px rgba(255, 92, 0, 0.6); } }
+
+    .animate-pulse { animation: pulse 1.5s ease-in-out infinite; }
+    .animate-slideUp { animation: slideUp 0.4s var(--ease-out); }
+    .animate-scaleIn { animation: scaleIn 0.3s var(--spring); }
+    .animate-glow { animation: glowPulse 2s ease-in-out infinite; }
+
+    .skeleton { background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-divider) 50%, var(--bg-card) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: var(--radius-sm); }
+
+    /* Divider */
+    .divider { height: 1px; background: var(--bg-divider); margin: var(--space-lg) 0; }
+
+    /* Nav back */
+    .nav-back { display: inline-flex; align-items: center; gap: var(--space-xs); color: var(--text-secondary); text-decoration: none; font-size: var(--fs-body-m); margin-bottom: var(--space-lg); transition: color 0.2s; }
+    .nav-back:hover { color: var(--text-primary); }
+    .nav-back::before { content: '←'; font-size: var(--fs-h3); }
+
+    /* Demo sections */
+    .demo-card { background: var(--bg-card); border-radius: var(--radius-lg); padding: var(--space-md); margin-bottom: var(--space-sm); display: flex; align-items: center; gap: var(--space-md); }
+    .demo-avatar { width: 48px; height: 48px; border-radius: 50%; flex-shrink: 0; }
+    .demo-info { flex: 1; }
+    .demo-name { font-size: var(--fs-body-m); font-weight: 600; }
+    .demo-desc { font-size: var(--fs-body-s); color: var(--text-secondary); }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <a href="index.html" class="nav-back">返回导航</a>
+
+  <h1 class="page-title">设计系统</h1>
+  <p class="page-subtitle">PrimeAtlas Design System — 暗色主题</p>
+
+  <!-- Colors -->
+  <div class="section">
+    <div class="section-title">色彩系统</div>
+
+    <h4 style="font-size:13px;color:var(--text-tertiary);margin-bottom:8px;">主色调</h4>
+    <div class="color-grid">
+      <div class="color-item" style="background:var(--color-primary);">
+        <span class="color-name">烈焰橙</span>
+        <span class="color-value">#FF5C00</span>
+      </div>
+      <div class="color-item" style="background:var(--color-danger);">
+        <span class="color-name">能量红</span>
+        <span class="color-value">#FF3B3B</span>
+      </div>
+      <div class="color-item" style="background:var(--color-gold);">
+        <span class="color-name">琥珀金</span>
+        <span class="color-value">#FFD700</span>
+      </div>
+    </div>
+    <div class="color-grid" style="margin-top:8px;">
+      <div class="color-item" style="background:var(--color-success);">
+        <span class="color-name">翡翠绿</span>
+        <span class="color-value">#00D2A0</span>
+      </div>
+      <div class="color-item" style="background:var(--color-info);">
+        <span class="color-name">电光蓝</span>
+        <span class="color-value">#4A90FF</span>
+      </div>
+    </div>
+
+    <h4 style="font-size:13px;color:var(--text-tertiary);margin:16px 0 8px;">伙伴专属色</h4>
+    <div class="color-grid">
+      <div class="color-item" style="background:var(--color-alex);"><span class="color-name">Alex·赤焰</span><span class="color-value">#FF4500</span></div>
+      <div class="color-item" style="background:var(--color-xiaoye);"><span class="color-name">小野·疾风</span><span class="color-value">#00CED1</span></div>
+      <div class="color-item" style="background:var(--color-elena);"><span class="color-name">Elena·晨曦</span><span class="color-value">#FFB6C1</span></div>
+    </div>
+    <div class="color-grid" style="margin-top:8px;">
+      <div class="color-item" style="background:var(--color-k);"><span class="color-name">K·零</span><span class="color-value">#7B68EE</span></div>
+      <div class="color-item" style="background:var(--color-rin);"><span class="color-name">凛·静流</span><span class="color-value">#2E8B57</span></div>
+    </div>
+
+    <h4 style="font-size:13px;color:var(--text-tertiary);margin:16px 0 8px;">中性色</h4>
+    <div class="color-grid">
+      <div class="color-item" style="background:var(--text-primary);color:#1A1A2E;"><span class="color-name" style="color:#1A1A2E;">文字一级</span><span class="color-value" style="color:#1A1A2E;">#FFFFFF</span></div>
+      <div class="color-item" style="background:var(--text-secondary);"><span class="color-name">文字二级</span><span class="color-value">#B0B0CC</span></div>
+      <div class="color-item" style="background:var(--text-tertiary);"><span class="color-name">文字三级</span><span class="color-value">#6B6B8A</span></div>
+    </div>
+    <div class="color-grid" style="margin-top:8px;">
+      <div class="color-item" style="background:var(--bg-card);"><span class="color-name">卡片背景</span><span class="color-value">#222240</span></div>
+      <div class="color-item" style="background:var(--bg-divider);"><span class="color-name">分割线</span><span class="color-value">#2A2A4A</span></div>
+      <div class="color-item" style="background:var(--bg-primary);border:1px solid var(--bg-divider);"><span class="color-name">页面背景</span><span class="color-value">#1A1A2E</span></div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Typography -->
+  <div class="section">
+    <div class="section-title">字体层级</div>
+    <div class="type-sample"><span class="type-label">Display 48</span><span style="font-size:var(--fs-display);font-weight:700;line-height:1.1;">PR 120</span></div>
+    <div class="type-sample"><span class="type-label">H1 32</span><span style="font-size:var(--fs-h1);font-weight:700;line-height:1.2;">页面主标题</span></div>
+    <div class="type-sample"><span class="type-label">H2 24</span><span style="font-size:var(--fs-h2);font-weight:600;line-height:1.3;">卡片标题</span></div>
+    <div class="type-sample"><span class="type-label">H3 20</span><span style="font-size:var(--fs-h3);font-weight:600;line-height:1.3;">分组标题</span></div>
+    <div class="type-sample"><span class="type-label">Body L 17</span><span style="font-size:var(--fs-body-l);line-height:1.5;">这是正文内容，用于主要阅读文本</span></div>
+    <div class="type-sample"><span class="type-label">Body M 15</span><span style="font-size:var(--fs-body-m);line-height:1.5;">次要正文内容</span></div>
+    <div class="type-sample"><span class="type-label">Body S 13</span><span style="font-size:var(--fs-body-s);line-height:1.4;color:var(--text-secondary);">辅助信息 / 标签文字</span></div>
+    <div class="type-sample"><span class="type-label">Caption 11</span><span style="font-size:var(--fs-caption);font-weight:500;line-height:1.3;color:var(--text-tertiary);">TIMESTAMP · TAG</span></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Buttons -->
+  <div class="section">
+    <div class="section-title">按钮</div>
+    <div class="btn-group">
+      <button class="btn btn-primary">主按钮</button>
+      <button class="btn btn-secondary">次要按钮</button>
+      <button class="btn btn-ghost">幽灵按钮</button>
+      <button class="btn btn-danger">危险按钮</button>
+      <button class="btn btn-success">成功按钮</button>
+    </div>
+    <div style="margin-top:12px;">
+      <button class="btn btn-primary btn-lg btn-block">大型主按钮（全宽）</button>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Inputs -->
+  <div class="section">
+    <div class="section-title">输入框</div>
+    <div class="input-group">
+      <label class="input-label">训练重量 (kg)</label>
+      <input class="input" type="number" placeholder="输入重量..." value="85">
+    </div>
+    <div class="input-group">
+      <label class="input-label">RPE (1-10)</label>
+      <input type="range" class="slider" min="1" max="10" value="7">
+      <div style="display:flex;justify-content:space-between;font-size:var(--fs-caption);color:var(--text-tertiary);margin-top:4px;">
+        <span>1 轻松</span><span>5 中等</span><span>10 极限</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Cards -->
+  <div class="section">
+    <div class="section-title">卡片</div>
+    <div class="card">
+      <div class="card-title">训练状态卡片</div>
+      <div class="card-body">今日已完成 3/5 组深蹲训练，RPE平均 7.5</div>
+      <div style="margin-top:12px;">
+        <div class="progress"><div class="progress-fill" style="width:60%"></div></div>
+        <div style="font-size:var(--fs-caption);color:var(--text-tertiary);margin-top:4px;">60% 完成</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">伙伴卡片</div>
+      <div class="demo-card" style="background:transparent;padding:0;">
+        <div class="demo-avatar" style="background:linear-gradient(135deg,var(--color-alex),var(--color-primary));display:flex;align-items:center;justify-content:center;font-size:24px;">🔥</div>
+        <div class="demo-info">
+          <div class="demo-name">Alex · 赤焰</div>
+          <div class="demo-desc">"今天状态不错，深蹲加5kg试试"</div>
+        </div>
+        <span class="tag tag-primary">Lv.3</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Tags -->
+  <div class="section">
+    <div class="section-title">标签</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <span class="tag tag-primary">训练中</span>
+      <span class="tag tag-success">已完成</span>
+      <span class="tag tag-danger">PR突破</span>
+      <span class="tag tag-gold">里程碑</span>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Tab Bar -->
+  <div class="section">
+    <div class="section-title">底部导航</div>
+    <div class="tab-bar">
+      <div class="tab-item active"><span class="tab-icon">🏠</span>首页</div>
+      <div class="tab-item"><span class="tab-icon">🏋️</span>训练</div>
+      <div class="tab-item"><span class="tab-icon">🗣️</span>英语</div>
+      <div class="tab-item"><span class="tab-icon">👤</span>我的</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Animations -->
+  <div class="section">
+    <div class="section-title">动效示例</div>
+    <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
+      <div style="width:60px;height:60px;background:var(--color-primary);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;animation:countdownPulse 0.5s ease-in-out infinite;">3</div>
+      <div class="skeleton" style="width:200px;height:40px;"></div>
+      <div class="btn btn-primary animate-glow">发光按钮</div>
+      <div style="width:40px;height:40px;background:var(--color-danger);border-radius:50%;animation:flameFlicker 0.3s ease-in-out infinite;"></div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Skeleton -->
+  <div class="section">
+    <div class="section-title">骨架屏</div>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <div class="skeleton" style="width:60%;height:20px;"></div>
+      <div class="skeleton" style="width:100%;height:14px;"></div>
+      <div class="skeleton" style="width:80%;height:14px;"></div>
+      <div class="skeleton" style="width:100%;height:60px;"></div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

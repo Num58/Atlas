@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>训练首页 — PrimeAtlas</title>
+  <style>
+    :root {
+      --bg-primary: #1A1A2E;
+      --bg-card: #222240;
+      --bg-divider: #2A2A4A;
+      --text-primary: #FFFFFF;
+      --text-secondary: #B0B0CC;
+      --text-tertiary: #6B6B8A;
+      --color-primary: #FF5C00;
+      --color-gold: #FFD700;
+      --color-success: #00D2A0;
+      --color-info: #4A90FF;
+      --color-danger: #FF3B3B;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+      --ease-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', Roboto, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+    .container { max-width: 414px; margin: 0 auto; min-height: 100vh; padding-bottom: 90px; }
+
+    /* Header */
+    .header { padding: 20px 16px 16px; display: flex; align-items: center; justify-content: space-between; }
+    .header-title { font-size: 24px; font-weight: 700; }
+    .header-subtitle { font-size: 13px; color: var(--text-tertiary); }
+    .header-actions { display: flex; gap: 12px; }
+    .header-action {
+      width: 36px; height: 36px; border-radius: 50%; background: var(--bg-card);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; cursor: pointer; transition: transform 0.15s var(--spring);
+      text-decoration: none; color: var(--text-primary);
+    }
+    .header-action:active { transform: scale(0.9); }
+
+    /* Section */
+    .section { padding: 0 16px; margin-bottom: 24px; }
+    .section-title { font-size: 17px; font-weight: 700; margin-bottom: 12px; }
+
+    /* Stats row */
+    .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .stat-card {
+      background: var(--bg-card); border-radius: var(--radius-lg);
+      padding: 16px 12px; text-align: center;
+    }
+    .stat-value { font-size: 24px; font-weight: 700; }
+    .stat-label { font-size: 12px; color: var(--text-tertiary); margin-top: 4px; }
+    .stat-value.orange { color: var(--color-primary); }
+    .stat-value.green { color: var(--color-success); }
+    .stat-value.gold { color: var(--color-gold); }
+
+    /* Today's plan card */
+    .plan-card {
+      background: var(--bg-card); border-radius: var(--radius-xl);
+      padding: 20px; border: 1px solid rgba(255, 92, 0, 0.15);
+    }
+    .plan-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .plan-title { font-size: 17px; font-weight: 700; }
+    .plan-tag { padding: 4px 12px; background: rgba(255, 92, 0, 0.15); color: var(--color-primary); border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .plan-meta { display: flex; gap: 16px; margin-bottom: 16px; }
+    .plan-meta-item { font-size: 13px; color: var(--text-secondary); }
+    .plan-meta-value { font-weight: 600; color: var(--text-primary); }
+
+    .exercise-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--bg-divider); }
+    .exercise-item:last-child { border-bottom: none; }
+    .exercise-num { width: 28px; height: 28px; border-radius: 8px; background: var(--bg-divider); display: flex; align-items: center; justify-content: center; font-size: 13px; color: var(--text-tertiary); flex-shrink: 0; }
+    .exercise-info { flex: 1; }
+    .exercise-name { font-size: 15px; font-weight: 600; }
+    .exercise-detail { font-size: 12px; color: var(--text-tertiary); margin-top: 2px; }
+    .exercise-sets { font-size: 14px; color: var(--text-secondary); white-space: nowrap; }
+    .exercise-rpe { padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; margin-left: 8px; }
+    .rpe-high { background: rgba(255, 59, 59, 0.15); color: var(--color-danger); }
+    .rpe-mid { background: rgba(255, 92, 0, 0.15); color: var(--color-primary); }
+    .rpe-low { background: rgba(0, 210, 160, 0.15); color: var(--color-success); }
+
+    /* Muscle heatmap */
+    .heatmap-card {
+      background: var(--bg-card); border-radius: var(--radius-xl);
+      padding: 20px; margin-bottom: 24px;
+    }
+    .heatmap-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 12px; }
+    .heatmap-item { text-align: center; padding: 12px 8px; border-radius: var(--radius-md); font-size: 11px; }
+    .heatmap-item .muscle-icon { font-size: 20px; margin-bottom: 4px; display: block; }
+    .heatmap-item .muscle-name { font-size: 10px; color: var(--text-secondary); }
+    .heatmap-recovered { background: rgba(0, 210, 160, 0.1); border: 1px solid rgba(0, 210, 160, 0.3); }
+    .heatmap-recovering { background: rgba(255, 184, 0, 0.1); border: 1px solid rgba(255, 184, 0, 0.3); }
+    .heatmap-fatigued { background: rgba(255, 92, 0, 0.1); border: 1px solid rgba(255, 92, 0, 0.3); }
+    .heatmap-rest { background: rgba(255, 59, 59, 0.1); border: 1px solid rgba(255, 59, 59, 0.3); }
+
+    /* Start button */
+    .start-section { padding: 0 16px 24px; }
+    .btn-start {
+      display: flex; align-items: center; justify-content: center;
+      width: 100%; padding: 18px; background: var(--color-primary); color: #fff;
+      border: none; border-radius: var(--radius-lg); font-size: 18px; font-weight: 700;
+      cursor: pointer; transition: all 0.15s var(--spring); text-decoration: none;
+      box-shadow: 0 4px 20px rgba(255, 92, 0, 0.3);
+    }
+    .btn-start:active { transform: scale(0.95); }
+    .btn-start:hover { box-shadow: 0 6px 30px rgba(255, 92, 0, 0.4); }
+
+    /* History */
+    .history-item {
+      display: flex; align-items: center; gap: 12px;
+      background: var(--bg-card); padding: 14px 16px;
+      border-radius: var(--radius-md); margin-bottom: 8px;
+    }
+    .history-date { font-size: 12px; color: var(--text-tertiary); }
+    .history-name { font-size: 14px; font-weight: 600; }
+    .history-volume { font-size: 12px; color: var(--text-secondary); margin-left: auto; }
+    .history-badge { padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; background: rgba(255, 215, 0, 0.15); color: var(--color-gold); margin-left: 8px; }
+
+    /* Tab Bar */
+    .tab-bar {
+      position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+      width: 100%; max-width: 414px; display: flex; background: var(--bg-card);
+      padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+      border-top: 1px solid var(--bg-divider);
+    }
+    .tab-item { flex: 1; text-align: center; font-size: 11px; color: var(--text-tertiary); cursor: pointer; text-decoration: none; }
+    .tab-item.active { color: var(--color-primary); }
+    .tab-icon { display: block; font-size: 20px; margin-bottom: 2px; }
+
+    .nav-back { display: inline-flex; align-items: center; gap: 4px; color: var(--text-tertiary); text-decoration: none; font-size: 13px; padding: 16px 16px 0; }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <a href="index.html" class="nav-back">← 返回导航</a>
+
+  <div class="header">
+    <div>
+      <div class="header-title">训练中心</div>
+      <div class="header-subtitle">周四 · 腿部训练日</div>
+    </div>
+    <div class="header-actions">
+      <a href="dashboard.html" class="header-action">📊</a>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="section">
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-value orange">32</div>
+        <div class="stat-label">总训练次数</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value gold">3</div>
+        <div class="stat-label">PR 突破</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value green">12</div>
+        <div class="stat-label">连续天数</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Today's Plan -->
+  <div class="section">
+    <div class="section-title">今日训练计划</div>
+    <div class="plan-card">
+      <div class="plan-header">
+        <span class="plan-title">下肢力量日</span>
+        <span class="plan-tag">腿部日</span>
+      </div>
+      <div class="plan-meta">
+        <div class="plan-meta-item">预计时长 <span class="plan-meta-value">55 min</span></div>
+        <div class="plan-meta-item">总容量 <span class="plan-meta-value">240 NVU</span></div>
+        <div class="plan-meta-item">ACWR <span class="plan-meta-value">1.12</span></div>
+      </div>
+
+      <div class="exercise-item">
+        <div class="exercise-num">1</div>
+        <div class="exercise-info">
+          <div class="exercise-name">杠铃深蹲</div>
+          <div class="exercise-detail">热身 20kg×10, 40kg×8, 60kg×5 → 正式组</div>
+        </div>
+        <div class="exercise-sets">
+          5×5<span class="exercise-rpe rpe-high">RPE 8</span>
+        </div>
+      </div>
+
+      <div class="exercise-item">
+        <div class="exercise-num">2</div>
+        <div class="exercise-info">
+          <div class="exercise-name">罗马尼亚硬拉</div>
+          <div class="exercise-detail">70kg</div>
+        </div>
+        <div class="exercise-sets">
+          3×8<span class="exercise-rpe rpe-mid">RPE 7</span>
+        </div>
+      </div>
+
+      <div class="exercise-item">
+        <div class="exercise-num">3</div>
+        <div class="exercise-info">
+          <div class="exercise-name">保加利亚分腿蹲</div>
+          <div class="exercise-detail">24kg × 2 哑铃</div>
+        </div>
+        <div class="exercise-sets">
+          3×10<span class="exercise-rpe rpe-mid">RPE 8</span>
+        </div>
+      </div>
+
+      <div class="exercise-item">
+        <div class="exercise-num">4</div>
+        <div class="exercise-info">
+          <div class="exercise-name">坐姿腿弯举</div>
+          <div class="exercise-detail">45kg</div>
+        </div>
+        <div class="exercise-sets">
+          3×12<span class="exercise-rpe rpe-low">RPE 6</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Muscle Heatmap -->
+  <div class="section">
+    <div class="section-title">肌群恢复状态</div>
+    <div class="heatmap-card">
+      <div class="heatmap-grid">
+        <div class="heatmap-item heatmap-recovered">
+          <span class="muscle-icon">🟢</span>
+          <span class="muscle-name">胸部</span>
+        </div>
+        <div class="heatmap-item heatmap-recovering">
+          <span class="muscle-icon">🟡</span>
+          <span class="muscle-name">背部</span>
+        </div>
+        <div class="heatmap-item heatmap-fatigued">
+          <span class="muscle-icon">🟠</span>
+          <span class="muscle-name">肩部</span>
+        </div>
+        <div class="heatmap-item heatmap-recovered">
+          <span class="muscle-icon">🟢</span>
+          <span class="muscle-name">手臂</span>
+        </div>
+        <div class="heatmap-item heatmap-recovered">
+          <span class="muscle-icon">🟢</span>
+          <span class="muscle-name">股四头肌</span>
+        </div>
+        <div class="heatmap-item heatmap-recovering">
+          <span class="muscle-icon">🟡</span>
+          <span class="muscle-name">腘绳肌</span>
+        </div>
+        <div class="heatmap-item heatmap-recovered">
+          <span class="muscle-icon">🟢</span>
+          <span class="muscle-name">臀肌</span>
+        </div>
+        <div class="heatmap-item heatmap-recovered">
+          <span class="muscle-icon">🟢</span>
+          <span class="muscle-name">小腿</span>
+        </div>
+        <div class="heatmap-item heatmap-fatigued">
+          <span class="muscle-icon">🟠</span>
+          <span class="muscle-name">核心</span>
+        </div>
+        <div class="heatmap-item heatmap-recovering">
+          <span class="muscle-icon">🟡</span>
+          <span class="muscle-name">下背</span>
+        </div>
+        <div class="heatmap-item heatmap-recovered">
+          <span class="muscle-icon">🟢</span>
+          <span class="muscle-name">前锯肌</span>
+        </div>
+        <div class="heatmap-item heatmap-recovered">
+          <span class="muscle-icon">🟢</span>
+          <span class="muscle-name">斜方肌</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;justify-content:center;margin-top:16px;font-size:11px;color:var(--text-tertiary);">
+        <span>🟢 已恢复</span><span>🟡 恢复中</span><span>🟠 疲劳</span><span>🔴 需要休息</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent History -->
+  <div class="section">
+    <div class="section-title">最近训练</div>
+    <div class="history-item">
+      <div>
+        <div class="history-date">7月1日 周一</div>
+        <div class="history-name">上肢推力日</div>
+      </div>
+      <div class="history-volume">320 NVU</div>
+      <span class="history-badge">PR</span>
+    </div>
+    <div class="history-item">
+      <div>
+        <div class="history-date">6月29日 周六</div>
+        <div class="history-name">下肢力量日</div>
+      </div>
+      <div class="history-volume">280 NVU</div>
+    </div>
+    <div class="history-item">
+      <div>
+        <div class="history-date">6月27日 周四</div>
+        <div class="history-name">背部 + 二头</div>
+      </div>
+      <div class="history-volume">260 NVU</div>
+    </div>
+  </div>
+
+  <!-- Start Button -->
+  <div class="start-section">
+    <a href="training-execute.html" class="btn-start">⚡ 开始训练</a>
+  </div>
+
+  <!-- Tab Bar -->
+  <div class="tab-bar">
+    <a href="partner-home.html" class="tab-item"><span class="tab-icon">🏠</span>首页</a>
+    <a href="training-home.html" class="tab-item active"><span class="tab-icon">🏋️</span>训练</a>
+    <a href="english-dialogue.html" class="tab-item"><span class="tab-icon">🗣️</span>英语</a>
+    <a href="dashboard.html" class="tab-item"><span class="tab-icon">👤</span>我的</a>
+  </div>
+
+</div>
+</body>
+</html>

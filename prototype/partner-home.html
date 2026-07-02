@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>伙伴首页 — PrimeAtlas</title>
+  <style>
+    :root {
+      --bg-primary: #1A1A2E;
+      --bg-card: #222240;
+      --bg-divider: #2A2A4A;
+      --text-primary: #FFFFFF;
+      --text-secondary: #B0B0CC;
+      --text-tertiary: #6B6B8A;
+      --color-primary: #FF5C00;
+      --color-gold: #FFD700;
+      --color-success: #00D2A0;
+      --color-info: #4A90FF;
+      --color-danger: #FF3B3B;
+      --color-alex: #FF4500;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+      --ease-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', Roboto, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+    .container { max-width: 414px; margin: 0 auto; min-height: 100vh; padding-bottom: 90px; }
+
+    /* Header */
+    .header { padding: 16px; display: flex; align-items: center; justify-content: space-between; }
+    .header-greeting { font-size: 13px; color: var(--text-tertiary); }
+    .header-time { font-size: 20px; font-weight: 700; }
+    .header-actions { display: flex; gap: 12px; }
+    .header-action {
+      width: 36px; height: 36px; border-radius: 50%; background: var(--bg-card);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; cursor: pointer; transition: transform 0.15s var(--spring);
+      text-decoration: none; color: var(--text-primary);
+    }
+    .header-action:active { transform: scale(0.9); }
+
+    /* Partner Banner */
+    .partner-banner {
+      margin: 0 16px 20px; background: var(--bg-card);
+      border-radius: var(--radius-xl); padding: 20px;
+      position: relative; overflow: hidden;
+    }
+    .partner-banner::before {
+      content: ''; position: absolute; top: -50%; right: -20%; width: 200px; height: 200px;
+      background: radial-gradient(circle, rgba(255, 69, 0, 0.1), transparent);
+      border-radius: 50%;
+    }
+    .partner-banner-top { display: flex; align-items: center; gap: 16px; position: relative; z-index: 1; }
+    .partner-avatar {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--color-alex), var(--color-primary));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 32px; animation: avatarPulse 3s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+    @keyframes avatarPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
+    .partner-info { flex: 1; min-width: 0; }
+    .partner-name { font-size: 18px; font-weight: 700; }
+    .partner-level { font-size: 12px; color: var(--color-alex); margin-top: 2px; }
+    .partner-status { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+
+    .partner-quote {
+      margin-top: 16px; padding: 12px 16px; background: rgba(255, 69, 0, 0.08);
+      border-radius: var(--radius-md); font-size: 14px; color: var(--text-secondary);
+      font-style: italic; position: relative; z-index: 1; line-height: 1.6;
+    }
+    .partner-quote::before { content: '"'; font-size: 24px; color: var(--color-alex); opacity: 0.5; }
+
+    /* Flame */
+    .flame-container { display: flex; align-items: center; justify-content: center; margin: 16px 0 20px; gap: 12px; }
+    .flame-icon { font-size: 28px; animation: flameFlicker 1.5s ease-in-out infinite; }
+    @keyframes flameFlicker { 0%,100%{filter:brightness(1);transform:scaleY(1)} 50%{filter:brightness(1.3);transform:scaleY(1.1)} }
+    .flame-text { font-size: 14px; color: var(--text-secondary); }
+    .flame-days { font-size: 28px; font-weight: 700; background: linear-gradient(135deg, var(--color-primary), var(--color-gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+    /* Today's log */
+    .section { padding: 0 16px; margin-bottom: 24px; }
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .section-title { font-size: 17px; font-weight: 700; }
+    .section-more { font-size: 13px; color: var(--text-tertiary); cursor: pointer; }
+
+    /* Log card */
+    .log-card {
+      background: var(--bg-card); border-radius: var(--radius-lg);
+      padding: 16px; margin-bottom: 10px;
+    }
+    .log-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .log-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    .log-title { font-size: 15px; font-weight: 600; }
+    .log-time { font-size: 12px; color: var(--text-tertiary); margin-left: auto; }
+    .log-detail { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+
+    /* Quick actions */
+    .quick-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 24px; }
+    .quick-action {
+      background: var(--bg-card); border-radius: var(--radius-lg);
+      padding: 16px 12px; text-align: center; cursor: pointer;
+      transition: transform 0.15s var(--spring); text-decoration: none; color: var(--text-primary);
+    }
+    .quick-action:active { transform: scale(0.95); }
+    .quick-action-icon { font-size: 28px; margin-bottom: 8px; }
+    .quick-action-label { font-size: 12px; color: var(--text-secondary); }
+
+    /* Training preview */
+    .training-preview {
+      background: var(--bg-card); border-radius: var(--radius-xl);
+      padding: 20px; margin: 0 16px 24px;
+      border: 1px solid rgba(255, 92, 0, 0.2);
+    }
+    .preview-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .preview-title { font-size: 17px; font-weight: 700; }
+    .preview-badge { padding: 4px 12px; background: rgba(255, 92, 0, 0.15); color: var(--color-primary); border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .exercise-preview { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--bg-divider); }
+    .exercise-preview:last-child { border-bottom: none; }
+    .exercise-num { width: 24px; height: 24px; border-radius: 50%; background: var(--bg-divider); display: flex; align-items: center; justify-content: center; font-size: 12px; color: var(--text-tertiary); flex-shrink: 0; }
+    .exercise-info { flex: 1; }
+    .exercise-name { font-size: 14px; font-weight: 600; }
+    .exercise-detail { font-size: 12px; color: var(--text-tertiary); }
+    .exercise-sets { font-size: 13px; color: var(--text-secondary); }
+
+    .btn-start {
+      display: flex; align-items: center; justify-content: center;
+      width: 100%; margin-top: 16px; padding: 14px;
+      background: var(--color-primary); color: #fff;
+      border: none; border-radius: var(--radius-md);
+      font-size: 16px; font-weight: 700; cursor: pointer;
+      transition: transform 0.15s var(--spring);
+    }
+    .btn-start:active { transform: scale(0.95); }
+
+    /* Tab Bar */
+    .tab-bar {
+      position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+      width: 100%; max-width: 414px; display: flex; background: var(--bg-card);
+      padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+      border-top: 1px solid var(--bg-divider);
+    }
+    .tab-item { flex: 1; text-align: center; font-size: 11px; color: var(--text-tertiary); cursor: pointer; text-decoration: none; }
+    .tab-item.active { color: var(--color-primary); }
+    .tab-icon { display: block; font-size: 20px; margin-bottom: 2px; }
+
+    /* Nav back */
+    .nav-back { display: inline-flex; align-items: center; gap: 4px; color: var(--text-tertiary); text-decoration: none; font-size: 13px; padding: 16px 16px 0; }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <a href="index.html" class="nav-back">← 返回导航</a>
+
+  <!-- Header -->
+  <div class="header">
+    <div>
+      <div class="header-greeting">早安，张逸飞</div>
+      <div class="header-time">07:22 AM</div>
+    </div>
+    <div class="header-actions">
+      <a href="dashboard.html" class="header-action">📊</a>
+      <a href="partner-onboarding.html" class="header-action">⚙️</a>
+    </div>
+  </div>
+
+  <!-- Partner Banner -->
+  <div class="partner-banner">
+    <div class="partner-banner-top">
+      <div class="partner-avatar">🔥</div>
+      <div class="partner-info">
+        <div class="partner-name">Alex · 赤焰</div>
+        <div class="partner-level">Lv.3 信任 ████████░░ 68%</div>
+        <div class="partner-status">累计训练 32 次</div>
+      </div>
+    </div>
+    <div class="partner-quote">
+      今天是练腿日。我看了你的恢复数据——股四头肌已经完全恢复了。
+      今天的计划里，深蹲可以尝试加 5kg。准备好了吗？
+    </div>
+  </div>
+
+  <!-- Flame -->
+  <div class="flame-container">
+    <div class="flame-icon">🔥</div>
+    <div>
+      <div class="flame-text">连续训练</div>
+      <div class="flame-days">12 天</div>
+    </div>
+  </div>
+
+  <!-- Today's Log -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">今日伙伴日志</span>
+      <span class="section-more">查看全部 →</span>
+    </div>
+
+    <div class="log-card">
+      <div class="log-header">
+        <div class="log-icon" style="background:rgba(255,92,0,0.12)">🏋️</div>
+        <div class="log-title">今日训练预告</div>
+        <div class="log-time">07:00</div>
+      </div>
+      <div class="log-detail">下肢力量日 · 杠铃深蹲 5×5 + 罗马尼亚硬拉 3×8 + 保加利亚分腿蹲 3×10 · 预计 55 分钟</div>
+    </div>
+
+    <div class="log-card">
+      <div class="log-header">
+        <div class="log-icon" style="background:rgba(74,144,255,0.12)">🗣️</div>
+        <div class="log-title">英语对话推荐</div>
+        <div class="log-time">06:45</div>
+      </div>
+      <div class="log-detail">今日话题：Gym Conversation — "Can you spot me?" · B1 难度 · 预计 10 分钟</div>
+    </div>
+
+    <div class="log-card">
+      <div class="log-header">
+        <div class="log-icon" style="background:rgba(0,210,160,0.12)">📖</div>
+        <div class="log-title">继续阅读《原子习惯》</div>
+        <div class="log-time">昨日</div>
+      </div>
+      <div class="log-detail">第 7 章 · 已读 62% · 上次读到"习惯堆叠"策略</div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="section">
+    <div class="quick-actions">
+      <a href="training-home.html" class="quick-action">
+        <div class="quick-action-icon">🏋️</div>
+        <div class="quick-action-label">开始训练</div>
+      </a>
+      <a href="english-dialogue.html" class="quick-action">
+        <div class="quick-action-icon">🗣️</div>
+        <div class="quick-action-label">练英语</div>
+      </a>
+      <a href="reading-reader.html" class="quick-action">
+        <div class="quick-action-icon">📖</div>
+        <div class="quick-action-label">去读书</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- Training Preview -->
+  <div class="training-preview">
+    <div class="preview-header">
+      <span class="preview-title">今日训练计划</span>
+      <span class="preview-badge">腿部日</span>
+    </div>
+    <div class="exercise-preview">
+      <div class="exercise-num">1</div>
+      <div class="exercise-info">
+        <div class="exercise-name">杠铃深蹲</div>
+        <div class="exercise-detail">85kg · 目标 RPE 8</div>
+      </div>
+      <div class="exercise-sets">5×5</div>
+    </div>
+    <div class="exercise-preview">
+      <div class="exercise-num">2</div>
+      <div class="exercise-info">
+        <div class="exercise-name">罗马尼亚硬拉</div>
+        <div class="exercise-detail">70kg · 目标 RPE 7</div>
+      </div>
+      <div class="exercise-sets">3×8</div>
+    </div>
+    <div class="exercise-preview">
+      <div class="exercise-num">3</div>
+      <div class="exercise-info">
+        <div class="exercise-name">保加利亚分腿蹲</div>
+        <div class="exercise-detail">24kg×2 · 目标 RPE 8</div>
+      </div>
+      <div class="exercise-sets">3×10</div>
+    </div>
+    <a href="training-execute.html" class="btn-start" style="text-decoration:none;display:flex;">⚡ 开始训练</a>
+  </div>
+
+  <!-- Tab Bar -->
+  <div class="tab-bar">
+    <a href="partner-home.html" class="tab-item active"><span class="tab-icon">🏠</span>首页</a>
+    <a href="training-home.html" class="tab-item"><span class="tab-icon">🏋️</span>训练</a>
+    <a href="english-dialogue.html" class="tab-item"><span class="tab-icon">🗣️</span>英语</a>
+    <a href="dashboard.html" class="tab-item"><span class="tab-icon">👤</span>我的</a>
+  </div>
+
+</div>
+</body>
+</html>

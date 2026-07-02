@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>训练总结 — PrimeAtlas</title>
+  <style>
+    :root {
+      --bg-primary: #1A1A2E;
+      --bg-card: #222240;
+      --bg-divider: #2A2A4A;
+      --text-primary: #FFFFFF;
+      --text-secondary: #B0B0CC;
+      --text-tertiary: #6B6B8A;
+      --color-primary: #FF5C00;
+      --color-gold: #FFD700;
+      --color-success: #00D2A0;
+      --color-info: #4A90FF;
+      --color-danger: #FF3B3B;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+      --ease-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', Roboto, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+    .container { max-width: 414px; margin: 0 auto; min-height: 100vh; padding: 0 16px 40px; }
+
+    /* Header */
+    .summary-header { text-align: center; padding: 32px 0 24px; }
+    .summary-check { font-size: 64px; animation: checkPop 0.6s var(--spring); }
+    @keyframes checkPop { from { opacity: 0; transform: scale(0) rotate(-30deg); } to { opacity: 1; transform: scale(1) rotate(0); } }
+    .summary-title { font-size: 28px; font-weight: 700; margin: 12px 0 4px; }
+    .summary-date { font-size: 14px; color: var(--text-tertiary); }
+
+    /* Overview card */
+    .overview-card {
+      background: var(--bg-card); border-radius: var(--radius-xl);
+      padding: 20px; margin-bottom: 16px;
+      border: 1px solid rgba(255, 92, 0, 0.1);
+    }
+    .overview-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .overview-item { text-align: center; }
+    .overview-value { font-size: 24px; font-weight: 700; }
+    .overview-value.orange { color: var(--color-primary); }
+    .overview-value.gold { color: var(--color-gold); }
+    .overview-value.green { color: var(--color-success); }
+    .overview-label { font-size: 12px; color: var(--text-tertiary); margin-top: 2px; }
+
+    /* Section */
+    .section { margin-bottom: 20px; }
+    .section-title { font-size: 17px; font-weight: 700; margin-bottom: 12px; }
+
+    /* Highlights */
+    .highlight-card {
+      background: var(--bg-card); border-radius: var(--radius-lg);
+      padding: 16px; margin-bottom: 10px; display: flex; gap: 12px; align-items: flex-start;
+    }
+    .highlight-icon { font-size: 28px; flex-shrink: 0; }
+    .highlight-title { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+    .highlight-desc { font-size: 13px; color: var(--text-secondary); }
+
+    /* Exercise summary */
+    .exercise-summary {
+      background: var(--bg-card); border-radius: var(--radius-xl);
+      padding: 20px; margin-bottom: 16px;
+    }
+    .ex-summary-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .ex-summary-name { font-size: 16px; font-weight: 600; }
+    .ex-summary-status { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .status-pr { background: rgba(255, 215, 0, 0.15); color: var(--color-gold); }
+    .status-done { background: rgba(0, 210, 160, 0.15); color: var(--color-success); }
+
+    .set-row { display: flex; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--bg-divider); font-size: 13px; }
+    .set-row:last-child { border-bottom: none; }
+    .set-num { width: 24px; color: var(--text-tertiary); }
+    .set-data { flex: 1; color: var(--text-secondary); }
+    .set-rpe { padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+    .set-rpe.high { background: rgba(255, 59, 59, 0.1); color: var(--color-danger); }
+    .set-rpe.mid { background: rgba(255, 92, 0, 0.1); color: var(--color-primary); }
+    .set-rpe.low { background: rgba(0, 210, 160, 0.1); color: var(--color-success); }
+
+    /* Partner evaluation */
+    .partner-eval {
+      background: var(--bg-card); border-radius: var(--radius-xl);
+      padding: 20px; margin-bottom: 16px;
+      border: 1px solid rgba(255, 69, 0, 0.1);
+    }
+    .partner-eval-header { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; }
+    .partner-eval-avatar { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #FF4500, var(--color-primary)); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+    .partner-eval-name { font-size: 15px; font-weight: 600; }
+    .partner-eval-rating { font-size: 12px; color: var(--text-tertiary); }
+    .partner-eval-text { font-size: 14px; color: var(--text-secondary); line-height: 1.8; }
+    .partner-eval-signature { text-align: right; font-size: 13px; color: var(--text-tertiary); font-style: italic; margin-top: 12px; }
+
+    /* Goal progress */
+    .goal-progress { margin-top: 8px; }
+    .goal-text { font-size: 13px; color: var(--text-secondary); margin-bottom: 6px; }
+    .goal-bar { height: 6px; background: var(--bg-divider); border-radius: 3px; overflow: hidden; }
+    .goal-fill { height: 100%; background: linear-gradient(90deg, var(--color-primary), var(--color-gold)); border-radius: 3px; transition: width 1s var(--ease-out); }
+
+    /* Actions */
+    .actions { display: flex; flex-direction: column; gap: 10px; margin-top: 24px; }
+    .btn {
+      padding: 16px; border: none; border-radius: var(--radius-lg);
+      font-size: 16px; font-weight: 700; cursor: pointer;
+      transition: transform 0.15s var(--spring); text-decoration: none;
+      text-align: center; display: block; color: #fff;
+    }
+    .btn:active { transform: scale(0.95); }
+    .btn-primary { background: var(--color-primary); }
+    .btn-secondary { background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--bg-divider); }
+    .btn-gold { background: var(--color-gold); color: #1A1A2E; }
+
+    .nav-back { display: inline-flex; align-items: center; gap: 4px; color: var(--text-tertiary); text-decoration: none; font-size: 12px; padding-top: 12px; }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <a href="index.html" class="nav-back">← 返回导航</a>
+
+  <!-- Header -->
+  <div class="summary-header">
+    <div class="summary-check">✅</div>
+    <div class="summary-title">训练完成！</div>
+    <div class="summary-date">2026年7月2日 周四 · 腿部训练日</div>
+  </div>
+
+  <!-- Overview -->
+  <div class="overview-card">
+    <div class="overview-row">
+      <div class="overview-item">
+        <div class="overview-value orange">52</div>
+        <div class="overview-label">训练时长 (min)</div>
+      </div>
+      <div class="overview-item">
+        <div class="overview-value gold">320</div>
+        <div class="overview-label">总容量 (NVU)</div>
+      </div>
+      <div class="overview-item">
+        <div class="overview-value green">4</div>
+        <div class="overview-label">完成动作</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Highlights -->
+  <div class="section">
+    <div class="section-title">亮点时刻</div>
+
+    <div class="highlight-card" style="border-left: 3px solid var(--color-gold);">
+      <div class="highlight-icon">🏆</div>
+      <div>
+        <div class="highlight-title">深蹲 PR 突破</div>
+        <div class="highlight-desc">90kg × 5 reps — 超越之前最佳 85kg，提升 5.9%</div>
+      </div>
+    </div>
+
+    <div class="highlight-card" style="border-left: 3px solid var(--color-success);">
+      <div class="highlight-icon">🎯</div>
+      <div>
+        <div class="highlight-title">全部动作完成</div>
+        <div class="highlight-desc">4/4 动作按计划完成，无跳过、无中途退出</div>
+      </div>
+    </div>
+
+    <div class="highlight-card" style="border-left: 3px solid var(--color-primary);">
+      <div class="highlight-icon">🔥</div>
+      <div>
+        <div class="highlight-title">最后一组全力输出</div>
+        <div class="highlight-desc">深蹲最后一组 RPE 9，真正挑战了极限</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Exercise Summary -->
+  <div class="section">
+    <div class="section-title">动作详情</div>
+
+    <div class="exercise-summary">
+      <div class="ex-summary-header">
+        <span class="ex-summary-name">杠铃深蹲</span>
+        <span class="ex-summary-status status-pr">PR!</span>
+      </div>
+      <div class="set-row"><span class="set-num">1</span><span class="set-data">60kg × 8 (热身)</span><span class="set-rpe low">RPE 4</span></div>
+      <div class="set-row"><span class="set-num">2</span><span class="set-data">70kg × 5 (热身)</span><span class="set-rpe low">RPE 5</span></div>
+      <div class="set-row"><span class="set-num">3</span><span class="set-data">80kg × 5</span><span class="set-rpe mid">RPE 7</span></div>
+      <div class="set-row"><span class="set-num">4</span><span class="set-data">85kg × 5</span><span class="set-rpe mid">RPE 8</span></div>
+      <div class="set-row"><span class="set-num">5</span><span class="set-data" style="color:var(--color-gold);">90kg × 5 ⭐</span><span class="set-rpe high">RPE 9</span></div>
+    </div>
+
+    <div class="exercise-summary">
+      <div class="ex-summary-header">
+        <span class="ex-summary-name">罗马尼亚硬拉</span>
+        <span class="ex-summary-status status-done">完成</span>
+      </div>
+      <div class="set-row"><span class="set-num">1</span><span class="set-data">70kg × 8</span><span class="set-rpe mid">RPE 6</span></div>
+      <div class="set-row"><span class="set-num">2</span><span class="set-data">70kg × 8</span><span class="set-rpe mid">RPE 7</span></div>
+      <div class="set-row"><span class="set-num">3</span><span class="set-data">70kg × 8</span><span class="set-rpe mid">RPE 7</span></div>
+    </div>
+
+    <div class="exercise-summary">
+      <div class="ex-summary-header">
+        <span class="ex-summary-name">保加利亚分腿蹲</span>
+        <span class="ex-summary-status status-done">完成</span>
+      </div>
+      <div class="set-row"><span class="set-num">1</span><span class="set-data">24kg×2 × 10</span><span class="set-rpe mid">RPE 7</span></div>
+      <div class="set-row"><span class="set-num">2</span><span class="set-data">24kg×2 × 10</span><span class="set-rpe mid">RPE 8</span></div>
+      <div class="set-row"><span class="set-num">3</span><span class="set-data">24kg×2 × 10</span><span class="set-rpe high">RPE 8</span></div>
+    </div>
+  </div>
+
+  <!-- Partner Evaluation -->
+  <div class="partner-eval">
+    <div class="partner-eval-header">
+      <div class="partner-eval-avatar">🔥</div>
+      <div>
+        <div class="partner-eval-name">Alex · 赤焰</div>
+        <div class="partner-eval-rating">今日评价 ⭐⭐⭐⭐⭐</div>
+      </div>
+    </div>
+    <div class="partner-eval-text">
+      今天的训练，我只说一个词：<strong style="color:var(--color-gold);">漂亮</strong>。<br><br>
+      深蹲 90kg×5 不是偶然。是你连续 12 天不缺席、每一次动作都抠细节的结果。我注意到你最后一组前深呼吸了 3 秒——那个瞬间，你战胜的不是重量，是犹豫。<br><br>
+      下一次深蹲日，我们可以把目标定在 92.5kg。<br>
+      休息好，恢复好。明天见。
+    </div>
+    <div class="partner-eval-signature">— Alex</div>
+  </div>
+
+  <!-- Goal Progress -->
+  <div class="section">
+    <div class="section-title">与目标距离</div>
+    <div class="goal-progress">
+      <div class="goal-text">深蹲 1RM 目标：120kg → 当前推算：105kg</div>
+      <div class="goal-bar"><div class="goal-fill" style="width:87%"></div></div>
+      <div style="font-size:11px;color:var(--text-tertiary);text-align:right;margin-top:4px;">87%</div>
+    </div>
+    <div class="goal-progress" style="margin-top:16px;">
+      <div class="goal-text">本周训练容量目标：1200 NVU → 已完成：640 NVU</div>
+      <div class="goal-bar"><div class="goal-fill" style="width:53%"></div></div>
+      <div style="font-size:11px;color:var(--text-tertiary);text-align:right;margin-top:4px;">53%</div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="actions">
+    <a href="training-home.html" class="btn btn-primary">返回训练首页</a>
+    <a href="training-pr-celebration.html" class="btn btn-gold">查看 PR 庆祝</a>
+    <a href="partner-home.html" class="btn btn-secondary">回到伙伴首页</a>
+  </div>
+
+</div>
+
+<script>
+// Stagger animations
+document.querySelectorAll('.highlight-card, .exercise-summary, .partner-eval').forEach((el, i) => {
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(20px)';
+  el.style.transition = 'all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+  setTimeout(() => {
+    el.style.opacity = '1';
+    el.style.transform = 'translateY(0)';
+  }, 100 + i * 80);
+});
+
+// Animate goal bars
+setTimeout(() => {
+  document.querySelectorAll('.goal-fill').forEach(el => {
+    const target = el.style.width;
+    el.style.width = '0%';
+    setTimeout(() => { el.style.width = target; }, 100);
+  });
+}, 500);
+</script>
+</body>
+</html>
