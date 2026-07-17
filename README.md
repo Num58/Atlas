@@ -1,50 +1,30 @@
-# Atlas — PrimeAtlas 个人AI效能与认知闭环系统
+# PrimeAtlas
 
-## 项目简介
+> 个人成长操作系统 — 「陪你成为」
+> Flutter · Android / iOS · 本地优先 · 云端同步预留
 
-PrimeAtlas 是一个有灵魂的个人效能系统——AI 训练伙伴陪你变强，不只是工具，更是陪伴。融合"专项健身训练 + AI 英语听说 + AI 读书伙伴"三大模块。
+本仓库以**产品战略交接包**为唯一真源重建，原内容已清空。
 
-## 技术栈
-
-- **前端**: React Native (Android/iOS) + 微信小程序
-- **后端**: Go + Python (AI 服务)
-- **数据库**: PostgreSQL + pgvector + TimescaleDB
-- **AI**: DeepSeek-V3 + GPT-4o-mini
-- **本地存储**: SQLite + SQLCipher
-
-## 项目结构
-
+## 目录结构
 ```
-Atlas/
-├── apps/                   # 前端应用
-│   ├── android/           # Android (React Native)
-│   ├── ios/               # iOS (React Native)
-│   └── miniapp/           # 微信小程序
-├── services/              # 后端服务
-│   ├── api/               # Go API 服务
-│   └── ai/                # Python AI 服务
-├── docs/                  # 产品文档
-├── prototype/             # HTML 交互原型
-└── .github/               # CI/CD 配置
+docs/                 产品与架构文档（真源）
+  handoff/            开发交接包
+  product/            蓝图 / PRD / 任务卡
+  design/             设计参考（v6 原型）
+  architecture/       架构设计
+lib/                  Flutter 源码
+  core/               纯 Dart 核心层（事件总线 / 调性 / 冲突 / 画像）
+  app/                UI 层（主题 / 路由 / 页面）
+test/                 单元 / 集成测试
 ```
 
-## 快速开始
-
+## 构建
 ```bash
-# 安装依赖
-cd apps && npm install
-
-# 启动开发服务器
-npm start
-
-# 启动后端
-cd services/api && go run main.go
-cd services/ai && python main.py
+flutter pub get
+flutter test
+flutter run
 ```
 
-## 文档
-
-- [完整功能蓝图](docs/PrimeAtlas_完整功能蓝图.md)
-- [全量交互原型规格](docs/PrimeAtlas_全量交互原型规格.md)
-- [可执行优先级任务清单](docs/PrimeAtlas_可执行优先级任务清单.md)
-- [PRD V2.0](docs/PrimeAtlas_PRD_V2.0.md)
+## 真源
+- 交接包：`docs/handoff/handoff-dev-phase1-s0-2026-07-17.md`
+- 重建日期：2026-07-17
