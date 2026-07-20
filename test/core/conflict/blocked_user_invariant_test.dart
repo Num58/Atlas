@@ -9,7 +9,7 @@ void main() {
     });
 
     test('blockedUser: false 合法', () {
-      final d = Disposition(blockedUser: false);
+      const d = Disposition(blockedUser: false);
       expect(d.blockedUser, isFalse);
       expect(d.toJson()['blocked_user'], isFalse);
     });

@@ -46,7 +46,7 @@ class InMemoryPortraitVersioner implements PortraitVersioner {
     final versionId = 'v${_counter}_${DateTime.now().microsecondsSinceEpoch}';
     final version = PortraitVersion(
       versionId: versionId,
-      createdAt: DateTime.now().millisecondsSinceEpoch,
+      createdAt: DateTime.now().microsecondsSinceEpoch,
       snapshot: snapshot,
       changeSummary: '',
       consentRecordId: consentRecordId,

@@ -17,13 +17,17 @@ void main() {
   group('Event log query', () {
     late DefaultIdentityEventBus bus;
 
-    setUp(() {
+    setUp(() async {
       bus = DefaultIdentityEventBus();
       bus.publish(ToneChangeEvent.eventType, _tone(Tone.professional, Tone.warm));
+      // Ensure strictly increasing createdAt so the time-window lower-bound
+      // assertion has a distinct earliest record to exclude.
+      await Future.delayed(const Duration(milliseconds: 5));
       bus.publish(ToneChangeEvent.eventType, _tone(Tone.warm, Tone.strict));
+      await Future.delayed(const Duration(milliseconds: 5));
       bus.publish(
           ConflictDetected.eventType,
-          ConflictDetected(
+          const ConflictDetected(
             conflict_id: 'c1',
             conflict_type: ConflictType.goalGoal,
             is_body_related: false,
@@ -37,20 +41,20 @@ void main() {
     });
 
     test('query all returns every published event', () {
-      final all = bus.query(QuerySpec());
+      final all = bus.query(const QuerySpec());
       expect(all, hasLength(3));
     });
 
     test('query filters by eventTypes', () {
       final tones =
-          bus.query(QuerySpec(eventTypes: [ToneChangeEvent.eventType]));
+          bus.query(const QuerySpec(eventTypes: [ToneChangeEvent.eventType]));
       expect(tones, hasLength(2));
       expect(tones.every((r) => r.eventType == ToneChangeEvent.eventType),
           isTrue);
     });
 
     test('query filters by time window', () {
-      final all = bus.query(QuerySpec());
+      final all = bus.query(const QuerySpec());
       final min = all.map((r) => r.createdAt).reduce((a, b) => a < b ? a : b);
       final max = all.map((r) => r.createdAt).reduce((a, b) => a > b ? a : b);
 
@@ -69,7 +73,7 @@ void main() {
     });
 
     test('query limit caps results', () {
-      final limited = bus.query(QuerySpec(limit: 1));
+      final limited = bus.query(const QuerySpec(limit: 1));
       expect(limited, hasLength(1));
     });
   });

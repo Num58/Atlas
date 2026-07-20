@@ -2,6 +2,7 @@
 ///
 /// 字段名与序列化键一律采用 snake_case（ADR-6，逐字对齐 handoff TS 契约）。
 /// 本文件不依赖 `package:flutter`，仅用 `dart:`，可被纯 Dart 单测。
+library;
 
 /// 调性枚举。
 ///

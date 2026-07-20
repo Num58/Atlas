@@ -16,7 +16,7 @@ void main() {
       for (var i = 0; i < 3; i++) {
         bus.publish(
             ToneChangeEvent.eventType,
-            ToneChangeEvent(
+            const ToneChangeEvent(
               from_tone: Tone.professional,
               to_tone: Tone.warm,
               trigger: ToneSwitchTrigger.userExplicit,
@@ -30,8 +30,8 @@ void main() {
               conflict_id: 'c$i',
               conflict_type: ConflictType.goalGoal,
               is_body_related: false,
-              disposition: Disposition(blockedUser: false),
-              recommended_orchestration: Orchestration(
+              disposition: const Disposition(blockedUser: false),
+              recommended_orchestration: const Orchestration(
                 type: OrchestrationType.defer,
                 rationale: 'r',
                 safetyChannelRequired: false,
@@ -41,7 +41,7 @@ void main() {
     });
 
     test('redlineCoverage counts per event type', () {
-      final dash = Dashboard(bus.query(QuerySpec()));
+      final dash = Dashboard(bus.query(const QuerySpec()));
       final cov = dash.redlineCoverage();
       expect(cov[ToneChangeEvent.eventType], 3);
       expect(cov[ConflictDetected.eventType], 2);
@@ -49,7 +49,7 @@ void main() {
     });
 
     test('timeSeries buckets a single event type', () {
-      final dash = Dashboard(bus.query(QuerySpec()));
+      final dash = Dashboard(bus.query(const QuerySpec()));
       // All events land within the same 1-hour bucket.
       final series =
           dash.timeSeries(ToneChangeEvent.eventType, const Duration(hours: 1));
@@ -58,7 +58,7 @@ void main() {
     });
 
     test('timeSeries returns empty for an absent event type', () {
-      final dash = Dashboard(bus.query(QuerySpec()));
+      final dash = Dashboard(bus.query(const QuerySpec()));
       expect(
           dash.timeSeries('unknown_event', const Duration(hours: 1)), isEmpty);
     });

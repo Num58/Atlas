@@ -1,6 +1,7 @@
 /// 画像版本化类型定义（P3-1）。
 ///
 /// 字段名与序列化键一律 snake_case（ADR-6）。不依赖 `package:flutter`。
+library;
 
 /// 单字段变更。
 class FieldChange {

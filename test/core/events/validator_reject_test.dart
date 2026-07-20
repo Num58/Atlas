@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:primeatlas/core/events/schemas/arbitration_event.dart';
 import 'package:primeatlas/core/events/schemas/conflict_detected.dart';
+import 'package:primeatlas/core/events/event_receipt.dart';
 import 'package:primeatlas/core/events/schemas/content_tone_tag.dart';
 import 'package:primeatlas/core/events/schemas/dimension_data_presence.dart';
 import 'package:primeatlas/core/events/schemas/identity_transition_event.dart';
@@ -32,19 +33,16 @@ void main() {
           }
         }),
         ArbitrationEventValidator().validateMap({
-          'conflict_id': 'c',
           'chosen_track': 'one_click_adopt',
           'rationale_display_complete': true,
           'retained_override_entry': true
         }),
         ProfileFieldUpdateValidator().validateMap({
-          'field_name': 'f',
           'confirm_source': 'user_explicit',
           'consent_record_id': 'consent1',
           'portrait_version': 'v1'
         }),
         IdentityTransitionEventValidator().validateMap({
-          'transition_id': 't',
           'from_role': 'initiate',
           'to_role': 'practitioner',
           'has_narratable_change': true,
@@ -60,7 +58,7 @@ void main() {
 
     test('(b) every schema validator rejects a wrong-typed payload', () {
       // Pass a ContentToneTag where each validator expects its own type.
-      final wrong = ContentToneTag(
+      const wrong = ContentToneTag(
         session_anchor_tone: Tone.professional,
         resolved_tone: Tone.warm,
         layer: ContentLayer.copy,
@@ -94,7 +92,7 @@ void main() {
     });
 
     test('(d) ArbitrationEvent rejected when i_will_do_it without edit', () {
-      final typed = ArbitrationEvent(
+      const typed = ArbitrationEvent(
         conflict_id: 'c1',
         chosen_track: ChosenTrack.iWillDoIt,
         rationale_display_complete: true,
@@ -114,7 +112,7 @@ void main() {
     });
 
     test('valid payloads pass (sanity)', () {
-      final c = ConflictDetected(
+      const c = ConflictDetected(
         conflict_id: 'c1',
         conflict_type: ConflictType.goalGoal,
         is_body_related: false,

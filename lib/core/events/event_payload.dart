@@ -1,3 +1,5 @@
+import 'event_receipt.dart';
+
 /// Base class for all event payloads carried by the [IdentityEventBus].
 ///
 /// Implementations must be serializable to a snake_case JSON map via [toJson].

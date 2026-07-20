@@ -23,28 +23,28 @@ void main() {
     });
 
     test('append + query all', () {
-      expect(repo.query(QuerySpec()), hasLength(3));
+      expect(repo.query(const QuerySpec()), hasLength(3));
     });
 
     test('filter by eventTypes', () {
-      final r = repo.query(QuerySpec(eventTypes: ['tone_change_event']));
+      final r = repo.query(const QuerySpec(eventTypes: ['tone_change_event']));
       expect(r, hasLength(2));
       expect(r.every((e) => e.eventType == 'tone_change_event'), isTrue);
     });
 
     test('filter by from/to time window', () {
-      final r = repo.query(QuerySpec(from: 2000, to: 2000));
+      final r = repo.query(const QuerySpec(from: 2000, to: 2000));
       expect(r, hasLength(1));
       expect(r.first.id, 'b');
     });
 
     test('filter by sessionId', () {
-      final r = repo.query(QuerySpec(sessionId: 's1'));
+      final r = repo.query(const QuerySpec(sessionId: 's1'));
       expect(r, hasLength(2));
     });
 
     test('limit caps results and preserves order', () {
-      final r = repo.query(QuerySpec(limit: 1));
+      final r = repo.query(const QuerySpec(limit: 1));
       expect(r, hasLength(1));
       expect(r.first.id, 'a');
     });

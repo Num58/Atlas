@@ -1,8 +1,6 @@
 import 'dart:convert';
 import 'package:sqlite3/sqlite3.dart';
 import 'package:primeatlas/core/events/event_receipt.dart';
-import 'package:primeatlas/core/events/event_payload.dart';
-import 'package:primeatlas/core/events/validator.dart';
 import '../event_log_repository.dart';
 
 /// DDL mirrored from `schema.sql` so the repository is usable without a Flutter

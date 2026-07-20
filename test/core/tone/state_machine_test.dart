@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:primeatlas/core/tone/tone_engine.dart';
 import 'package:primeatlas/core/tone/tone_state_machine.dart';
 import 'package:primeatlas/core/tone/tone_types.dart';
 
@@ -25,7 +24,7 @@ void main() {
           warningThresholdPct: 80,
         ),
       );
-      final resp = sm.switchTone(ToneSwitchRequest(
+      final resp = sm.switchTone(const ToneSwitchRequest(
         targetTone: Tone.warm,
         trigger: ToneSwitchTrigger.userExplicit,
       ));
@@ -40,19 +39,19 @@ void main() {
     test('超 maxSwitchesPerSession 触发 cooldown 且 accepted=false (T-RL1)', () {
       const max = 3;
       final sm = ToneStateMachine(
-        config: HealthBandwidthConfig(
+        config: const HealthBandwidthConfig(
           maxSwitchesPerSession: max,
           cooldownDurationMs: 1000,
           warningThresholdPct: 80,
         ),
       );
       for (var i = 0; i < max; i++) {
-        sm.switchTone(ToneSwitchRequest(
+        sm.switchTone(const ToneSwitchRequest(
           targetTone: Tone.warm,
           trigger: ToneSwitchTrigger.userExplicit,
         ));
       }
-      final resp = sm.switchTone(ToneSwitchRequest(
+      final resp = sm.switchTone(const ToneSwitchRequest(
         targetTone: Tone.strict,
         trigger: ToneSwitchTrigger.userExplicit,
       ));

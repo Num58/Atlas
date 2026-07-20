@@ -77,7 +77,7 @@ class DefaultIdentityEventBus implements IdentityEventBus {
   @override
   EventReceipt publish(String eventType, EventPayload payload) {
     final result = validate(eventType, payload);
-    final storedAt = DateTime.now().millisecondsSinceEpoch;
+    final storedAt = DateTime.now().microsecondsSinceEpoch;
     if (!result.valid) {
       return EventReceipt(
         receiptId: _nextId('rcpt'),
@@ -126,6 +126,6 @@ class DefaultIdentityEventBus implements IdentityEventBus {
 
   String _nextId(String prefix) {
     _idCounter++;
-    return '${prefix}_${DateTime.now().microsecondsSinceEpoch}_${_idCounter}';
+    return '${prefix}_${DateTime.now().microsecondsSinceEpoch}_$_idCounter';
   }
 }

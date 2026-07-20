@@ -15,12 +15,12 @@ void main() {
         () {
       var fired = false;
       late EventRecord received;
-      bus.subscribe(ToneChangeEvent.eventType, (rec) {
+      bus.subscribe(ToneChangeEvent.eventType, (EventRecord rec) {
         fired = true;
         received = rec;
       });
 
-      final evt = ToneChangeEvent(
+      const evt = ToneChangeEvent(
         from_tone: Tone.professional,
         to_tone: Tone.warm,
         trigger: ToneSwitchTrigger.userExplicit,
@@ -34,14 +34,14 @@ void main() {
       expect(received.eventType, ToneChangeEvent.eventType);
       expect(received.payload['to_tone'], 'warm');
 
-      final results = bus.query(QuerySpec(eventTypes: [ToneChangeEvent.eventType]));
+      final results = bus.query(const QuerySpec(eventTypes: [ToneChangeEvent.eventType]));
       expect(results, hasLength(1));
       expect(results.first.id, received.id);
     });
 
     test('publish invalid payload -> ok false and NOT stored', () {
       // C-RL2 violation: i_will_do_it without user_initiated_edit.
-      final bad = ArbitrationEvent(
+      const bad = ArbitrationEvent(
         conflict_id: 'c1',
         chosen_track: ChosenTrack.iWillDoIt,
         rationale_display_complete: true,
@@ -53,12 +53,12 @@ void main() {
       expect(receipt.ok, isFalse);
       expect(receipt.errors, isNotNull);
       final stored =
-          bus.query(QuerySpec(eventTypes: [ArbitrationEvent.eventType]));
+          bus.query(const QuerySpec(eventTypes: [ArbitrationEvent.eventType]));
       expect(stored, isEmpty);
     });
 
     test('validate() returns valid:false for an invalid payload', () {
-      final bad = ArbitrationEvent(
+      const bad = ArbitrationEvent(
         conflict_id: 'c1',
         chosen_track: ChosenTrack.iWillDoIt,
         rationale_display_complete: true,
@@ -75,7 +75,7 @@ void main() {
           (rec) => count++);
       bus.publish(
           ToneChangeEvent.eventType,
-          ToneChangeEvent(
+          const ToneChangeEvent(
             from_tone: Tone.professional,
             to_tone: Tone.strict,
             trigger: ToneSwitchTrigger.systemSuggested,
@@ -84,7 +84,7 @@ void main() {
       unsub();
       bus.publish(
           ToneChangeEvent.eventType,
-          ToneChangeEvent(
+          const ToneChangeEvent(
             from_tone: Tone.strict,
             to_tone: Tone.warm,
             trigger: ToneSwitchTrigger.contextAdaptive,

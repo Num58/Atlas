@@ -26,7 +26,7 @@ ProfileSnapshot _snapshotFromJson(Map<String, Object?> json) {
   final inactive = json['inactive_dimensions'];
   return ProfileSnapshot(
     fields: fields is Map
-        ? (fields as Map).cast<String, Object?>()
+        ? (fields).cast<String, Object?>()
         : <String, Object?>{},
     activeDimensions:
         active is List ? List<String>.from(active) : <String>[],
@@ -77,13 +77,15 @@ class SqlitePortraitRepository implements PortraitRepository {
 
   @override
   List<PortraitVersion> list({int? limit}) {
-    var rows = _db.select(
+    final rows = _db.select(
         'SELECT version_id, created_at, snapshot, change_summary, consent_record_id '
         'FROM portrait_versions ORDER BY created_at DESC, version_id DESC');
-    if (limit != null && limit < rows.length) {
-      rows = rows.sublist(0, limit);
-    }
-    return rows.map(_rowToVersion).toList();
+    // _db.select() returns a `ResultSet`; `.sublist()` yields a plain List
+    // that is not assignable back to a ResultSet-typed variable. Take the
+    // prefix as a fresh List to keep both branches the same static type.
+    final effective =
+        (limit != null) ? rows.take(limit).toList() : rows;
+    return effective.map(_rowToVersion).toList();
   }
 
   PortraitVersion _rowToVersion(Map<String, Object?> row) {

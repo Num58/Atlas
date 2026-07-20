@@ -11,7 +11,7 @@ void main() {
     });
 
     test('pushEvents is a no-op and completes', () async {
-      final rec = EventRecord(
+      const rec = EventRecord(
         id: 'e1',
         eventType: 'tone_change_event',
         payload: {},

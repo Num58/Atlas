@@ -1,6 +1,7 @@
 /// 冲突检测类型定义（C1-1）。
 ///
 /// 字段名与序列化键一律 snake_case（ADR-6）。不依赖 `package:flutter`。
+library;
 
 /// 冲突类型枚举。
 enum ConflictType {

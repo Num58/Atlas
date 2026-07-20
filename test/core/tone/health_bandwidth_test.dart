@@ -13,12 +13,12 @@ void main() {
         ),
       );
       expect(sm.getHealthBandwidth().remaining, 5);
-      sm.switchTone(ToneSwitchRequest(
+      sm.switchTone(const ToneSwitchRequest(
         targetTone: Tone.warm,
         trigger: ToneSwitchTrigger.userExplicit,
       ));
       expect(sm.getHealthBandwidth().remaining, 4);
-      sm.switchTone(ToneSwitchRequest(
+      sm.switchTone(const ToneSwitchRequest(
         targetTone: Tone.encouraging,
         trigger: ToneSwitchTrigger.userExplicit,
       ));
@@ -36,7 +36,7 @@ void main() {
       // 阈值 = ceil(0.5*10) = 5；switchCount > 5 触发 gentleNudge
       Intervention last = Intervention.none;
       for (var i = 0; i < 6; i++) {
-        final r = sm.switchTone(ToneSwitchRequest(
+        final r = sm.switchTone(const ToneSwitchRequest(
           targetTone: Tone.warm,
           trigger: ToneSwitchTrigger.userExplicit,
         ));

@@ -5,7 +5,7 @@
 class EventReceipt {
   final String receiptId;
   final String eventType;
-  final int storedAt; // epoch ms
+  final int storedAt; // epoch μs
   final bool ok; // false = rejected by validation
   final List<String>? errors; // rejection reasons
 
@@ -36,11 +36,9 @@ class ValidationResult {
         errors = const [],
         warnings = const [];
 
-  const ValidationResult.failed(List<String> errors,
-      [List<String> warnings = const []])
-      : valid = false,
-        errors = errors,
-        warnings = warnings;
+  const ValidationResult.failed(this.errors,
+      [this.warnings = const []])
+      : valid = false;
 
   bool get hasWarnings => warnings.isNotEmpty;
 }
@@ -48,8 +46,8 @@ class ValidationResult {
 /// Query specification for the local dashboard query layer.
 class QuerySpec {
   final List<String> eventTypes; // empty = all event types
-  final int? from; // epoch ms lower bound (inclusive)
-  final int? to; // epoch ms upper bound (inclusive)
+  final int? from; // epoch μs lower bound (inclusive)
+  final int? to; // epoch μs upper bound (inclusive)
   final int? limit;
   final String? sessionId;
 
@@ -67,7 +65,7 @@ class EventRecord {
   final String id;
   final String eventType;
   final Map<String, Object?> payload; // deserialized payload map
-  final int createdAt; // epoch ms
+  final int createdAt; // epoch μs
   final String? sessionId;
 
   const EventRecord({
