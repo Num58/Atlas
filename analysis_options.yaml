@@ -1,8 +1,6 @@
 include: package:flutter_lints/flutter.yaml
 
 analyzer:
-  exclude:
-    - lib/app/**      # UI 层本阶段不交付，为避免分析噪声先行排除
   errors:
     invalid_annotation_target: ignore
     # ADR-6: 数据类字段名与 toJson 键一律 snake_case（对齐 handoff TS 契约），

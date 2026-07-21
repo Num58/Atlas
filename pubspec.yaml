@@ -1,7 +1,7 @@
 name: primeatlas
 description: PrimeAtlas — 个人成长操作系统（陪你成为）。本地优先 Flutter/Dart 核心层（lib/core，纯 Dart 无 Flutter 依赖）与 UI 层（lib/app）。
 publish_to: 'none'
-version: 0.1.0+1
+version: 0.2.0+2
 
 environment:
   sdk: '>=3.4.0 <4.0.0'
@@ -12,6 +12,8 @@ dependencies:
     sdk: flutter
   meta: ^1.12.0
   sqlite3: ^2.4.0          # 纯 Dart SQLite 绑定（仅 sqlite 实现用到，运行期需原生库；单测默认走 InMemory 仓储）
+  flutter_riverpod: ^2.5.0  # S1 状态管理
+  go_router: ^14.0.0        # S1 路由（含 StatefulShellRoute 底部导航）
 
 dev_dependencies:
   flutter_test:
