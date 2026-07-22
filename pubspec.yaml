@@ -14,6 +14,8 @@ dependencies:
   sqlite3: ^2.4.0          # 纯 Dart SQLite 绑定（仅 sqlite 实现用到，运行期需原生库；单测默认走 InMemory 仓储）
   flutter_riverpod: ^2.5.0  # S1 状态管理
   go_router: ^14.0.0        # S1 路由（含 StatefulShellRoute 底部导航）
+  uuid: 4.6.0               # RFC 9562 UUIDv7（Freeze 验证精确锁定）
+  flutter_svg: 2.3.0        # Lucide SVG allowlist 唯一渲染器（Freeze 验证精确锁定）
 
 dev_dependencies:
   flutter_test:
@@ -23,3 +25,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/icons/lucide/

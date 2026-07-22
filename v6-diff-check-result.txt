@@ -1,0 +1,13 @@
+﻿exit=2
+warning: in the working copy of 'docs/product-strategy/primeatlas-full-prd-review-2026-07-17.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/product-strategy/primeatlas-product-decision-confirmation-2026-07-20.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/product-strategy/primeatlas-product-understanding-review-2026-07-20.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/prototype/primeatlas-prototype-v6.html', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/prototype/primeatlas-review-prototype-v1.0.html', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/spec/primeatlas-spec-architecture-input-v1.0.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/spec/primeatlas-spec-v1.0.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/spec/v0.2-test-traceability-v1.0.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'pubspec.lock', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'pubspec.yaml', LF will be replaced by CRLF the next time Git touches it
+docs/spec/v0.2-test-traceability-v1.0.md:3: trailing whitespace.
++> 鏂囨。瑙掕壊锛歏0.2銆屾柟鍚戔€旂洰鏍囬棴鐜€峈equirement 绾ф祴璇曡拷韪笌 P0 鏁呴殰娉ㄥ叆鍚堝悓銆? 
