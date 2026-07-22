@@ -1,0 +1,1 @@
+P0 functional emoji scan: PASS; whitelist=emotion-expression

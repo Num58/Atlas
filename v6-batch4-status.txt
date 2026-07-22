@@ -1,0 +1,56 @@
+﻿ M docs/product-strategy/primeatlas-full-prd-review-2026-07-17.md
+ M docs/product-strategy/primeatlas-product-decision-confirmation-2026-07-20.md
+ M docs/product-strategy/primeatlas-product-understanding-review-2026-07-20.md
+ M docs/prototype/primeatlas-prototype-v6.html
+ M docs/prototype/primeatlas-review-prototype-v1.0.html
+ M docs/spec/primeatlas-spec-architecture-input-v1.0.md
+ M docs/spec/primeatlas-spec-v1.0.md
+ M docs/spec/v0.2-test-traceability-v1.0.md
+ M pubspec.lock
+ M pubspec.yaml
+?? assets/
+?? docs/decisions/
+?? docs/prototype/primeatlas-prototype-v6-review-r2.html
+?? docs/prototype/tests/
+?? docs/prototype/v6-evolution-strategy-v1.0.md
+?? docs/prototype/v6-first-product-options-v1.0.md
+?? docs/prototype/v6-p0-remediation-spec-v1.0.md
+?? docs/prototype/v6-review-r2-design-spec-v1.0.md
+?? docs/qa/
+?? docs/reviews/
+?? docs/spec/v0.2-freeze-gap-plan-v1.0.md
+?? docs/spec/v0.2-freeze-verification-v1.0.md
+?? lib/app/
+?? lib/infrastructure/
+?? node-version.txt
+?? test/architecture/
+?? test/infrastructure/
+?? v6-batch3-diff-check-exit.txt
+?? v6-batch3-diff-check.txt
+?? v6-batch3-diff-stat.txt
+?? v6-batch3-heldout.txt
+?? v6-batch3-p0-emoji.txt
+?? v6-batch3-r1.txt
+?? v6-batch3-script-parse.txt
+?? v6-batch3-specialty-precheck.txt
+?? v6-batch3-specialty.txt
+?? v6-batch3-status.txt
+?? v6-batch4-diff-check-exit.txt
+?? v6-batch4-diff-check.txt
+?? v6-batch4-heldout-exit.txt
+?? v6-batch4-heldout.txt
+?? v6-batch4-r1-exit.txt
+?? v6-batch4-r1.txt
+?? v6-batch4-script-parse-exit.txt
+?? v6-batch4-script-parse.txt
+?? v6-batch4-specialty-exit.txt
+?? v6-batch4-specialty.txt
+?? v6-batch4-status.txt
+?? v6-diff-check-result.txt
+?? v6-emoji-residual.txt
+?? v6-emoji-unique.txt
+?? v6-owned-diff-check-batch2.txt
+?? v6-owned-diff-check-result.txt
+?? v6-status-result.txt
+?? v6-test-results-batch2.txt
+?? v6-test-results.txt
