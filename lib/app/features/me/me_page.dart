@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:primeatlas/app/design_system/app_tokens.dart';
 import 'package:primeatlas/app/state/journey_state.dart';
 
@@ -29,6 +30,14 @@ class MePage extends ConsumerWidget {
           _InfoRow(label: '当前状态', value: _capabilityStatus(journey)),
           _InfoRow(label: '会话草稿', value: _sessionDraftStatus(journey)),
           _InfoRow(label: '持久版本', value: _persistenceStatus(journey)),
+          const SizedBox(height: AppTokens.space4),
+          SizedBox(
+            height: 48,
+            child: OutlinedButton(
+              onPressed: () => context.push('/me/local-data'),
+              child: const Text('打开本机数据状态'),
+            ),
+          ),
           const SizedBox(height: AppTokens.space6),
           DecoratedBox(
             decoration: BoxDecoration(

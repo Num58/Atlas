@@ -4,6 +4,7 @@ import 'package:primeatlas/app/features/journey/domain_page.dart';
 import 'package:primeatlas/app/features/journey/goal_pages.dart';
 import 'package:primeatlas/app/features/journey/journey_edit_pages.dart';
 import 'package:primeatlas/app/features/journey/journey_page.dart';
+import 'package:primeatlas/app/features/me/local_data_page.dart';
 import 'package:primeatlas/app/features/me/me_page.dart';
 import 'package:primeatlas/app/navigation/app_shell.dart';
 
@@ -16,6 +17,7 @@ abstract final class AppRoutePath {
   static const goalNew = '/journey/goals/new';
   static const milestone = '/journey/milestone';
   static const me = '/me';
+  static const localData = '/me/local-data';
 }
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -78,6 +80,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: AppRoutePath.me,
                 builder: (context, state) => const MePage(),
+                routes: [
+                  GoRoute(
+                    path: 'local-data',
+                    builder: (context, state) => const LocalDataPage(),
+                  ),
+                ],
               ),
             ],
           ),
