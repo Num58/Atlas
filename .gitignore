@@ -1,4 +1,9 @@
-# Flutter / Dart
+# =============================================================================
+# PrimeAtlas .gitignore
+# Keep the repository lean, professional, and free of tool/agent residue.
+# =============================================================================
+
+# --- Flutter / Dart ---
 .dart_tool/
 .flutter-plugins
 .flutter-plugins-dependencies
@@ -6,32 +11,80 @@
 .pub-cache/
 .pub/
 build/
+coverage/
 *.iml
+*.freezed.dart
+*.g.dart
+
+# --- Editors / OS ---
 .idea/
 .vscode/
 .DS_Store
-*.log
-*.freezed.dart
-*.g.dart
+Thumbs.db
+*.swp
+*~
+
+# --- Secrets ---
 .env
-.env.local
-coverage/
+.env.*
+!.env.example
+
+# --- Large toolchains (never commit) ---
 .flutter-sdk/
 .workbuddy-runtime/
 android-device-lab/
-*.capture.txt
-*-capture.txt
-*-output.txt
-*-diff.txt
-*-numstat.txt
-flutter-version-code.txt
-dart-analyze-*.txt
 **/android/.gradle/
 **/android/captures/
-**/android/gradlew
-**/android/gradlew.bat
 **/android/local.properties
 **/android/**/GeneratedPluginRegistrant.java
 **/ios/Flutter/
 **/ios/ServiceDefinitions.json
 **/ios/Runner/GeneratedPluginRegistrant.*
+
+# --- Logs ---
+*.log
+logs/
+
+# --- Agent / diagnostics residue (repo root hygiene) ---
+*.capture.txt
+*-capture.txt
+*-output.txt
+*-diff.txt
+*-numstat.txt
+*-exit.txt
+*-heldout.txt
+*-precheck.txt
+*-status.txt
+*-results.txt
+*-result.txt
+*-residual.txt
+*-unique.txt
+*-specialty.txt
+*-script-parse.txt
+*-p0-emoji.txt
+*-wiring-check.txt
+*-test-retry*.txt
+*-unit-test.txt
+*-analyze*.txt
+flutter-version-code.txt
+dart-analyze-*.txt
+node-version.txt
+git-status-output.txt
+analyze-capture.txt
+core-diff.txt
+core-numstat.txt
+frontend-*.txt
+journey-*.txt
+v6-*.txt
+sqlite-*.txt
+flutter-out.txt
+
+# --- Local runtime data ---
+.primeatlas/
+*.db
+!test/**/fixtures/**/*.db
+
+# --- Temporary ---
+tmp/
+.temp/
+*.tmp

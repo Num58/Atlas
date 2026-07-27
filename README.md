@@ -1,65 +1,100 @@
 # PrimeAtlas
 
-> 不是管理任务，而是管理用户成为谁。
->
-> Flutter · Android / iOS · 本地优先 · 云端同步钩子预留
+> 不是“今天做了吗”，而是“离目标近了吗”。  
+> Flutter · Android / iOS · 本地优先 · V0.2 纯本闭环
 
-PrimeAtlas 是以身份迁移为主轴的个人成长操作系统。产品主循环为：
+PrimeAtlas 管理用户的成长方向与目标证据，而不是简单的待办清单。
 
 ```text
-身份定义 → 目标与里程碑 → 专业计划 → 今日执行与反馈 → 成果证据 → 身份与目标重校准
+方向 / 现实约束
+  → 成长域
+  → 目标与里程碑
+  → 旅程总览与本机版本
+  → （后续）执行反馈与重校准
 ```
 
-## 当前阶段
+---
 
-- 产品理解与全量 PRD：产品层已评审通过；
-- 主 Spec：`Draft for Freeze`，当前仍为 `NOT SPEC READY / NOT DEV READY`；
-- 编码前原型：修正版已完成主代理第一层核验，独立 QA 与视觉门禁尚未最终关闭；
-- Flutter：仅 `lib/core` S0 纯 Dart 基线已实现，正式移动端 UI 尚未进入编码；
-- Android 设备实验室：工具链可用，system image 与 AVD 尚待完成。
+## 当前状态（诚实）
 
-用户评审通过前，不进入正式 Flutter 功能开发。
+| 项 | 状态 |
+|---|---|
+| 产品 / V6 原型 | 用户已批准为体验基线 |
+| 规格与研发合同 | V0.2 已锁定 |
+| 工程集成线 | `develop`（唯一日更线） |
+| 最新检查点 | 见 `develop` 最新 commit |
+| Dev Ready | **否** |
+| 合入 `main` 发布 | **否** |
+
+当前阶段：**M2 Journey 真持久化闭环（检查点）→ 准备 M3 业务完整化**
+
+---
+
+## 仓库运营约定
+
+- **不拉长期 feature 分支丛**，避免合并冲突雪崩  
+- 日常开发只在 **`develop`**  
+- **`main` 受保护**，仅通过 PR 在门禁通过后合入  
+- 检查点可以推送；**完成/发布必须有测试证据**
+
+详见 [CONTRIBUTING.md](./CONTRIBUTING.md)。
+
+---
+
+## 本地开发
+
+```bash
+# 建议 Flutter 3.44.x / Dart 3.12.x（以 pubspec 与 lock 为准）
+flutter pub get
+dart analyze
+flutter test test/app
+flutter test test/infrastructure/storage/sqlite
+```
+
+V0.2 范围说明：纯本地闭环；无 HTTP 业务、无云同步、无登录注册、无第三方模型。
+
+---
+
+## 目录
+
+```text
+lib/
+  app/                 UI、路由、Riverpod 装配
+  application/         用例 / Port
+  core/                纯 Dart 领域
+  infrastructure/      SQLite 等实现
+docs/
+  spec/                V0.2 合同与追踪
+  qa/                  门禁基线
+  status/              进度与运营状态
+  decisions/           ADR
+  prototype/           V6 等批准原型
+test/                  单元 / 集成候选
+```
+
+---
 
 ## 真源优先级
 
-1. `docs/product/PrimeAtlas_完整需求蓝图_Final.md`：终局产品范围与铁律；
-2. `docs/product-strategy/primeatlas-product-decision-confirmation-2026-07-20.md`：12 项 P0 产品裁决；
-3. `docs/product-strategy/primeatlas-full-prd-review-2026-07-17.md`：全量 PRD；
-4. `docs/spec/primeatlas-spec-v1.0.md`：当前规格契约草案；
-5. `docs/prototype/primeatlas-prototype-plan-review-v1.0.md`：编码前原型方案；
-6. `docs/prototype/primeatlas-review-prototype-v1.0.html`：可点击评审原型，不是业务实现真源；
-7. `docs/prototype/primeatlas-prototype-v6.html`：v6 纵向原型（体能高密度锚点体验参考），不是当前导航或业务规则真源；
-8. `docs/handoff/`：开发交接与后续专家团接续说明。
+1. 用户已批准的 V6 体验基线与产品红线  
+2. `docs/spec/v0.2-development-contract-v1.0.md`  
+3. `docs/spec/v0.2-test-traceability-v1.0.md`  
+4. `docs/qa/v0.2-dev-gate-baseline-2026-07-27.md`  
+5. `docs/status/` 进度文档  
+6. 代码实现（不得反向覆盖合同）
 
-发生冲突时按以上顺序裁决，不得以旧原型、旧任务卡或现有代码反向覆盖产品真源。
+---
 
-## 目录结构
+## 产品红线
 
-```text
-docs/
-  product/            完整蓝图与早期需求真源
-  product-strategy/   产品理解、全量 PRD、追踪矩阵、P0 决策
-  spec/               主 Spec 与架构、设计、QA 输入
-  prototype/          原型方案、可点击评审原型、v6 纵向原型
-  handoff/            专家团交接文档（本次同步后生成）
-  status/             阶段状态与门禁说明
-lib/core/             纯 Dart 核心层
-lib/app/              正式 UI 层，尚未开始
-test/                 核心层自动化测试
-```
+- 不替用户定义身份 / 角色  
+- 功能图标仅 Lucide SVG allowlist（禁止 emoji 作图标）  
+- 禁止紫粉渐变与空洞 AI 模板文案  
+- 未成功写入不得显示“已保存到本机”
 
-## 本地验证
+---
 
-```bash
-flutter pub get
-flutter analyze
-flutter test
-```
+## 进度
 
-已知基线：Flutter 3.44.2、Dart 3.12.2。不要把本地 SDK、Android system image、AVD、缓存、截图或凭证提交到仓库。
-
-## 三条绝对规则
-
-- 禁止使用 emoji 作为 UI 功能图标，正式实现统一使用 Spec 锁定的一套 SVG 图标库；
-- 禁止紫色到粉色渐变主视觉；
-- 禁止占位文案、伪精确指标和 AI 模板味实现。
+- 阶段进度：`docs/status/development-progress.md`  
+- 工作区交付看板（仓库外）：`F:/AIPM/Atlas/deliverables/`
