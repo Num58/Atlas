@@ -206,7 +206,8 @@ assert.match(toast, /isError \? 'alert' : 'status'/);
 assert.match(html, /\.detail-modal \{ width: min\(340px, calc\(100vw - 24px\)\); max-height: min\(78vh, 680px\); overflow-y: auto; overflow-x:hidden; \}/);
 assert.match(html, /\.toast \{ max-width: min\(340px, calc\(100vw - 24px\)\); white-space: normal; overflow-wrap: anywhere;/);
 assert.match(html, /\.icon-button::after \{ content:""; position:absolute; width:44px; height:44px;/);
-assert.match(html, /\.emotion-expression \{ min-width:44px; min-height:44px;/);
+assert.match(html, /\.emotion-expression \{ position:relative; border:0; padding:0;/);
+assert.match(html, /\.emotion-expression::after \{ content:""; position:absolute; width:44px; height:44px;/);
 assert.match(html, /\.lucide-icon \{ display:inline-flex; width:1em; height:1em;/);
 
 // D01: the state supports no more than three active growth domains, with multiple goals in the current domain and no fake empty-slot card.

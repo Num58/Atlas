@@ -2622,7 +2622,8 @@ body {
 .lucide-icon svg { width:100%; height:100%; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
 .icon-button { position:relative; }
 .icon-button::after { content:""; position:absolute; width:44px; height:44px; left:50%; top:50%; transform:translate(-50%,-50%); }
-.emotion-expression { min-width:44px; min-height:44px; border:0; padding:0; background:transparent; color:inherit; display:inline-flex; align-items:center; justify-content:center; font:inherit; cursor:pointer; }
+.emotion-expression { position:relative; border:0; padding:0; background:transparent; color:inherit; display:inline-flex; align-items:center; justify-content:center; font:inherit; cursor:pointer; }
+.emotion-expression::after { content:""; position:absolute; width:44px; height:44px; left:50%; top:50%; transform:translate(-50%,-50%); }
 [data-icon-size="16"] { font-size:16px; }
 [data-icon-size="20"] { font-size:20px; }
 [data-icon-size="24"] { font-size:24px; }
@@ -3817,7 +3818,7 @@ const V6_STORAGE_KEY = 'primeatlas.v6.prototype.state';
 const initialPrototypeState = {
   version: 1,
   auth: { loggedIn: false, method: null },
-  settings: { units: 'metric', rpe: '1-10', notifyTraining: true, notifyLoad: true, theme: 'dark', tone: 0, model: 'deepseek-v4-pro' },
+  settings: { units: 'metric', rpe: '1-10', notifyTraining: true, notifyLoad: true, theme: 'dark', tone: 0, model: 'deepseek-v4-pro', energy: 3 },
   metrics: {
     height:{ val:180, unit:'cm', updatedAt:'2026-06-23', source:'手动测量' }, weight:{ val:82, unit:'kg', updatedAt:'2026-06-27', source:'手动测量' },
     stand_reach:{ val:235, unit:'cm', updatedAt:'2026-06-17', source:'手动测量' }, wingspan:{ val:183, unit:'cm', updatedAt:'2026-06-17', source:'手动测量' },
@@ -4174,15 +4175,22 @@ function handlePulseTap() {
 
 // 能量感知
 const energyLabels = ['非常疲惫','有点累','感觉不错','精力充沛','能量爆棚'];
-function setEnergy(lvl) {
+function renderEnergy(level) {
   const items = document.querySelectorAll('#energyPicker .emotion-expression');
   items.forEach((el, i) => {
-    const selected = i === lvl - 1;
+    const selected = i === level - 1;
     el.style.opacity = selected ? '1' : '0.4';
     el.setAttribute('aria-pressed', String(selected));
   });
-  document.getElementById('energyLabel').textContent = energyLabels[lvl-1];
-  showToast('今日能量：' + energyLabels[lvl-1]);
+  const label = document.getElementById('energyLabel');
+  if (label) label.textContent = energyLabels[level - 1];
+}
+function setEnergy(lvl) {
+  const level = Number(lvl);
+  if (!Number.isInteger(level) || level < 1 || level > energyLabels.length) { showToast('能量值无效', true); return false; }
+  if (!commitMutation(state => { state.settings.energy = level; }, '今日能量：' + energyLabels[level - 1])) return false;
+  renderEnergy(level);
+  return true;
 }
 
 function toggleReadiness() {
@@ -4721,17 +4729,29 @@ function showFBDCat(i){ const c=fullBodyData[i]; let h='<div style="max-height:3
 function exportBodyData(){ showDetail('[icon:package] 导出','格式','<div style="display:flex;flex-direction:column;gap:10px"><button class="btn-primary" style="background:var(--green)" onclick="closeDetail();showToast(\'[icon:check] CSV 已下载\')">[icon:file] CSV</button><button class="btn-primary" style="background:var(--blue)" onclick="closeDetail();showToast(\'[icon:check] JSON 已下载\')">[icon:clipboard] JSON</button><button class="btn-primary" style="background:var(--orange)" onclick="closeDetail();showToast(\'[icon:check] PDF 已生成\')">[icon:book] PDF</button></div>'); }
 
 // --- 指标编辑(全局委托) ---
+const metricNameToKey = { '身高':'height', '体重':'weight', '站立摸高':'stand_reach', '臂展':'wingspan', '深蹲 1RM':'squat', '硬拉 1RM':'deadlift', '卧推 1RM':'bench', '高翻 1RM':'pclean', '原地摸高':'vert_jump', '助跑摸高':'touch', 'RSI':'rsi', 'Apley摸背测试':'apley', '直腿抬高':'slr', '膝贴墙测距':'ankle', '最大心率':'max_hr', '静息心率':'rest_hr', 'HRV':'hrv' };
 function editMetric(name, val, unit) {
-  const h = '<input id="emv" value="'+val+'" style="width:100%;background:var(--bg-input);border:1px solid var(--border-subtle);color:var(--text-primary);padding:12px;border-radius:var(--radius-md);font-size:16px;margin:10px 0"><span style="font-size:11px;color:var(--text-tertiary)">'+unit+'</span><div style="display:flex;gap:10px;margin-top:12px"><button onclick="closeDetail()" style="flex:1;padding:12px;background:var(--bg-input);color:var(--text-secondary);border:none;border-radius:var(--radius-md);cursor:pointer">取消</button><button id="emvSave" style="flex:1;padding:12px;background:var(--orange);color:#fff;border:none;border-radius:var(--radius-md);cursor:pointer">保存</button></div>';
+  const key = metricNameToKey[name];
+  if (!key || !prototypeState.metrics[key]) { showToast('该指标暂不支持编辑', true); return false; }
+  const current = prototypeState.metrics[key];
+  const h = '<input id="emv" value="'+formatMetricValue(key)+'" inputmode="decimal" style="width:100%;background:var(--bg-input);border:1px solid var(--border-subtle);color:var(--text-primary);padding:12px;border-radius:var(--radius-md);font-size:16px;margin:10px 0"><span style="font-size:11px;color:var(--text-tertiary)">'+unit+'</span><div style="display:flex;gap:10px;margin-top:12px"><button onclick="closeDetail()" style="flex:1;padding:12px;background:var(--bg-input);color:var(--text-secondary);border:none;border-radius:var(--radius-md);cursor:pointer">取消</button><button id="emvSave" style="flex:1;padding:12px;background:var(--orange);color:#fff;border:none;border-radius:var(--radius-md);cursor:pointer">保存</button></div>';
   showDetail('[icon:edit] '+name, '', h);
   setTimeout(() => {
     const btn = document.getElementById('emvSave');
     if (btn) btn.onclick = function() {
-      const v = document.getElementById('emv')?.value || val;
+      const raw = document.getElementById('emv')?.value;
+      const parsed = Number.parseFloat(String(raw || '').replace(/[^0-9.\\-]/g, ''));
+      if (!Number.isFinite(parsed)) { showToast('请输入有效数值', true); return false; }
+      const nextValue = parseMetricValue(key, parsed);
+      const saved = commitMutation(state => {
+        state.metrics[key] = Object.assign({}, state.metrics[key], { val: nextValue, updatedAt: new Date().toISOString().slice(0, 10), source:'手动编辑' });
+      }, name+'已保存到本机');
+      if (!saved) return false;
       closeDetail();
-      showToast('[icon:check] '+name+' 已更新为 '+v+' '+unit);
+      return true;
     };
   }, 50);
+  return true;
 }
 document.addEventListener('click', function(e) {
   const row = e.target.closest('.metric-row');
@@ -6193,34 +6213,29 @@ function selectedModel() { return models.find(model => model.id === prototypeSta
 function showModelSwitch() {
   let h = '<div style="font-size:12px;color:var(--text-tertiary);margin-bottom:14px">选择 AI 大模型，切换后所有 Agent 统一使用新模型</div>';
   models.forEach(m => {
-    const sel = currentModel === m.id;
+    const sel = prototypeState.settings.model === m.id;
     h += '<div onclick="switchModel(\''+m.id+'\')" style="background:'+(sel?'var(--bg-card)':'var(--bg-elevated)')+';border:1px solid '+(sel?m.color:'var(--border-subtle)')+';border-left:3px solid '+(sel?m.color:'transparent')+';border-radius:var(--radius-md);padding:14px;margin-bottom:10px;cursor:pointer"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-weight:700;font-size:15px">'+m.name+(sel?' <span style="color:'+m.color+';font-size:11px">●</span>':'')+'</span><span style="font-size:11px;color:var(--text-tertiary)">'+m.provider+(m.tag?' · <span style="color:'+m.color+';font-weight:600">'+m.tag+'</span>':'')+'</span></div></div>';
   });
   h += '<div style="font-size:11px;color:var(--text-muted);text-align:center;margin-top:8px">切换后立即生效 · 故障时自动 Fallback</div>';
   showDetail('[icon:bot] AI 模型切换', '', h);
 }
 function switchModel(id) {
-  currentModel = id;
   const m = models.find(x => x.id === id);
-  document.getElementById('currentModelLabel').textContent = m.name;
+  if (!m) { showToast('模型不存在', true); return false; }
+  if (!commitMutation(state => { state.settings.model = id; }, '已切换至 ' + m.name)) return false;
+  document.getElementById('currentModelLabel').textContent = selectedModel().name;
   closeDetail();
-  setTimeout(() => showToast('[icon:check] 已切换至 ' + m.name), 300);
+  return true;
 }
 
-// Theme toggle — actually swap CSS variables via body class
-let isDark = true;
-function toggleTheme() {
-  isDark = !isDark;
+// Theme toggle — prototypeState.settings.theme is authoritative
+function renderTheme() {
+  const isDark = prototypeState.settings.theme === 'dark';
   const body = document.body;
   const switchEl = document.getElementById('themeSwitch');
-  if (isDark) {
-    body.classList.remove('light-theme');
-    switchEl.classList.remove('light');
-  } else {
-    body.classList.add('light-theme');
-    switchEl.classList.add('light');
-  }
-  // Update theme switch label
+  if (!switchEl) return;
+  body.classList.toggle('light-theme', !isDark);
+  switchEl.classList.toggle('light', !isDark);
   const labelRow = switchEl.closest('.setting-row');
   if (labelRow) {
     const spans = labelRow.querySelectorAll('.theme-toggle span');
@@ -6229,9 +6244,13 @@ function toggleTheme() {
       spans[1].style.color = isDark ? 'var(--text-muted)' : 'var(--orange)';
     }
   }
-  showToast(isDark ? '[icon:moon] 深色模式' : '[icon:sun] 明亮活力橙模式');
-  // Redraw charts to match new theme
+}
+function toggleTheme() {
+  const next = prototypeState.settings.theme === 'dark' ? 'light' : 'dark';
+  if (!commitMutation(state => { state.settings.theme = next; }, next === 'dark' ? '[icon:moon] 深色模式' : '[icon:sun] 明亮活力橙模式')) return false;
+  renderTheme();
   setTimeout(() => { drawSparkline(); drawGCTrend(); }, 100);
+  return true;
 }
 
 // ============================
@@ -6244,6 +6263,8 @@ drawSparkline();
 drawGCTrend();
 renderSettingDerivedValues();
 renderRPEOptions();
+renderTheme();
+renderEnergy(prototypeState.settings.energy || 3);
 updateLocalSaveUI();
 ['scene-morning','scene-noon','scene-evening','scene-recovery'].forEach(id => updateSceneCompletion(id));
 updateOverallProgress();
