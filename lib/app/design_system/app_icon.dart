@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-enum AppIconKey { target }
+enum AppIconKey { route, target, userRound }
 
 class AppIcon extends StatelessWidget {
   const AppIcon({
@@ -18,7 +18,9 @@ class AppIcon extends StatelessWidget {
   final Color? color;
 
   static const _assets = <AppIconKey, String>{
+    AppIconKey.route: 'assets/icons/lucide/route.svg',
     AppIconKey.target: 'assets/icons/lucide/target.svg',
+    AppIconKey.userRound: 'assets/icons/lucide/user-round.svg',
   };
 
   @override
@@ -33,7 +35,9 @@ class AppIcon extends StatelessWidget {
       height: size,
       semanticsLabel: semanticLabel,
       colorFilter: ColorFilter.mode(
-        color ?? IconTheme.of(context).color ?? Colors.black,
+        color ??
+            IconTheme.of(context).color ??
+            Theme.of(context).colorScheme.onSurface,
         BlendMode.srcIn,
       ),
     );
