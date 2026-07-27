@@ -1,0 +1,3 @@
+warning: in the working copy of 'docs/prototype/primeatlas-prototype-v6.html', LF will be replaced by CRLF the next time Git touches it
+ docs/prototype/primeatlas-prototype-v6.html | 1431 ++++++++++++++++++---------
+ 1 file changed, 947 insertions(+), 484 deletions(-)

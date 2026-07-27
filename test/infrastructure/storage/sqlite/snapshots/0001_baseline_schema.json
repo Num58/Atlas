@@ -1,0 +1,40 @@
+{
+  "tables": [
+    "active_domains",
+    "audit_records",
+    "devices",
+    "domain_events",
+    "evidence_links",
+    "goals",
+    "identity_drafts",
+    "milestones",
+    "operation_ledger",
+    "portrait_candidates",
+    "portrait_versions",
+    "schema_migrations",
+    "subjects"
+  ],
+  "indexes": [
+    "idx_audit_owner_object",
+    "idx_audit_owner_operation",
+    "idx_devices_owner_seen",
+    "idx_domains_owner_status",
+    "idx_events_owner_aggregate",
+    "idx_events_owner_operation",
+    "idx_events_owner_type_time",
+    "idx_evidence_subject",
+    "idx_goals_owner_domain_status",
+    "idx_goals_owner_updated",
+    "idx_identity_drafts_owner_status",
+    "idx_milestones_owner_goal",
+    "idx_milestones_owner_status",
+    "idx_operation_ledger_owner_entity",
+    "idx_operation_ledger_owner_state_seq",
+    "idx_portrait_candidates_owner_status",
+    "idx_portrait_versions_owner_time",
+    "ux_active_domains_priority",
+    "ux_identity_drafts_pending",
+    "ux_portrait_versions_active",
+    "ux_subjects_active_kind"
+  ]
+}

@@ -14,7 +14,7 @@
 本文提供可直接并入 `PrimeAtlas Spec v1.0` 的九类合同输入：
 
 1. 核心数据对象与字段级最小 Schema；
-2. 身份、目标、计划、执行、Consent、适用范围、安全、画像、同步状态机；
+2. 目标方向、目标、计划、执行、Consent、适用范围、安全、兼容版本对象、同步状态机；
 3. 领域事件；
 4. API / Repository 接口清单；
 5. 离线幂等与冲突优先级；
@@ -37,6 +37,8 @@
 - 可修改聚合 MUST 保存 `version`；离线写入 MUST 保存稳定 `event_id` / `operation_id` 与设备单调递增 `device_seq`。
 - 推断、生成、预测不得伪装成用户事实。所有关键值 MUST 带 `source_type`：
   `user_declared | device_observed | imported | system_inferred | model_generated | professional_content | deterministic_rule`。
+- 系统只引导用户形成目标，不生成或确认角色身份、人格标签、“我现在是/我想成为”或身份差距。用户控制目标、时间、场景、现实约束和是否发起知识注入；Atlas 自主决定知识采纳、计划生成及普通调整，并保存可展示的依据、差异、影响和版本。
+- 安全规则是独立且不可覆盖的决策层；用户普通偏好、Atlas 编排、调性、模型或其他 Agent 均不能降低安全结论。
 - 数据充分度至少使用：`insufficient | partial | sufficient`；不足时禁止显示伪精确百分比。
 - 未激活成长域 MUST 不渲染、不创建占位业务记录、不进入 Agent 上下文、不进入指标分母。
 - 软删除只用于需要同步 tombstone 的用户可删除对象；执行事实、安全审计、Consent 回执等不可直接物理覆盖，按保留/删除合同处理。
@@ -97,7 +99,9 @@
 | `started_at_us` | int64 | 是 |  |
 | `ended_at_us` | int64? | 否 |  |
 
-### 1.3 身份草案、成长域与画像版本
+### 1.3 目标方向草案、成长域与版本历史
+
+> `identity_drafts`、`portrait_versions`、`portrait_candidates` 是 V0.2 已固化 SQLite 表名，只作存储兼容，不再承载角色身份定义、身份差距或画像确认产品语义。本次不改表、不增字段；应用层将其解释为“用户原话/目标边界草案”“目标边界版本”“方向候选”。
 
 #### `identity_drafts`
 
@@ -105,20 +109,20 @@
 |---|---|---:|---|
 | 通用字段 |  | 是 |  |
 | `state` | enum | 是 | `draft | pending_confirmation | confirmed | discarded | superseded` |
-| `current_identity_text` | text? | 否 | 用户可编辑；敏感画像文本 |
-| `target_identity_text` | text? | 否 | 用户可编辑；敏感画像文本 |
-| `constraints_summary` | text? | 否 | 不得把模型推断写成用户自述 |
-| `inference_source` | enum | 是 | `user_only | assisted` |
+| `current_identity_text` | text? | 否 | 兼容字段：仅存用户对当前情况/基线的原话；UI 与领域层不得称“当前身份” |
+| `target_identity_text` | text? | 否 | 兼容字段：仅存用户想提升的方向或目标原话；不得生成身份称谓 |
+| `constraints_summary` | text? | 否 | 用户可控的时间、场景与现实约束摘要；不得把模型推断写成用户自述 |
+| `inference_source` | enum | 是 | `user_only | assisted`；assisted 只能产出可修改目标候选 |
 | `data_sufficiency` | enum | 是 |  |
-| `confirmed_at_us` | int64? | 否 | 只有 confirmed 时存在 |
-| `confirmed_by` | enum? | 否 | 正式确认只允许 `user_explicit` |
+| `confirmed_at_us` | int64? | 否 | 只有用户确认目标边界时存在；不是身份确认 |
+| `confirmed_by` | enum? | 否 | 兼容枚举只允许 `user_explicit`；含义是确认目标/约束原话 |
 
 #### `active_domains`
 
 | 字段 | 类型 | 必填 | 约束 |
 |---|---|---:|---|
 | 通用字段 |  | 是 |  |
-| `portrait_version_id` | text | 是 | 归属已确认画像版本 |
+| `portrait_version_id` | text | 是 | 关联已确认目标边界版本；字段名仅为兼容 |
 | `domain_code` | text | 是 | 首发域字典由 Spec 冻结 |
 | `display_name` | text | 是 |  |
 | `state` | enum | 是 | `active | paused | archived` |
@@ -134,12 +138,12 @@
 | 通用字段 |  | 是 |  |
 | `state` | enum | 是 | `active | superseded | archived | restored` |
 | `previous_version_id` | text? | 否 | 版本链 |
-| `identity_draft_id` | text | 是 | 形成此版本的已确认草案/候选 |
-| `current_identity_text` | text | 是 | 用户确认后的正式画像 |
-| `target_identity_text` | text | 是 | 用户确认后的正式目标身份 |
-| `role_stage` | enum? | 否 | `initiate | practitioner | advanced | master`；升级规则 BLOCKED |
-| `evidence_summary` | text? | 否 | 结构化证据的用户可见摘要 |
-| `confirmation_source` | enum | 是 | MUST 为 `user_explicit`；禁止 `system_auto` |
+| `identity_draft_id` | text | 是 | 兼容字段：形成此目标边界版本的草案/候选 |
+| `current_identity_text` | text | 是 | 兼容字段：用户确认的当前情况/基线原话；不得解释为角色身份 |
+| `target_identity_text` | text | 是 | 兼容字段：用户确认的目标方向原话；不得解释为目标身份 |
+| `role_stage` | enum? | 否 | Deprecated；新写入 MUST 为 null，UI/指标/计划不得读取，后续迁移再移除 |
+| `evidence_summary` | text? | 否 | 目标、基线与约束证据的用户可见摘要 |
+| `confirmation_source` | enum | 是 | MUST 为 `user_explicit`；仅表示用户确认目标边界，禁止 `system_auto` |
 | `activated_at_us` | int64 | 是 |  |
 
 #### `portrait_candidates`
@@ -166,7 +170,7 @@
 | `state` | enum | 是 | `draft | pending_confirmation | active | paused | recalibrating | completed | archived` |
 | `title` | text | 是 |  |
 | `description` | text? | 否 |  |
-| `source_identity_gap` | text | 是 | 解释为什么存在 |
+| `source_identity_gap` | text | 是 | 兼容字段：保存用户原话、基线/约束来源摘要；不得计算或展示身份差距 |
 | `baseline_kind` | enum | 是 | `quantitative | evidence_based | exploratory` |
 | `baseline_value` | real? | 否 | 仅 quantitative |
 | `baseline_unit` | text? | 否 |  |
@@ -444,7 +448,7 @@
 |---|---|---:|---|
 | `id` | text | 是 |  |
 | `owner_id` | text | 是 |  |
-| `subject_type` | text | 是 | 目标、计划、PR、画像候选等 |
+| `subject_type` | text | 是 | 目标、计划、PR、方向候选等；物理枚举若保留 portrait 命名仅为兼容 |
 | `subject_id` | text | 是 |  |
 | `evidence_type` | text | 是 |  |
 | `evidence_ref_id` | text | 是 | 指向执行、反馈、内容、规则或观测 |
@@ -495,15 +499,15 @@
 | 字段 | 类型 | 必填 | 约束 |
 |---|---|---:|---|
 | 通用字段 |  | 是 |  |
-| `state` | enum | 是 | `extracting | evaluating | proposed_accept | proposed_adapt | proposed_defer | proposed_reject | pending_confirmation | accepted | adapted | deferred | rejected | integrated | withdrawn | conflicted` |
+| `state` | enum | 是 | `extracting | evaluating | proposed_accept | proposed_adapt | proposed_defer | proposed_reject | accepted | adapted | deferred | rejected | integrated | withdrawn | conflicted`；`pending_confirmation` 仅兼容旧记录，新流程不得写入 |
 | `source_content_id` | text | 是 | 原文/笔记来源 |
 | `target_goal_id` | text | 是 |  |
 | `target_plan_id` | text? | 否 |  |
-| `decision_summary` | text | 是 | 结论 |
-| `reason_summary` | text | 是 | 1–2 句可读理由 |
+| `decision_summary` | text | 是 | Atlas 的采纳/改造/暂缓/不采纳结论 |
+| `reason_summary` | text | 是 | 1–2 句可读理由；必须解释依据和预期影响 |
 | `evidence_ids` | json[text] | 是 | 依据、来源、版本 |
-| `safety_status` | enum | 是 | 阻断级独立存在 |
-| `confirmed_at_us` | int64? | 否 | 用户逐条确认 |
+| `safety_status` | enum | 是 | 阻断级独立存在，普通知识决策不可覆盖 |
+| `confirmed_at_us` | int64? | 否 | Deprecated 兼容字段；新流程 MUST 为 null，用户不逐条确认 |
 | `integration_stage` | enum? | 否 | `adaptation | transition | stable` |
 
 ### 1.12 同步、冲突与 tombstone
@@ -580,7 +584,7 @@
 
 ## 2. 状态机合同
 
-### 2.1 身份草案状态机
+### 2.1 目标方向草案状态机（复用 V0.2 身份命名）
 
 ```text
 [draft]
@@ -600,7 +604,8 @@
 硬规则：
 
 - `system_auto`、模型完成、追问轮数达到阈值均不得触发 `confirmed`。
-- 未确认草案不得成为正式画像、计划准入事实或第三方模型长期画像。
+- `confirmed` 只表示用户确认目标、时间、场景和现实约束原话；不得表示系统为用户定义了角色身份或人格画像，也不得成为建立目标的前置身份门槛。
+- 未确认草案不得成为正式目标约束事实或第三方模型长期画像；系统推断始终保留来源，不得写成用户事实。
 
 ### 2.2 目标状态机
 
@@ -619,7 +624,7 @@
 
 - 超过 3 个 active 域时只产生聚焦建议，不静默暂停/归档目标。
 - 恢复目标必须重新运行受影响的专业、安全、时间冲突评审。
-- `completed` 不自动升级画像，只能产生画像候选。
+- `completed` 不自动修改目标边界版本；若产生 `PortraitCandidate` 兼容对象，其产品语义仅为方向/边界变化候选，不得定义角色身份或人格。
 
 ### 2.3 计划状态机
 
@@ -633,13 +638,13 @@
 [pending_review]
   ├─ safety_fail → [safety_blocked]
   ├─ professional_fail → [draft]
-  ├─ minor_reversible + passed → [active] + visible notice
-  └─ major + all_reviews_passed → [pending_confirmation]
+  ├─ minor_reversible + passed → [active] + explanation/version
+  └─ major + all_reviews_passed → [active] + explanation/version
 
-[pending_confirmation]
-  ├─ user_confirm → [active]
-  ├─ user_edit → [draft]
-  └─ user_reject → [draft|archived]
+[pending_confirmation]  # 仅兼容旧记录，新流程不得进入
+  ├─ legacy_reviews_passed → [active]
+  ├─ upstream_constraints_changed → [draft]
+  └─ legacy_record_archived → [archived]
 
 [active]
   ├─ end_of_validity → [expired]
@@ -764,7 +769,7 @@
 - 阻止的是危险具体方案，不删除目标，不阻断查看依据和安全替代。
 - 新疼痛离线时必须本地即时进入保守暂停。
 
-### 2.8 画像候选与正式画像状态机
+### 2.8 方向候选与目标边界版本状态机（兼容对象名）
 
 ```text
 [candidate] → [pending_confirmation]
@@ -775,15 +780,15 @@
   └─ concurrent_candidate/version → [conflicted]
 
 [conflicted] ── user_resolve → accepted/rejected/withdrawn
-[active portrait version] ── new version activated → [superseded]
+[active goal-boundary version; PortraitVersion 兼容对象] ── new version activated → [superseded]
 [superseded] ── user_restore → new PortraitVersion.restored(active)
 ```
 
 硬规则：
 
-- 画像冲突不得自动字段合并为正式画像。
-- `system_auto` 仅能生成 `candidate`。
-- 恢复旧画像创建新版本，不改写历史版本。
+- 方向/目标边界版本冲突不得自动字段合并为用户事实；`Portrait*` 仅为兼容对象名。
+- `system_auto` 仅能生成可修改 `candidate`，不得定义用户角色、身份或人格。
+- 恢复旧目标边界版本必须创建新版本，不改写历史版本。
 
 ### 2.9 同步状态机
 
@@ -831,12 +836,12 @@ recorded_at_us, payload, payload_hash
 规则：
 
 - `event_id` 唯一；`operation_id` 表示一次业务意图，可关联多事件。
-- `causation_id` 指直接触发事件；`correlation_id` 串联身份→目标→计划→执行→画像因果链。
-- payload 不得记录第三方模型不可见的健康原文、笔记全文或完整身份叙事。
+- `causation_id` 指直接触发事件；`correlation_id` 串联方向/约束→目标→计划→执行→证据/版本因果链。
+- payload 不得记录第三方模型不可见的健康原文、笔记全文或完整角色/人格叙事。
 
 ### 3.2 事件目录
 
-#### 身份 / 画像
+#### 方向 / 目标边界版本（兼容 Identity / Portrait 事件名）
 
 - `identity_draft_created`
 - `identity_draft_updated`
@@ -1142,7 +1147,7 @@ recorded_at_us, payload, payload_hash
 
 | 能力 | 离线读取 | 离线写入 | 离线最终结论 |
 |---|---:|---:|---|
-| 已确认身份/目标/里程碑 | 是 | 草案、暂停请求可写 | 复杂重校准待同步 |
+| 已确认目标边界版本/目标/里程碑 | 是 | 草案、暂停请求可写 | 复杂重校准待同步 |
 | 已缓存今日计划/动作说明 | 是 | 是 | 使用缓存版本；不伪造新专业审核 |
 | 开始/暂停/完成/撤销 | 是 | 是，追加事件 | 本地立即生效 |
 | RPE/疼痛/能量 | 是 | 是 | 新疼痛立即本地安全暂停 |
@@ -1162,7 +1167,7 @@ recorded_at_us, payload, payload_hash
 4. 服务端/SyncAdapter 保存 `operation_id + payload_hash + result_ref`：
    - 同 key + 同 hash：返回原结果；
    - 同 key + 不同 hash：`idempotency_key_reused`，不得择一覆盖。
-5. PR、画像候选、计划调整等衍生副作用必须以原始事件 ID 作为去重输入；重复执行同步不得重复生成。
+5. PR、方向候选（兼容 `PortraitCandidate`）、计划调整等衍生副作用必须以原始事件 ID 作为去重输入；重复执行同步不得重复生成。
 6. 一次“完成 + 反馈”可共享 `correlation_id`，但完成事件与反馈事件使用不同 `event_id`，避免部分失败时整组重复。
 7. 重试不能创建新的安全通过或 Consent；必须引用原审核/授权版本。
 
@@ -1175,10 +1180,10 @@ recorded_at_us, payload, payload_hash
 | 3 | Consent 撤回/拒绝/过期 | 更严格状态优先；撤回立即阻止新采集/发送，时间戳只用于审计而非放宽授权 |
 | 4 | 适用范围失效/命中不支持 | `ineligible/rejected/unavailable/expired/superseded` 优先于旧 `eligible_confirmed` |
 | 5 | 已发生执行事实 | 追加保留；云端新计划不得删除或改写过去的开始/完成/RPE/疼痛事实 |
-| 6 | 用户显式编辑 vs 未确认系统建议 | 用户显式编辑优先；建议保留审计但不覆盖 |
-| 7 | 正式画像并发修改 | 不自动字段合并；保留两个候选，用户显式解决后生成新正式版本 |
-| 8 | 计划版本并发 | 版本并存；实际执行继续绑定当时版本；未来生效版本按安全/确认状态决定 |
-| 9 | 普通冲突建议 | 用户可采纳或自己调整；系统不得静默删除目标 |
+| 6 | 用户上游输入 vs 系统建议 | 用户对目标、时间、场景、现实约束和知识注入开关的显式修改优先；建议保留审计但不覆盖 |
+| 7 | 目标边界版本并发修改 | 不自动字段合并；保留两个兼容候选，用户解决其上游输入冲突后生成新版本，不定义角色身份 |
+| 8 | 计划版本并发 | 版本并存；实际执行继续绑定当时版本；Atlas 基于有效上游约束与独立安全结论决定未来版本并解释差异和影响 |
+| 9 | 普通冲突 | Atlas 自主编排并解释；用户通过修改上游约束影响后续版本，系统不得静默删除目标或要求逐项审批 |
 | 10 | 非关键展示偏好 | 可采用最新明确用户操作；仍保留版本与账号隔离 |
 
 ### 5.4 对象级合并规则
@@ -1186,8 +1191,8 @@ recorded_at_us, payload, payload_hash
 - **执行**：append-only；相同 `event_id` 去重，不进行 last-write-wins。
 - **疼痛/安全观测**：追加并允许更正链；删除旧值不能使当前风险自动消失，须重新评估。
 - **目标**：用户显式状态变化优先于普通建议；两个设备并发改目标核心字段进入冲突，不按更新时间静默覆盖。
-- **计划**：保留版本；过去执行绑定旧版本，未来时间槽绑定已确认且安全有效的新版本。
-- **画像**：系统推断只生成候选；并发正式画像变更必须用户选择。
+- **计划**：保留版本；过去执行绑定旧版本，未来时间槽绑定 Atlas 基于有效上游约束和独立安全结论生成的新版本；展示触发来源、依据、差异和影响，不逐项审批。
+- **目标边界版本**：`Portrait*` 仅为兼容对象名；系统推断只生成可修改候选，并发变更不得定义用户角色、身份或人格。
 - **Consent**：拒绝/撤回/过期采用更严格结果；扩大授权必须新回执，禁止字段并集。
 - **删除**：有效 tombstone 防止旧设备复活对象；审计/法定保留与用户界面删除分开处理。
 - **调性**：当前会话已确认 `tone_version` 作为新输出真源；历史内容不回写。
@@ -1239,7 +1244,7 @@ recorded_at_us, payload, payload_hash
 | 专业内容规则与内容版本 | 是 | 是 | 条件可见 | 是 | 可发送已授权/自研规则片段，不泄露无关用户数据 |
 | 已确认计划完整内容 | 是 | 同步/云评审启用时 | 否 | 默认否 | 模型只收当前任务相关计划片段和约束 |
 | `safety_constraint_codes` | 是 | 是 | 条件可见 | 是 | 结构化、无疾病原文；不得让模型绕过规则结论 |
-| 画像候选/历史版本全集 | 是 | 同步启用时 | 否 | 否 | 仅发送当前任务已确认版本的最小摘要 |
+| 方向候选/目标边界版本历史全集（兼容 Portrait 对象） | 是 | 同步启用时 | 否 | 否 | 仅发送当前任务已确认版本的最小摘要 |
 | Consent/撤回审计全文 | 是 | 审计必要时 | 否 | 否 | 模型只接收布尔能力门控，不见回执细节 |
 | Agent 私有推理链 | 不应持久化为用户数据 | 不应记录 | 否 | 否 | 只保存结构化结论、证据、规则、版本 |
 | Audit 日志 | 是 | 是，按政策 | 否 | 否 | 日志本身不得含敏感原文 |
@@ -1274,7 +1279,7 @@ recorded_at_us, payload, payload_hash
 | 本地今日摘要首屏 | `<2s` 候选目标 | 最近有效本地摘要、同步状态 | 空白等待云 Agent | 否 |
 | Pulse 首反馈 | `<100ms` | 等效按钮、可直接绕过 | 把未完成 Pulse 当训练锁 | 否 |
 | 调性适配 | `≤5s` | 保持当前已确认 `tone_version` | 混合调性、改变事实/权限/安全 | 否 |
-| 身份/目标引导单轮 | `≤10s` | 保存输入、稍后继续 | 未确认推断写正式画像 | 否 |
+| 方向/目标引导单轮 | `≤10s` | 保存输入、稍后继续 | 系统推断写成角色身份、人格或用户事实 | 否 |
 | 日内重排/小幅调整 | `≤20s` | 保留最近有效安全计划，标待处理 | 清空今日、伪称已评审 | 涉及安全则是 |
 | 有界语言评测 | `≤30s` | 估计等级/未完成 | 正式权威等级 | 否 |
 | 睡眠/营养非紧急建议 | `≤30s` | 一般建议、数据不足态 | 精确健康结论/诊断 | 否 |
@@ -1348,11 +1353,11 @@ recorded_at_us, payload, payload_hash
 | `SB-P0-11` | 第三方模型供应方、字段白名单、保留时限、区域、训练政策和删除证明 | Visibility/Agent | 安全/隐私评审 |
 | `SB-P0-12` | PrimeAtlas 服务端实际可见字段与“仅设备”承诺的能力开关 | 同步/云分析 | 产品 + 架构 + 隐私 |
 | `SB-P0-13` | 12 职责各自属于确定性规则/专业内容/模型/人工的属性，读写权限、否决权限、失败接管 | Agent 合同 | 产品 + 专业 +架构评审 |
-| `SB-P0-14` | 身份进度、目标邻近度、准备度、恢复、完成质量、融合的公式版本、样本、窗口、误差与禁止显示条件 | 指标呈现 | 数据 + 产品 + QA，至少 3 组金标 |
-| `SB-P0-15` | PR/隐藏进步四类型规则、最小样本、去重、冷却、误判、撤销和重算 | 成果/画像候选 | 数据 + 产品 + QA |
+| `SB-P0-14` | 目标进展、目标邻近度、准备度、恢复、完成质量、融合的公式版本、样本、窗口、误差与禁止显示条件 | 指标呈现 | 数据 + 产品 + QA，至少 3 组金标 |
+| `SB-P0-15` | PR/隐藏进步四类型规则、最小样本、去重、冷却、误判、撤销和重算 | 成果/方向候选（兼容 Portrait 对象） | 数据 + 产品 + QA |
 | `SB-P0-16` | 各域“完成质量”的客观/主观证据、`unknown` 状态与来源优先级 | Execution/Evidence | 专业 + 数据 |
 | `SB-P0-17` | 场景来源的新鲜度与冲突规则：用户声明、日历、位置、健康数据、系统推断的优先级 | 场景自适应 | 产品 + 数据 + 隐私 |
-| `SB-P0-18` | 目标/计划/画像并发冲突的用户解决 UI 合同与超时后的保留策略 | Sync/状态 | 产品 + 设计 + QA |
+| `SB-P0-18` | 目标/计划/目标边界版本（兼容 Portrait 对象）并发冲突的用户上游输入解决 UI 合同与超时后的保留策略 | Sync/状态 | 产品 + 设计 + QA |
 | `SB-P0-19` | 游客到账号合并、重装设备 ID、登出/切号本地缓存与删除规则 | 账号/同步隔离 | 产品 + 隐私 + 架构 |
 | `SB-P0-20` | tombstone 保留期、旧设备防复活窗口、备份恢复后的再删除策略 | 删除/同步 | 隐私 + 架构 + QA |
 | `SB-P0-21` | SLO 的设备档位、网络条件、计时起止、P95/P99 窗口、后台/取消行为 | NF1/AG4 | QA + 产品 + 架构 |
@@ -1382,16 +1387,16 @@ recorded_at_us, payload, payload_hash
 
 以下不是 Blocked，不应在 Spec 中重新讨论：
 
-- 身份迁移是唯一最高层主轴；
+- 目标、方向、现实约束和证据是最高产品主轴；系统不得定义用户角色、身份或人格；
 - 早期体能单域深扎 + 融合可见；
 - 最多 3 个活跃成长域，每域多个目标；
-- 普通冲突不硬阻断，必须有“一键采纳 / 我自己来”；
-- 安全否决不可覆盖；
+- 普通冲突不硬阻断；Atlas 按用户上游约束自主编排并展示触发来源、依据、前后差异、影响和版本，不设置“一键采纳”或逐项审批；
+- 安全否决独立且不可覆盖；
 - 首发仅支持 18 岁以上普通健康成年人，训练方案前主动、默认未选确认；
 - Pulse 可绕过，500ms 是产品建议阈值，不锁训练；
 - 默认专业调性，四调性只改变表达；
-- 小幅低风险可逆调整可先执行后通知，重大/越界/安全相关需确认或安全通道；
-- 画像只生成候选，用户确认后才成为正式版本；
+- Atlas 自主执行重大与普通计划调整并保存可解释版本；安全/隐私授权保持独立，不得混成计划逐项审批；
+- `PortraitCandidate/PortraitVersion` 只作兼容对象名，承载方向候选与目标边界版本，不形成角色身份或人格画像；
 - 融合入口/证据默认可发现，采集和生成可关闭/撤回且无惩罚；
 - 第三方模型最小必要、默认去标识、独立 Consent、默认不用于通用模型训练；
 - 12 Agent 是职责/权限模型，不等于 12 个模型或真人专家；
@@ -1406,7 +1411,7 @@ recorded_at_us, payload, payload_hash
 - 本地优先，核心今日执行、反馈和安全暂停离线可用；
 - 执行事实追加，云端计划不得覆盖；
 - Consent/Eligibility/Safety/普通冲突为彼此独立的状态和权限边界；
-- 正式画像、目标重大变化、知识注入均需用户显式确认；
+- 用户显式控制目标、时间、场景、现实约束及是否发起知识注入；Atlas 自主决定知识采纳、计划生成和重大/普通调整，展示触发来源、依据、前后差异、影响和版本，不设置逐项审批；兼容目标边界版本不得解释为角色身份或人格画像；
 - 安全、撤回、账号隔离优先于同步便利；
 - 第三方模型调用前必须经过字段级 manifest 校验；
 - 安全与专业未完成不得伪装 ready；

@@ -1,0 +1,2 @@
+﻿exit=0
+warning: in the working copy of 'docs/prototype/primeatlas-prototype-v6.html', LF will be replaced by CRLF the next time Git touches it

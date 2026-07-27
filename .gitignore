@@ -16,6 +16,16 @@ build/
 .env
 .env.local
 coverage/
+.flutter-sdk/
+.workbuddy-runtime/
+android-device-lab/
+*.capture.txt
+*-capture.txt
+*-output.txt
+*-diff.txt
+*-numstat.txt
+flutter-version-code.txt
+dart-analyze-*.txt
 **/android/.gradle/
 **/android/captures/
 **/android/gradlew

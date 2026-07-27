@@ -1,0 +1,19 @@
+﻿[r1-regression.test.mjs] exit=0
+r1-regression: PASS
+[r1-heldout-verifier.test.mjs] exit=0
+PASS P0-02 actual appendAITextBubble treats held-out payload as text
+PASS P0-04 actual persist handles QuotaExceededError without input/savedAt loss
+PASS P0-04 actual persist handles SecurityError without input/savedAt loss
+PASS P0-04 actual startup recovery isolates malformed JSON and keeps initial input
+PASS P0-05 actual runAssistedFailure timeout preserves formal state
+PASS P0-05 actual runAssistedFailure limit preserves formal state
+PASS P0-05 actual runAssistedFailure invalid-response preserves formal state
+PASS P0-06 actual resolve transaction rolls all formal/conflict state back on persist failure
+PASS P0-04/P0-06 actual atomicConfirm rolls back and does not announce success on persist failure
+PASS P0-07 actual repository fixture removes inactive domain everywhere and preserves other-domain hashes
+PASS P0-04 goA0 must not advance or report route change when persist fails
+PASS P0-04 confirm-milestones must roll back/unlock nothing when persist fails
+PASS P0-04 save-draft does not toast success when persist fails
+heldout-verifier: 13/13 passed
+[v6-approved-remediation.test.mjs] exit=0
+v6-approved-remediation: PASS
