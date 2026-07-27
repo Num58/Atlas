@@ -16,67 +16,101 @@ class MilestoneDraft {
   final String window;
 }
 
+class DomainSelectionResult {
+  const DomainSelectionResult.accepted(this.domains)
+      : focusSuggestion = null,
+        accepted = true;
+
+  const DomainSelectionResult.focusSuggestion(this.focusSuggestion)
+      : domains = const <String>[],
+        accepted = false;
+
+  final bool accepted;
+  final List<String> domains;
+  final String? focusSuggestion;
+}
+
 class JourneyState {
   const JourneyState({
     required this.direction,
     required this.constraint,
-    required this.domain,
+    required this.domains,
     required this.goal,
     required this.milestone,
     required this.saveStatus,
     required this.isConfirmed,
     this.saveError,
     this.isRestoring = false,
+    this.domainFocusSuggestion,
   });
 
   const JourneyState.initial()
       : direction = '',
         constraint = '',
-        domain = '',
+        domains = const <String>[],
         goal = '',
         milestone = null,
         saveStatus = LocalSaveStatus.pendingPersistence,
         isConfirmed = false,
         saveError = null,
-        isRestoring = false;
+        isRestoring = false,
+        domainFocusSuggestion = null;
 
   final String direction;
   final String constraint;
-  final String domain;
+  final List<String> domains;
   final String goal;
   final MilestoneDraft? milestone;
   final LocalSaveStatus saveStatus;
   final bool isConfirmed;
   final String? saveError;
   final bool isRestoring;
+  final String? domainFocusSuggestion;
+
+  /// Primary domain used by current V0.2 confirm write path.
+  String get domain => domains.isEmpty ? '' : domains.first;
+
+  String get domainsLabel {
+    if (domains.isEmpty) {
+      return '';
+    }
+    return domains.join(' · ');
+  }
 
   JourneyState copyWith({
     String? direction,
     String? constraint,
-    String? domain,
+    List<String>? domains,
     String? goal,
     MilestoneDraft? milestone,
     LocalSaveStatus? saveStatus,
     bool? isConfirmed,
     String? saveError,
     bool? isRestoring,
+    String? domainFocusSuggestion,
     bool clearSaveError = false,
+    bool clearDomainFocusSuggestion = false,
   }) {
     return JourneyState(
       direction: direction ?? this.direction,
       constraint: constraint ?? this.constraint,
-      domain: domain ?? this.domain,
+      domains: domains ?? this.domains,
       goal: goal ?? this.goal,
       milestone: milestone ?? this.milestone,
       saveStatus: saveStatus ?? this.saveStatus,
       isConfirmed: isConfirmed ?? this.isConfirmed,
       saveError: clearSaveError ? null : (saveError ?? this.saveError),
       isRestoring: isRestoring ?? this.isRestoring,
+      domainFocusSuggestion: clearDomainFocusSuggestion
+          ? null
+          : (domainFocusSuggestion ?? this.domainFocusSuggestion),
     );
   }
 }
 
 class JourneyController extends Notifier<JourneyState> {
+  static const maxActiveDomains = 3;
+
   var _restoreStarted = false;
 
   @override
@@ -97,10 +131,17 @@ class JourneyController extends Notifier<JourneyState> {
         state = state.copyWith(isRestoring: false);
         return;
       }
+      final restoredDomains = snapshot.domain
+          .split(RegExp(r'[·,]'))
+          .map((item) => item.trim())
+          .where((item) => item.isNotEmpty)
+          .toList(growable: false);
       state = JourneyState(
         direction: snapshot.direction,
         constraint: snapshot.constraint,
-        domain: snapshot.domain,
+        domains: restoredDomains.isEmpty
+            ? <String>[snapshot.domain]
+            : restoredDomains,
         goal: snapshot.goalTitle,
         milestone: MilestoneDraft(
           title: snapshot.milestoneTitle,
@@ -111,9 +152,9 @@ class JourneyController extends Notifier<JourneyState> {
         isConfirmed: true,
         saveError: null,
         isRestoring: false,
+        domainFocusSuggestion: null,
       );
     } catch (_) {
-      // Keep session draft if present; mark restore failure without fake save.
       state = state.copyWith(
         isRestoring: false,
         saveStatus: state.saveStatus == LocalSaveStatus.persisted
@@ -134,12 +175,44 @@ class JourneyController extends Notifier<JourneyState> {
     );
   }
 
-  void selectDomain(String domain) {
+  /// Toggle/select growth domains. At most [maxActiveDomains] active.
+  /// Selecting a 4th domain returns focus suggestion and does not write.
+  DomainSelectionResult selectDomain(String domain) {
+    final normalized = domain.trim();
+    if (normalized.isEmpty) {
+      return const DomainSelectionResult.focusSuggestion('成长域不能为空');
+    }
+    final current = [...state.domains];
+    if (current.contains(normalized)) {
+      current.remove(normalized);
+      state = state.copyWith(
+        domains: List<String>.unmodifiable(current),
+        isConfirmed: false,
+        saveStatus: LocalSaveStatus.pendingPersistence,
+        clearSaveError: true,
+        clearDomainFocusSuggestion: true,
+      );
+      return DomainSelectionResult.accepted(
+        List<String>.unmodifiable(current),
+      );
+    }
+    if (current.length >= maxActiveDomains) {
+      final suggestion =
+          '已有 $maxActiveDomains 个活跃成长域（${current.join('、')}）。'
+          '请先聚焦或调整现有域，而不是继续增加第 ${maxActiveDomains + 1} 个。';
+      state = state.copyWith(domainFocusSuggestion: suggestion);
+      return DomainSelectionResult.focusSuggestion(suggestion);
+    }
+    current.add(normalized);
     state = state.copyWith(
-      domain: domain,
+      domains: List<String>.unmodifiable(current),
       isConfirmed: false,
       saveStatus: LocalSaveStatus.pendingPersistence,
       clearSaveError: true,
+      clearDomainFocusSuggestion: true,
+    );
+    return DomainSelectionResult.accepted(
+      List<String>.unmodifiable(current),
     );
   }
 
@@ -164,7 +237,7 @@ class JourneyController extends Notifier<JourneyState> {
   Future<void> confirmBoundary() async {
     final complete = state.direction.isNotEmpty &&
         state.constraint.isNotEmpty &&
-        state.domain.isNotEmpty &&
+        state.domains.isNotEmpty &&
         state.goal.isNotEmpty &&
         state.milestone != null;
     if (!complete) {
@@ -174,7 +247,6 @@ class JourneyController extends Notifier<JourneyState> {
       return;
     }
 
-    // Keep edit buffer; only claim confirmation after use-case success.
     final snapshot = state;
     state = state.copyWith(
       saveStatus: LocalSaveStatus.saving,
@@ -188,7 +260,7 @@ class JourneyController extends Notifier<JourneyState> {
         ConfirmJourneyBoundaryCommand(
           direction: snapshot.direction,
           constraint: snapshot.constraint,
-          domain: snapshot.domain,
+          domain: snapshot.domainsLabel,
           goalTitle: snapshot.goal,
           milestoneTitle: snapshot.milestone!.title,
           milestoneEvidenceRule: snapshot.milestone!.evidenceRule,
@@ -200,6 +272,7 @@ class JourneyController extends Notifier<JourneyState> {
           isConfirmed: true,
           saveStatus: LocalSaveStatus.persisted,
           clearSaveError: true,
+          clearDomainFocusSuggestion: true,
         );
         return;
       }

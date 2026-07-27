@@ -1,7 +1,7 @@
 # PrimeAtlas 开发进度与阶段
 
-> 更新：2026-07-27  
-> 集成线：`develop`  
+> 更新：2026-07-27
+> 集成线：`develop`
 > 总状态：**NOT DEV READY**
 
 ## 大阶段
@@ -33,21 +33,21 @@
 
 ## 分支运营
 
-- `main`：保护发布线  
-- `develop`：唯一日更集成线（由原 `chore/sync-stage-progress-20260722@dac3eb5` 收敛）  
+- `main`：保护发布线
+- `develop`：唯一日更集成线（由原 `chore/sync-stage-progress-20260722@dac3eb5` 收敛）
 - 不再维护长期 feature 分支丛
 
 ## 最近检查点
 
-- `dac3eb5` — feat: wire journey boundary local persistence  
-  - analyze PASS（相关文件）  
-  - `flutter test` journey_state 4/4  
-  - journey_boundary_repository 4/4  
-  - functional smoke PASS  
+- `dac3eb5` — feat: wire journey boundary local persistence
+  - analyze PASS（相关文件）
+  - `flutter test` journey_state 4/4
+  - journey_boundary_repository 4/4
+  - functional smoke PASS
 
 ## 下一步
 
-1. 在 `develop` 上推进 M3（正式域/目标路由与生命周期）  
-2. 补 T-V02 FULL/BUSY 与设备证据  
-3. 独立 QA 二次核验（网络恢复后）  
+1. 在 `develop` 上推进 M3（正式域/目标路由与生命周期）
+2. 补 T-V02 FULL/BUSY 与设备证据
+3. 独立 QA 二次核验（网络恢复后）
 4. 门禁全过后再 PR 合 `main`

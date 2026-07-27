@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:primeatlas/app/features/journey/domain_page.dart';
 import 'package:primeatlas/app/features/journey/journey_edit_pages.dart';
 import 'package:primeatlas/app/features/journey/journey_page.dart';
 import 'package:primeatlas/app/features/me/me_page.dart';

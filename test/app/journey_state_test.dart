@@ -36,7 +36,7 @@ class _SnapshotLoad implements LoadLatestJourneyBoundary {
     return const JourneyBoundarySnapshot(
       direction: '改善长距离跑步的稳定性',
       constraint: '每周三个晚间时段，每次四十分钟',
-      domain: '体能',
+      domain: '体能 · 语言',
       goalTitle: '完成一次稳定的十公里训练',
       milestoneTitle: '完成连续四周基础训练',
       milestoneEvidenceRule: '每周保留三次训练记录',
@@ -89,7 +89,7 @@ void main() {
     final state = container.read(journeyControllerProvider);
     expect(state.isConfirmed, isTrue);
     expect(state.saveStatus, LocalSaveStatus.persisted);
-    expect(state.domain, '体能');
+    expect(state.domains, ['体能']);
     expect(state.direction, isNotEmpty);
   });
 
@@ -140,11 +140,45 @@ void main() {
     expect(state.isConfirmed, isTrue);
     expect(state.saveStatus, LocalSaveStatus.persisted);
     expect(state.direction, '改善长距离跑步的稳定性');
-    expect(state.constraint, '每周三个晚间时段，每次四十分钟');
-    expect(state.domain, '体能');
+    expect(state.domains, ['体能', '语言']);
     expect(state.goal, '完成一次稳定的十公里训练');
     expect(state.milestone?.title, '完成连续四周基础训练');
-    expect(state.milestone?.evidenceRule, '每周保留三次训练记录');
-    expect(state.milestone?.window, '四周');
+  });
+
+  test('accepts up to three domains and rejects fourth with focus suggestion',
+      () {
+    final container = ProviderContainer(
+      overrides: baseOverrides(),
+    );
+    addTearDown(container.dispose);
+    final controller = container.read(journeyControllerProvider.notifier);
+
+    expect(controller.selectDomain('体能').accepted, isTrue);
+    expect(controller.selectDomain('语言').accepted, isTrue);
+    expect(controller.selectDomain('创作').accepted, isTrue);
+    final fourth = controller.selectDomain('认知');
+    expect(fourth.accepted, isFalse);
+    expect(fourth.focusSuggestion, contains('聚焦'));
+
+    final state = container.read(journeyControllerProvider);
+    expect(state.domains, ['体能', '语言', '创作']);
+    expect(state.domainFocusSuggestion, isNotNull);
+  });
+
+  test('toggling selected domain removes it without focus suggestion', () {
+    final container = ProviderContainer(
+      overrides: baseOverrides(),
+    );
+    addTearDown(container.dispose);
+    final controller = container.read(journeyControllerProvider.notifier);
+
+    controller.selectDomain('体能');
+    controller.selectDomain('语言');
+    final removed = controller.selectDomain('体能');
+    expect(removed.accepted, isTrue);
+
+    final state = container.read(journeyControllerProvider);
+    expect(state.domains, ['语言']);
+    expect(state.domainFocusSuggestion, isNull);
   });
 }

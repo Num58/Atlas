@@ -32,8 +32,8 @@ class JourneyPage extends ConsumerWidget {
             const SizedBox(height: AppTokens.space4),
             _JourneyStep(
               label: '成长域',
-              value: state.domain.isEmpty ? '待选择' : state.domain,
-              actionLabel: state.domain.isEmpty ? '选择成长域' : '修改',
+              value: state.domains.isEmpty ? '待选择' : state.domainsLabel,
+              actionLabel: state.domains.isEmpty ? '选择成长域' : '修改',
               onPressed:
                   isSaving ? null : () => context.push('/journey/domain'),
             ),
@@ -80,7 +80,7 @@ class JourneyPage extends ConsumerWidget {
   }
 
   bool _canConfirm(JourneyState state) {
-    final complete = state.domain.isNotEmpty &&
+    final complete = state.domains.isNotEmpty &&
         state.goal.isNotEmpty &&
         state.milestone != null &&
         state.direction.isNotEmpty &&
