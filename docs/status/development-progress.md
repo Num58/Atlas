@@ -1,53 +1,40 @@
-# PrimeAtlas 开发进度与阶段
+# PrimeAtlas 开发进度
 
 > 更新：2026-07-27
 > 集成线：`develop`
-> 总状态：**NOT DEV READY**
+> HEAD：见仓库最新 commit
+> 结论：**NOT DEV READY**
+
+## 分支
+
+- `main`：保护发布线
+- `develop`：唯一日更集成线
 
 ## 大阶段
 
-| 阶段 | 名称 | 状态 | 完成度 |
-|---|---|---|---:|
-| M0 | 产品与合同冻结 | 完成 | 100% |
-| M1 | 可运行本地骨架 | 检查点完成 | 90% |
-| M2 | Journey 真持久化闭环 | 检查点完成（局部测试绿） | 70% |
-| M3 | 成长域 / 目标 / 里程碑完整化 | 下一焦点 | 10% |
-| M4 | 审计 · 幂等 · 错误恢复 | 未开始 | 20% |
-| M5 | 质量与设备门禁 | 未开始 | 8% |
-| M6 | 合入 `main` 与发布 | 禁止进入 | 0% |
-
-## 功能需求 R01–R10
-
-| ID | 需求 | 阶段 | 状态 |
-|---|---|---|---|
-| R01 | 方向 / 现实约束草案 | M2 | 检查点 |
-| R02 | 目标边界确认与版本 | M2/M3 | 确认+恢复检查点；历史页未做 |
-| R03 | 活跃成长域 1–3 | M3 | 未开始 |
-| R04 | 域/目标生命周期 | M3 | 未开始 |
-| R05 | 域内多目标 | M3 | 未开始 |
-| R06 | 里程碑 | M2/M3 | 最小落库 |
-| R07 | 旅程与目标详情 | M1–M3 | 壳检查点 |
-| R08 | 本地持久化 | M1–M4 | 闭环检查点 |
-| R09 | 审计 / 隔离 / 零外调 | M4–M5 | 未闭合 |
-| R10 | 学习态禁伪精确 | M3/M5 | 未开始 |
-
-## 分支运营
-
-- `main`：保护发布线
-- `develop`：唯一日更集成线（由原 `chore/sync-stage-progress-20260722@dac3eb5` 收敛）
-- 不再维护长期 feature 分支丛
+| 阶段 | 状态 | 说明 |
+|---|---|---|
+| M0 | 完成 | 产品/V6/合同冻结 |
+| M1 | 检查点 | 双入口壳 + SQLite 基础 |
+| M2 | 检查点 | 真持久化 + 恢复（局部测试绿） |
+| M3 | 进行中 | 多域≤3、第4域建议、pause/resume |
+| M4 | 未开始 | 审计/容错矩阵 |
+| M5 | 未开始 | 55 Test ID / 设备 / 无障碍 |
+| M6 | 禁止 | 合 main / 发布 |
 
 ## 最近检查点
 
-- `dac3eb5` — feat: wire journey boundary local persistence
-  - analyze PASS（相关文件）
-  - `flutter test` journey_state 4/4
-  - journey_boundary_repository 4/4
-  - functional smoke PASS
+- multi-domain selection + focus suggestion
+- domain pause/resume + pure lifecycle module
+- 诊断 txt 清理、`develop` 单线运营
+
+## 测试
+
+- `dart analyze`（相关路径）：PASS
+- `flutter test test/app test/application`：PASS
 
 ## 下一步
 
-1. 在 `develop` 上推进 M3（正式域/目标路由与生命周期）
-2. 补 T-V02 FULL/BUSY 与设备证据
-3. 独立 QA 二次核验（网络恢复后）
-4. 门禁全过后再 PR 合 `main`
+1. 目标列表/详情路由（仍在 develop 直线推进）
+2. FULL/BUSY 注入测试
+3. 网络恢复后独立 QA 二次核验

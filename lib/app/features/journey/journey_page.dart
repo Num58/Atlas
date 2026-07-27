@@ -32,7 +32,13 @@ class JourneyPage extends ConsumerWidget {
             const SizedBox(height: AppTokens.space4),
             _JourneyStep(
               label: '成长域',
-              value: state.domains.isEmpty ? '待选择' : state.domainsLabel,
+              value: state.domains.isEmpty
+                  ? (state.pausedDomains.isEmpty
+                      ? '待选择'
+                      : '无活跃（已暂停：${state.pausedDomainsLabel}）')
+                  : state.pausedDomains.isEmpty
+                      ? state.domainsLabel
+                      : '${state.domainsLabel}（暂停：${state.pausedDomainsLabel}）',
               actionLabel: state.domains.isEmpty ? '选择成长域' : '修改',
               onPressed:
                   isSaving ? null : () => context.push('/journey/domain'),

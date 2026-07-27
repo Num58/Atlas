@@ -181,4 +181,25 @@ void main() {
     expect(state.domains, ['语言']);
     expect(state.domainFocusSuggestion, isNull);
   });
+
+  test('pause and resume domain keep capacity and auditability of lists', () {
+    final container = ProviderContainer(
+      overrides: baseOverrides(),
+    );
+    addTearDown(container.dispose);
+    final controller = container.read(journeyControllerProvider.notifier);
+
+    controller.selectDomain('体能');
+    controller.selectDomain('语言');
+    expect(controller.pauseDomain('体能').accepted, isTrue);
+
+    var state = container.read(journeyControllerProvider);
+    expect(state.domains, ['语言']);
+    expect(state.pausedDomains, ['体能']);
+
+    expect(controller.resumeDomain('体能').accepted, isTrue);
+    state = container.read(journeyControllerProvider);
+    expect(state.domains, ['语言', '体能']);
+    expect(state.pausedDomains, isEmpty);
+  });
 }

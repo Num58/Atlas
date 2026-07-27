@@ -1,115 +1,15 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:primeatlas/app/bootstrap/persistence_providers.dart';
+import 'package:primeatlas/app/state/journey_models.dart';
+import 'package:primeatlas/app/state/journey_state_helpers.dart';
 import 'package:primeatlas/application/journey/confirm_journey_boundary.dart';
+import 'package:primeatlas/application/journey/domain_lifecycle.dart';
 
-enum LocalSaveStatus { pendingPersistence, saving, persisted, failed }
-
-class MilestoneDraft {
-  const MilestoneDraft({
-    required this.title,
-    required this.evidenceRule,
-    required this.window,
-  });
-
-  final String title;
-  final String evidenceRule;
-  final String window;
-}
-
-class DomainSelectionResult {
-  const DomainSelectionResult.accepted(this.domains)
-      : focusSuggestion = null,
-        accepted = true;
-
-  const DomainSelectionResult.focusSuggestion(this.focusSuggestion)
-      : domains = const <String>[],
-        accepted = false;
-
-  final bool accepted;
-  final List<String> domains;
-  final String? focusSuggestion;
-}
-
-class JourneyState {
-  const JourneyState({
-    required this.direction,
-    required this.constraint,
-    required this.domains,
-    required this.goal,
-    required this.milestone,
-    required this.saveStatus,
-    required this.isConfirmed,
-    this.saveError,
-    this.isRestoring = false,
-    this.domainFocusSuggestion,
-  });
-
-  const JourneyState.initial()
-      : direction = '',
-        constraint = '',
-        domains = const <String>[],
-        goal = '',
-        milestone = null,
-        saveStatus = LocalSaveStatus.pendingPersistence,
-        isConfirmed = false,
-        saveError = null,
-        isRestoring = false,
-        domainFocusSuggestion = null;
-
-  final String direction;
-  final String constraint;
-  final List<String> domains;
-  final String goal;
-  final MilestoneDraft? milestone;
-  final LocalSaveStatus saveStatus;
-  final bool isConfirmed;
-  final String? saveError;
-  final bool isRestoring;
-  final String? domainFocusSuggestion;
-
-  /// Primary domain used by current V0.2 confirm write path.
-  String get domain => domains.isEmpty ? '' : domains.first;
-
-  String get domainsLabel {
-    if (domains.isEmpty) {
-      return '';
-    }
-    return domains.join(' · ');
-  }
-
-  JourneyState copyWith({
-    String? direction,
-    String? constraint,
-    List<String>? domains,
-    String? goal,
-    MilestoneDraft? milestone,
-    LocalSaveStatus? saveStatus,
-    bool? isConfirmed,
-    String? saveError,
-    bool? isRestoring,
-    String? domainFocusSuggestion,
-    bool clearSaveError = false,
-    bool clearDomainFocusSuggestion = false,
-  }) {
-    return JourneyState(
-      direction: direction ?? this.direction,
-      constraint: constraint ?? this.constraint,
-      domains: domains ?? this.domains,
-      goal: goal ?? this.goal,
-      milestone: milestone ?? this.milestone,
-      saveStatus: saveStatus ?? this.saveStatus,
-      isConfirmed: isConfirmed ?? this.isConfirmed,
-      saveError: clearSaveError ? null : (saveError ?? this.saveError),
-      isRestoring: isRestoring ?? this.isRestoring,
-      domainFocusSuggestion: clearDomainFocusSuggestion
-          ? null
-          : (domainFocusSuggestion ?? this.domainFocusSuggestion),
-    );
-  }
-}
+export 'package:primeatlas/app/state/journey_models.dart';
 
 class JourneyController extends Notifier<JourneyState> {
   static const maxActiveDomains = 3;
+  static const _lifecycle = DomainLifecycle(maxActive: maxActiveDomains);
 
   var _restoreStarted = false;
 
@@ -131,29 +31,7 @@ class JourneyController extends Notifier<JourneyState> {
         state = state.copyWith(isRestoring: false);
         return;
       }
-      final restoredDomains = snapshot.domain
-          .split(RegExp(r'[·,]'))
-          .map((item) => item.trim())
-          .where((item) => item.isNotEmpty)
-          .toList(growable: false);
-      state = JourneyState(
-        direction: snapshot.direction,
-        constraint: snapshot.constraint,
-        domains: restoredDomains.isEmpty
-            ? <String>[snapshot.domain]
-            : restoredDomains,
-        goal: snapshot.goalTitle,
-        milestone: MilestoneDraft(
-          title: snapshot.milestoneTitle,
-          evidenceRule: snapshot.milestoneEvidenceRule,
-          window: snapshot.milestoneWindow,
-        ),
-        saveStatus: LocalSaveStatus.persisted,
-        isConfirmed: true,
-        saveError: null,
-        isRestoring: false,
-        domainFocusSuggestion: null,
-      );
+      state = journeyStateFromSnapshot(snapshot);
     } catch (_) {
       state = state.copyWith(
         isRestoring: false,
@@ -175,45 +53,73 @@ class JourneyController extends Notifier<JourneyState> {
     );
   }
 
-  /// Toggle/select growth domains. At most [maxActiveDomains] active.
-  /// Selecting a 4th domain returns focus suggestion and does not write.
   DomainSelectionResult selectDomain(String domain) {
-    final normalized = domain.trim();
-    if (normalized.isEmpty) {
-      return const DomainSelectionResult.focusSuggestion('成长域不能为空');
-    }
-    final current = [...state.domains];
-    if (current.contains(normalized)) {
-      current.remove(normalized);
-      state = state.copyWith(
-        domains: List<String>.unmodifiable(current),
-        isConfirmed: false,
-        saveStatus: LocalSaveStatus.pendingPersistence,
-        clearSaveError: true,
-        clearDomainFocusSuggestion: true,
-      );
-      return DomainSelectionResult.accepted(
-        List<String>.unmodifiable(current),
+    final outcome = _lifecycle.toggleActive(
+      active: state.domains,
+      paused: state.pausedDomains,
+      domain: domain,
+    );
+    if (!outcome.ok) {
+      state = state.copyWith(domainFocusSuggestion: outcome.message);
+      return DomainSelectionResult.focusSuggestion(
+        outcome.message ?? '请先聚焦现有成长域',
       );
     }
-    if (current.length >= maxActiveDomains) {
-      final suggestion =
-          '已有 $maxActiveDomains 个活跃成长域（${current.join('、')}）。'
-          '请先聚焦或调整现有域，而不是继续增加第 ${maxActiveDomains + 1} 个。';
-      state = state.copyWith(domainFocusSuggestion: suggestion);
-      return DomainSelectionResult.focusSuggestion(suggestion);
-    }
-    current.add(normalized);
     state = state.copyWith(
-      domains: List<String>.unmodifiable(current),
+      domains: outcome.active,
+      pausedDomains: outcome.paused,
       isConfirmed: false,
       saveStatus: LocalSaveStatus.pendingPersistence,
       clearSaveError: true,
       clearDomainFocusSuggestion: true,
     );
-    return DomainSelectionResult.accepted(
-      List<String>.unmodifiable(current),
+    return DomainSelectionResult.accepted(outcome.active);
+  }
+
+  DomainSelectionResult pauseDomain(String domain) {
+    final outcome = _lifecycle.pause(
+      active: state.domains,
+      paused: state.pausedDomains,
+      domain: domain,
     );
+    if (!outcome.ok) {
+      state = state.copyWith(domainFocusSuggestion: outcome.message);
+      return DomainSelectionResult.focusSuggestion(
+        outcome.message ?? '无法暂停该成长域',
+      );
+    }
+    state = state.copyWith(
+      domains: outcome.active,
+      pausedDomains: outcome.paused,
+      isConfirmed: false,
+      saveStatus: LocalSaveStatus.pendingPersistence,
+      clearSaveError: true,
+      clearDomainFocusSuggestion: true,
+    );
+    return DomainSelectionResult.accepted(outcome.active);
+  }
+
+  DomainSelectionResult resumeDomain(String domain) {
+    final outcome = _lifecycle.resume(
+      active: state.domains,
+      paused: state.pausedDomains,
+      domain: domain,
+    );
+    if (!outcome.ok) {
+      state = state.copyWith(domainFocusSuggestion: outcome.message);
+      return DomainSelectionResult.focusSuggestion(
+        outcome.message ?? '无法恢复该成长域',
+      );
+    }
+    state = state.copyWith(
+      domains: outcome.active,
+      pausedDomains: outcome.paused,
+      isConfirmed: false,
+      saveStatus: LocalSaveStatus.pendingPersistence,
+      clearSaveError: true,
+      clearDomainFocusSuggestion: true,
+    );
+    return DomainSelectionResult.accepted(outcome.active);
   }
 
   void saveGoal(String goal) {
@@ -235,12 +141,7 @@ class JourneyController extends Notifier<JourneyState> {
   }
 
   Future<void> confirmBoundary() async {
-    final complete = state.direction.isNotEmpty &&
-        state.constraint.isNotEmpty &&
-        state.domains.isNotEmpty &&
-        state.goal.isNotEmpty &&
-        state.milestone != null;
-    if (!complete) {
+    if (!isJourneyBoundaryComplete(state)) {
       throw StateError('The local journey boundary is incomplete.');
     }
     if (state.saveStatus == LocalSaveStatus.saving) {

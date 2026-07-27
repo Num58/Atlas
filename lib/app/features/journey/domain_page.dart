@@ -8,29 +8,41 @@ import 'package:primeatlas/app/state/journey_state.dart';
 class DomainPage extends ConsumerWidget {
   const DomainPage({super.key});
 
-  static const domains = ['体能', '语言', '创作', '认知'];
+  static const catalog = ['体能', '语言', '创作', '认知'];
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(journeyControllerProvider);
-    final selected = state.domains;
+    final active = state.domains;
+    final paused = state.pausedDomains;
+    final controller = ref.read(journeyControllerProvider.notifier);
+
     return JourneyEditorScaffold(
       title: '选择成长域',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const Text(
-            '最多保留三个活跃成长域。再次点按可取消；选择第 4 个域只给聚焦建议，不会写入。',
+            '最多 3 个活跃成长域。可点按切换活跃；对已活跃域可暂停，对已暂停域可恢复。第 4 个活跃域只给聚焦建议。',
           ),
           const SizedBox(height: AppTokens.space3),
           Text(
-            selected.isEmpty
-                ? '当前未选择成长域'
-                : '已选择 ${selected.length}/3：${selected.join(' · ')}',
+            active.isEmpty
+                ? '当前无活跃成长域'
+                : '活跃 ${active.length}/3：${active.join(' · ')}',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: AppTokens.colorTextSecondary,
                 ),
           ),
+          if (paused.isNotEmpty) ...[
+            const SizedBox(height: AppTokens.space2),
+            Text(
+              '已暂停：${paused.join(' · ')}',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: AppTokens.colorTextSecondary,
+                  ),
+            ),
+          ],
           if (state.domainFocusSuggestion != null) ...[
             const SizedBox(height: AppTokens.space3),
             Text(
@@ -41,54 +53,78 @@ class DomainPage extends ConsumerWidget {
             ),
           ],
           const SizedBox(height: AppTokens.space4),
-          ...domains.map(
-            (domain) {
-              final isSelected = selected.contains(domain);
-              return Padding(
-                padding: const EdgeInsets.only(bottom: AppTokens.space2),
-                child: OutlinedButton(
-                  style: OutlinedButton.styleFrom(
-                    minimumSize: const Size.fromHeight(48),
-                    backgroundColor: isSelected
-                        ? AppTokens.colorActionPrimarySubtle
-                        : null,
-                    side: BorderSide(
-                      color: isSelected
-                          ? AppTokens.colorActionPrimary
-                          : AppTokens.colorBorderDefault,
+          ...catalog.map((domain) {
+            final isActive = active.contains(domain);
+            final isPaused = paused.contains(domain);
+            final label = isActive
+                ? '$domain（活跃）'
+                : isPaused
+                    ? '$domain（已暂停）'
+                    : domain;
+            return Padding(
+              padding: const EdgeInsets.only(bottom: AppTokens.space2),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      minimumSize: const Size.fromHeight(48),
+                      backgroundColor: isActive
+                          ? AppTokens.colorActionPrimarySubtle
+                          : null,
+                      side: BorderSide(
+                        color: isActive
+                            ? AppTokens.colorActionPrimary
+                            : AppTokens.colorBorderDefault,
+                      ),
+                    ),
+                    onPressed: () {
+                      final result = isPaused
+                          ? controller.resumeDomain(domain)
+                          : controller.selectDomain(domain);
+                      if (!result.accepted && context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              result.focusSuggestion ?? '请先聚焦现有成长域',
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(label),
                     ),
                   ),
-                  onPressed: () {
-                    final result = ref
-                        .read(journeyControllerProvider.notifier)
-                        .selectDomain(domain);
-                    if (!result.accepted && context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            result.focusSuggestion ?? '请先聚焦现有成长域',
-                          ),
-                        ),
-                      );
-                    }
-                  },
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(isSelected ? '$domain（已选）' : domain),
-                  ),
-                ),
-              );
-            },
-          ),
-          const SizedBox(height: AppTokens.space4),
+                  if (isActive)
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        onPressed: () {
+                          final result = controller.pauseDomain(domain);
+                          if (!result.accepted && context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  result.focusSuggestion ?? '无法暂停',
+                                ),
+                              ),
+                            );
+                          }
+                        },
+                        child: const Text('暂停该域'),
+                      ),
+                    ),
+                ],
+              ),
+            );
+          }),
+          const SizedBox(height: AppTokens.space3),
           SizedBox(
             height: 48,
             child: FilledButton(
-              onPressed: selected.isEmpty
-                  ? null
-                  : () {
-                      context.pop();
-                    },
+              onPressed: active.isEmpty ? null : () => context.pop(),
               child: const Text('完成选择'),
             ),
           ),
@@ -97,4 +133,3 @@ class DomainPage extends ConsumerWidget {
     );
   }
 }
-
