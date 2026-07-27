@@ -1,5 +1,7 @@
 enum LocalSaveStatus { pendingPersistence, saving, persisted, failed }
 
+enum GoalDraftStatus { draft, active, paused, archived }
+
 class MilestoneDraft {
   const MilestoneDraft({
     required this.title,
@@ -10,6 +12,30 @@ class MilestoneDraft {
   final String title;
   final String evidenceRule;
   final String window;
+}
+
+class GoalDraft {
+  const GoalDraft({
+    required this.id,
+    required this.title,
+    this.status = GoalDraftStatus.draft,
+  });
+
+  final String id;
+  final String title;
+  final GoalDraftStatus status;
+
+  GoalDraft copyWith({
+    String? id,
+    String? title,
+    GoalDraftStatus? status,
+  }) {
+    return GoalDraft(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      status: status ?? this.status,
+    );
+  }
 }
 
 class DomainSelectionResult {
@@ -32,7 +58,7 @@ class JourneyState {
     required this.constraint,
     required this.domains,
     required this.pausedDomains,
-    required this.goal,
+    required this.goals,
     required this.milestone,
     required this.saveStatus,
     required this.isConfirmed,
@@ -46,7 +72,7 @@ class JourneyState {
         constraint = '',
         domains = const <String>[],
         pausedDomains = const <String>[],
-        goal = '',
+        goals = const <GoalDraft>[],
         milestone = null,
         saveStatus = LocalSaveStatus.pendingPersistence,
         isConfirmed = false,
@@ -58,7 +84,7 @@ class JourneyState {
   final String constraint;
   final List<String> domains;
   final List<String> pausedDomains;
-  final String goal;
+  final List<GoalDraft> goals;
   final MilestoneDraft? milestone;
   final LocalSaveStatus saveStatus;
   final bool isConfirmed;
@@ -82,12 +108,43 @@ class JourneyState {
     return pausedDomains.join(' · ');
   }
 
+  /// Compatibility primary goal used by current confirm write path.
+  String get goal =>
+      goals.isEmpty ? '' : goals.firstWhere(
+            (item) => item.status != GoalDraftStatus.archived,
+            orElse: () => goals.first,
+          ).title;
+
+  String get goalsLabel {
+    final visible = goals
+        .where((item) => item.status != GoalDraftStatus.archived)
+        .map((item) => item.title)
+        .where((title) => title.trim().isNotEmpty)
+        .toList(growable: false);
+    if (visible.isEmpty) {
+      return '';
+    }
+    if (visible.length == 1) {
+      return visible.first;
+    }
+    return '${visible.first} 等 ${visible.length} 个目标';
+  }
+
+  GoalDraft? goalById(String id) {
+    for (final item in goals) {
+      if (item.id == id) {
+        return item;
+      }
+    }
+    return null;
+  }
+
   JourneyState copyWith({
     String? direction,
     String? constraint,
     List<String>? domains,
     List<String>? pausedDomains,
-    String? goal,
+    List<GoalDraft>? goals,
     MilestoneDraft? milestone,
     LocalSaveStatus? saveStatus,
     bool? isConfirmed,
@@ -102,7 +159,7 @@ class JourneyState {
       constraint: constraint ?? this.constraint,
       domains: domains ?? this.domains,
       pausedDomains: pausedDomains ?? this.pausedDomains,
-      goal: goal ?? this.goal,
+      goals: goals ?? this.goals,
       milestone: milestone ?? this.milestone,
       saveStatus: saveStatus ?? this.saveStatus,
       isConfirmed: isConfirmed ?? this.isConfirmed,

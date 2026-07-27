@@ -45,9 +45,9 @@ class JourneyPage extends ConsumerWidget {
             ),
             _JourneyStep(
               label: '目标',
-              value: state.goal.isEmpty ? '待编辑' : state.goal,
-              actionLabel: state.goal.isEmpty ? '编辑目标' : '修改',
-              onPressed: isSaving ? null : () => context.push('/journey/goal'),
+              value: state.goalsLabel.isEmpty ? '待编辑' : state.goalsLabel,
+              actionLabel: state.goals.isEmpty ? '管理目标' : '查看目标',
+              onPressed: isSaving ? null : () => context.push('/journey/goals'),
             ),
             _JourneyStep(
               label: '里程碑',

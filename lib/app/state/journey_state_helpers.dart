@@ -7,6 +7,7 @@ JourneyState journeyStateFromSnapshot(JourneyBoundarySnapshot snapshot) {
       .map((item) => item.trim())
       .where((item) => item.isNotEmpty)
       .toList(growable: false);
+  final goalTitle = snapshot.goalTitle.trim();
   return JourneyState(
     direction: snapshot.direction,
     constraint: snapshot.constraint,
@@ -14,7 +15,15 @@ JourneyState journeyStateFromSnapshot(JourneyBoundarySnapshot snapshot) {
         ? <String>[snapshot.domain]
         : restoredDomains,
     pausedDomains: const <String>[],
-    goal: snapshot.goalTitle,
+    goals: goalTitle.isEmpty
+        ? const <GoalDraft>[]
+        : <GoalDraft>[
+            GoalDraft(
+              id: 'goal-restored-1',
+              title: goalTitle,
+              status: GoalDraftStatus.active,
+            ),
+          ],
     milestone: MilestoneDraft(
       title: snapshot.milestoneTitle,
       evidenceRule: snapshot.milestoneEvidenceRule,
@@ -29,9 +38,17 @@ JourneyState journeyStateFromSnapshot(JourneyBoundarySnapshot snapshot) {
 }
 
 bool isJourneyBoundaryComplete(JourneyState state) {
+  final hasGoal = state.goals.any(
+    (item) =>
+        item.status != GoalDraftStatus.archived && item.title.trim().isNotEmpty,
+  );
   return state.direction.isNotEmpty &&
       state.constraint.isNotEmpty &&
       state.domains.isNotEmpty &&
-      state.goal.isNotEmpty &&
+      hasGoal &&
       state.milestone != null;
+}
+
+String nextGoalId(List<GoalDraft> existing) {
+  return 'goal-${existing.length + 1}-${DateTime.now().microsecondsSinceEpoch}';
 }

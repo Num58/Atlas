@@ -122,9 +122,64 @@ class JourneyController extends Notifier<JourneyState> {
     return DomainSelectionResult.accepted(outcome.active);
   }
 
+  /// Compatibility entry used by simplified GoalPage.
   void saveGoal(String goal) {
+    final title = goal.trim();
+    if (title.isEmpty) {
+      return;
+    }
+    if (state.goals.isEmpty) {
+      addGoal(title);
+      return;
+    }
+    final primary = state.goals.first;
+    updateGoal(primary.id, title);
+  }
+
+  void addGoal(String title) {
+    final normalized = title.trim();
+    if (normalized.isEmpty) {
+      return;
+    }
+    final goals = [
+      ...state.goals,
+      GoalDraft(
+        id: nextGoalId(state.goals),
+        title: normalized,
+      ),
+    ];
     state = state.copyWith(
-      goal: goal.trim(),
+      goals: List<GoalDraft>.unmodifiable(goals),
+      isConfirmed: false,
+      saveStatus: LocalSaveStatus.pendingPersistence,
+      clearSaveError: true,
+    );
+  }
+
+  void updateGoal(String id, String title) {
+    final normalized = title.trim();
+    if (normalized.isEmpty) {
+      return;
+    }
+    final goals = state.goals
+        .map(
+          (item) => item.id == id ? item.copyWith(title: normalized) : item,
+        )
+        .toList(growable: false);
+    state = state.copyWith(
+      goals: List<GoalDraft>.unmodifiable(goals),
+      isConfirmed: false,
+      saveStatus: LocalSaveStatus.pendingPersistence,
+      clearSaveError: true,
+    );
+  }
+
+  void setGoalStatus(String id, GoalDraftStatus status) {
+    final goals = state.goals
+        .map((item) => item.id == id ? item.copyWith(status: status) : item)
+        .toList(growable: false);
+    state = state.copyWith(
+      goals: List<GoalDraft>.unmodifiable(goals),
       isConfirmed: false,
       saveStatus: LocalSaveStatus.pendingPersistence,
       clearSaveError: true,
@@ -169,7 +224,15 @@ class JourneyController extends Notifier<JourneyState> {
         ),
       );
       if (result.ok) {
+        final activated = snapshot.goals
+            .map(
+              (item) => item.status == GoalDraftStatus.archived
+                  ? item
+                  : item.copyWith(status: GoalDraftStatus.active),
+            )
+            .toList(growable: false);
         state = state.copyWith(
+          goals: List<GoalDraft>.unmodifiable(activated),
           isConfirmed: true,
           saveStatus: LocalSaveStatus.persisted,
           clearSaveError: true,

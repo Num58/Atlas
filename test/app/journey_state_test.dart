@@ -90,7 +90,8 @@ void main() {
     expect(state.isConfirmed, isTrue);
     expect(state.saveStatus, LocalSaveStatus.persisted);
     expect(state.domains, ['体能']);
-    expect(state.direction, isNotEmpty);
+    expect(state.goals.first.title, '完成一次稳定的十公里训练');
+    expect(state.goals.first.status, GoalDraftStatus.active);
   });
 
   test('keeps edit buffer and marks failed when use-case fails', () async {
@@ -201,5 +202,25 @@ void main() {
     state = container.read(journeyControllerProvider);
     expect(state.domains, ['语言', '体能']);
     expect(state.pausedDomains, isEmpty);
+  });
+
+  test('supports multi goals with detail status transitions', () {
+    final container = ProviderContainer(
+      overrides: baseOverrides(),
+    );
+    addTearDown(container.dispose);
+    final controller = container.read(journeyControllerProvider.notifier);
+
+    controller.addGoal('完成一次稳定的十公里训练');
+    controller.addGoal('建立睡前拉伸习惯');
+    final state = container.read(journeyControllerProvider);
+    expect(state.goals.length, 2);
+
+    final secondId = state.goals[1].id;
+    controller.updateGoal(secondId, '建立稳定的睡前拉伸');
+    controller.setGoalStatus(secondId, GoalDraftStatus.paused);
+    final updated = container.read(journeyControllerProvider).goalById(secondId);
+    expect(updated?.title, '建立稳定的睡前拉伸');
+    expect(updated?.status, GoalDraftStatus.paused);
   });
 }
