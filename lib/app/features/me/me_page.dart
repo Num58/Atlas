@@ -38,6 +38,14 @@ class MePage extends ConsumerWidget {
               child: const Text('打开本机数据状态'),
             ),
           ),
+          const SizedBox(height: AppTokens.space2),
+          SizedBox(
+            height: 48,
+            child: OutlinedButton(
+              onPressed: () => context.push('/me/boundary-versions'),
+              child: const Text('查看目标边界版本历史'),
+            ),
+          ),
           const SizedBox(height: AppTokens.space6),
           DecoratedBox(
             decoration: BoxDecoration(

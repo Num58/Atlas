@@ -127,6 +127,16 @@ class ConfirmJourneyBoundaryExecutor {
     return repository.loadLatestConfirmed(ownerId);
   }
 
+  List<core.BoundaryVersionSummary> listBoundaryVersions(String ownerId) {
+    return repository.listBoundaryVersions(ownerId);
+  }
+
+  core.ConfirmedJourneyBoundary restoreVersion(
+    core.RestoreBoundaryVersionCommand command,
+  ) {
+    return repository.restoreVersion(command);
+  }
+
   static void _requireComplete(core.ConfirmJourneyBoundaryCommand command) {
     final incomplete = command.direction.trim().isEmpty ||
         command.constraint.trim().isEmpty ||

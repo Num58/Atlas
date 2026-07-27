@@ -79,14 +79,49 @@ void insertConfirmedJourneyBoundaryGraph(
       now,
     ],
   );
-  tx.execute(
-    'INSERT INTO active_domains '
-    '(id,owner_id,domain_code,status,priority,version,'
-    'source_portrait_version_id,paused_at_us,archived_at_us,'
-    'created_at_us,updated_at_us) '
-    "VALUES (?,?,?,'active',1,1,?,NULL,NULL,?,?)",
-    [domainId, command.ownerId, command.domainCode, portraitId, now, now],
+  // domain_code is unique per owner for all statuses. Reuse the existing row
+  // when restoring/reconfirming the same growth domain. Never rewrite PK id
+  // (goals still FK-reference the historical domain id).
+  final existingDomain = tx.select(
+    'SELECT id, version FROM active_domains '
+    'WHERE owner_id = ? AND domain_code = ?',
+    [command.ownerId, command.domainCode],
   );
+  final resolvedDomainId = existingDomain.isEmpty
+      ? domainId
+      : existingDomain.single['id'] as String;
+  if (existingDomain.isEmpty) {
+    tx.execute(
+      'INSERT INTO active_domains '
+      '(id,owner_id,domain_code,status,priority,version,'
+      'source_portrait_version_id,paused_at_us,archived_at_us,'
+      'created_at_us,updated_at_us) '
+      "VALUES (?,?,?,'active',1,1,?,NULL,NULL,?,?)",
+      [
+        resolvedDomainId,
+        command.ownerId,
+        command.domainCode,
+        portraitId,
+        now,
+        now,
+      ],
+    );
+  } else {
+    final nextVersion = (existingDomain.single['version'] as int) + 1;
+    tx.execute(
+      "UPDATE active_domains SET status = 'active', priority = 1, "
+      'version = ?, source_portrait_version_id = ?, paused_at_us = NULL, '
+      'archived_at_us = NULL, updated_at_us = ? '
+      'WHERE owner_id = ? AND id = ?',
+      [
+        nextVersion,
+        portraitId,
+        now,
+        command.ownerId,
+        resolvedDomainId,
+      ],
+    );
+  }
   tx.execute(
     'INSERT INTO goals '
     '(id,owner_id,domain_id,status,version,title,description,'
@@ -98,7 +133,7 @@ void insertConfirmedJourneyBoundaryGraph(
     [
       goalId,
       command.ownerId,
-      domainId,
+      resolvedDomainId,
       command.goalTitle,
       answersJson,
       portraitId,

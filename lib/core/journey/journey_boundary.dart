@@ -147,3 +147,58 @@ class JourneyBoundaryIncomplete implements Exception {
   @override
   String toString() => message;
 }
+
+/// Historical target-boundary version (compatible physical table portrait_versions).
+class BoundaryVersionSummary {
+  const BoundaryVersionSummary({
+    required this.versionId,
+    required this.ordinal,
+    required this.lifecycle,
+    required this.kind,
+    required this.direction,
+    required this.constraint,
+    required this.domainCode,
+    required this.goalTitle,
+    required this.milestone,
+    required this.activatedAtUs,
+    this.restoredFromVersionId,
+  });
+
+  final String versionId;
+  final int ordinal;
+  final String lifecycle;
+  final String kind;
+  final String direction;
+  final String constraint;
+  final String domainCode;
+  final String goalTitle;
+  final JourneyMilestoneInput milestone;
+  final int activatedAtUs;
+  final String? restoredFromVersionId;
+
+  bool get isActive => lifecycle == 'active';
+}
+
+class RestoreBoundaryVersionCommand {
+  const RestoreBoundaryVersionCommand({
+    required this.ownerId,
+    required this.operationId,
+    required this.deviceId,
+    required this.installationId,
+    required this.versionId,
+    required this.occurredAtUs,
+    this.appVersion = '0.2.0+2',
+    this.platform = 'test',
+    this.subjectKind = 'guest',
+  });
+
+  final String ownerId;
+  final String operationId;
+  final String deviceId;
+  final String installationId;
+  final String versionId;
+  final int occurredAtUs;
+  final String appVersion;
+  final String platform;
+  final String subjectKind;
+}

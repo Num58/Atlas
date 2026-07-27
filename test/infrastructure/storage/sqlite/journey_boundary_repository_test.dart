@@ -212,7 +212,7 @@ void main() {
   test('incomplete and identity-like labels are rejected before any write', () {
     expect(
       () => useCase.execute(
-        ConfirmJourneyBoundaryCommand(
+        const ConfirmJourneyBoundaryCommand(
           ownerId: 'owner-a',
           operationId: 'op-empty',
           deviceId: 'device-a',
@@ -221,7 +221,7 @@ void main() {
           constraint: 'x',
           domainCode: 'cognition',
           goalTitle: 'y',
-          milestone: const JourneyMilestoneInput(
+          milestone: JourneyMilestoneInput(
             title: 'm',
             evidenceRule: 'e',
             window: '7d',
@@ -246,6 +246,52 @@ void main() {
       db.connection.select('SELECT count(*) AS n FROM subjects').single['n'],
       0,
     );
+  });
+
+  test('lists versions and restore creates a new active restored version', () {
+    final first = useCase.execute(
+      _command(
+        ownerId: 'owner-a',
+        operationId: 'op-v1',
+        deviceId: 'device-a',
+        goalTitle: 'First confirmed goal',
+      ),
+    );
+    final second = useCase.execute(
+      _command(
+        ownerId: 'owner-a',
+        operationId: 'op-v2',
+        deviceId: 'device-a',
+        goalTitle: 'Second confirmed goal',
+      ),
+    );
+    expect(first.portraitVersionId, isNot(equals(second.portraitVersionId)));
+
+    final versions = useCase.listBoundaryVersions('owner-a');
+    expect(versions.length, greaterThanOrEqualTo(2));
+    expect(versions.where((item) => item.isActive).length, 1);
+    expect(versions.first.isActive, isTrue);
+    expect(versions.first.goalTitle, 'Second confirmed goal');
+
+    final historical = versions.firstWhere((item) => !item.isActive);
+    final restored = useCase.restoreVersion(
+      RestoreBoundaryVersionCommand(
+        ownerId: 'owner-a',
+        operationId: 'op-restore-1',
+        deviceId: 'device-a',
+        installationId: 'install-owner-a',
+        versionId: historical.versionId,
+        occurredAtUs: 1700000000001000,
+      ),
+    );
+    expect(restored.goalTitle, historical.goalTitle);
+
+    final after = useCase.listBoundaryVersions('owner-a');
+    expect(after.length, greaterThanOrEqualTo(3));
+    final active = after.firstWhere((item) => item.isActive);
+    expect(active.kind, 'restored');
+    expect(active.goalTitle, historical.goalTitle);
+    expect(active.versionId, isNot(equals(historical.versionId)));
   });
 }
 

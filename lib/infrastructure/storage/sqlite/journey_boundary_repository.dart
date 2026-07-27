@@ -4,6 +4,7 @@ import 'package:primeatlas/core/journey/journey_boundary.dart';
 import 'package:primeatlas/core/journey/journey_boundary_repository.dart';
 import 'package:sqlite3/sqlite3.dart';
 
+import 'journey_boundary_history.dart';
 import 'journey_boundary_ids.dart';
 import 'journey_boundary_writer.dart';
 import 'operation_ledger_repository.dart';
@@ -103,71 +104,53 @@ class SqliteJourneyBoundaryRepository implements JourneyBoundaryRepository {
       throw const OwnerScopeViolation();
     }
     final portraitRows = database.select(
-      'SELECT id, snapshot_json, confirmed_draft_id, activated_at_us '
+      'SELECT id, snapshot_json, confirmed_draft_id, activated_at_us, kind '
       'FROM portrait_versions '
-      "WHERE owner_id = ? AND lifecycle = 'active' AND kind = 'confirmed' "
+      "WHERE owner_id = ? AND lifecycle = 'active' "
+      "AND kind IN ('confirmed','restored') "
       'ORDER BY activated_at_us DESC, id DESC LIMIT 1',
       [ownerId],
     );
     if (portraitRows.isEmpty) return null;
-    final portrait = portraitRows.single;
-    final snapshot = Map<String, Object?>.from(
-      jsonDecode(portrait['snapshot_json'] as String) as Map,
+    return confirmedFromPortraitRow(database, ownerId, portraitRows.single);
+  }
+
+  @override
+  List<BoundaryVersionSummary> listBoundaryVersions(String ownerId) {
+    if (ownerId.trim().isEmpty) {
+      throw const OwnerScopeViolation();
+    }
+    return queryBoundaryVersions(database, ownerId);
+  }
+
+  @override
+  ConfirmedJourneyBoundary restoreVersion(
+    RestoreBoundaryVersionCommand command,
+  ) {
+    final payloadJson = journeyCanonicalJson({
+      'version_id': command.versionId,
+      'action': 'restore',
+    });
+    final payloadHash = journeySha256Hex(payloadJson);
+    final ledger = OperationLedgerRepository(database);
+    final existing = ledger.ensureReplayable(
+      command.ownerId,
+      command.operationId,
+      payloadHash,
     );
-    final domainRows = database.select(
-      'SELECT id, domain_code FROM active_domains '
-      "WHERE owner_id = ? AND status = 'active' "
-      'ORDER BY priority ASC LIMIT 1',
-      [ownerId],
-    );
-    if (domainRows.isEmpty) return null;
-    final domain = domainRows.single;
-    final goalRows = database.select(
-      'SELECT id, title FROM goals '
-      "WHERE owner_id = ? AND domain_id = ? AND status = 'active' "
-      'ORDER BY updated_at_us DESC, id DESC LIMIT 1',
-      [ownerId, domain['id']],
-    );
-    if (goalRows.isEmpty) return null;
-    final goal = goalRows.single;
-    final milestoneRows = database.select(
-      'SELECT id, title, rule_json FROM milestones '
-      'WHERE owner_id = ? AND goal_id = ? '
-      'ORDER BY sequence_no ASC LIMIT 1',
-      [ownerId, goal['id']],
-    );
-    if (milestoneRows.isEmpty) return null;
-    final milestoneRow = milestoneRows.single;
-    final rule = Map<String, Object?>.from(
-      jsonDecode(milestoneRow['rule_json'] as String) as Map,
-    );
-    final ledgerRows = database.select(
-      'SELECT operation_id FROM operation_ledger '
-      "WHERE owner_id = ? AND entity_type = 'journey_boundary' "
-      "AND entity_id = ? AND state = 'committed' "
-      'ORDER BY created_at_us DESC LIMIT 1',
-      [ownerId, portrait['id']],
-    );
-    return ConfirmedJourneyBoundary(
-      ownerId: ownerId,
-      operationId: ledgerRows.isEmpty
-          ? ''
-          : ledgerRows.single['operation_id'] as String,
-      draftId: portrait['confirmed_draft_id'] as String,
-      portraitVersionId: portrait['id'] as String,
-      domainId: domain['id'] as String,
-      goalId: goal['id'] as String,
-      milestoneId: milestoneRow['id'] as String,
-      direction: snapshot['direction'] as String,
-      constraint: snapshot['constraint'] as String,
-      domainCode: domain['domain_code'] as String,
-      goalTitle: goal['title'] as String,
-      milestone: JourneyMilestoneInput(
-        title: milestoneRow['title'] as String,
-        evidenceRule: rule['evidence_rule'] as String,
-        window: rule['window'] as String,
+    if (existing != null) {
+      return ConfirmedJourneyBoundary.fromResultJson(
+        Map<String, Object?>.from(jsonDecode(existing.resultJson!) as Map),
+      );
+    }
+
+    return _unitOfWork.run(
+      (tx) => restoreBoundaryVersionInTransaction(
+        tx,
+        command,
+        payloadJson: payloadJson,
+        payloadHash: payloadHash,
       ),
-      confirmedAtUs: portrait['activated_at_us'] as int,
     );
   }
 }

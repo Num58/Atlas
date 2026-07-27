@@ -8,6 +8,12 @@ abstract interface class JourneyBoundaryRepository {
   /// Same operation_id + same payload must replay the stored result.
   ConfirmedJourneyBoundary confirm(ConfirmJourneyBoundaryCommand command);
 
-  /// Returns the latest active confirmed boundary for [ownerId], or null.
+  /// Returns the latest active confirmed/restored boundary for [ownerId], or null.
   ConfirmedJourneyBoundary? loadLatestConfirmed(String ownerId);
+
+  /// Lists boundary versions newest first (active + superseded history).
+  List<BoundaryVersionSummary> listBoundaryVersions(String ownerId);
+
+  /// Restores a historical version by creating a new active restored version.
+  ConfirmedJourneyBoundary restoreVersion(RestoreBoundaryVersionCommand command);
 }

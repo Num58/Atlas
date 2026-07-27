@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:primeatlas/application/journey/boundary_version_ports.dart';
 import 'package:primeatlas/application/journey/confirm_journey_boundary.dart';
 import 'package:primeatlas/infrastructure/storage/sqlite/baseline_migration.dart';
 import 'package:primeatlas/infrastructure/storage/sqlite/journey_boundary_repository.dart';
@@ -78,5 +79,23 @@ final loadLatestJourneyBoundaryProvider =
   return LocalLoadLatestJourneyBoundary(
     executor,
     ownerId: localGuestOwnerId,
+  );
+});
+
+final listBoundaryVersionsProvider = Provider<ListBoundaryVersions>((ref) {
+  final executor = ref.watch(confirmJourneyBoundaryExecutorProvider);
+  return LocalListBoundaryVersions(
+    executor,
+    ownerId: localGuestOwnerId,
+  );
+});
+
+final restoreBoundaryVersionProvider = Provider<RestoreBoundaryVersion>((ref) {
+  final executor = ref.watch(confirmJourneyBoundaryExecutorProvider);
+  return LocalRestoreBoundaryVersion(
+    executor,
+    ownerId: localGuestOwnerId,
+    deviceId: localGuestDeviceId,
+    installationId: localGuestInstallationId,
   );
 });
