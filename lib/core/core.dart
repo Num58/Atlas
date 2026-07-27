@@ -27,6 +27,10 @@ export 'storage/in_memory_portrait.dart';
 export 'storage/sqlite/sqlite_event_log.dart';
 export 'storage/sqlite/sqlite_portrait.dart';
 
+// ---- Journey boundary (V0.2 local direction-goal) ----
+export 'journey/journey_boundary.dart';
+export 'journey/journey_boundary_repository.dart';
+
 // ---- Sync ----
 export 'sync/sync_adapter.dart';
 

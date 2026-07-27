@@ -11,6 +11,7 @@ class JourneyPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(journeyControllerProvider);
+    final isSaving = state.saveStatus == LocalSaveStatus.saving;
     return SafeArea(
       child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 24, 16, 32),
@@ -33,21 +34,32 @@ class JourneyPage extends ConsumerWidget {
               label: '成长域',
               value: state.domain.isEmpty ? '待选择' : state.domain,
               actionLabel: state.domain.isEmpty ? '选择成长域' : '修改',
-              onPressed: () => context.push('/journey/domain'),
+              onPressed:
+                  isSaving ? null : () => context.push('/journey/domain'),
             ),
             _JourneyStep(
               label: '目标',
               value: state.goal.isEmpty ? '待编辑' : state.goal,
               actionLabel: state.goal.isEmpty ? '编辑目标' : '修改',
-              onPressed: () => context.push('/journey/goal'),
+              onPressed: isSaving ? null : () => context.push('/journey/goal'),
             ),
             _JourneyStep(
               label: '里程碑',
               value: state.milestone?.title ?? '待确认',
               actionLabel: state.milestone == null ? '设置里程碑' : '修改',
-              onPressed: () => context.push('/journey/milestone'),
+              onPressed:
+                  isSaving ? null : () => context.push('/journey/milestone'),
             ),
             const SizedBox(height: AppTokens.space4),
+            if (state.saveStatus == LocalSaveStatus.failed) ...[
+              Text(
+                state.saveError ?? '写入本机失败，请重试',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: AppTokens.colorStatusDanger,
+                    ),
+              ),
+              const SizedBox(height: AppTokens.space3),
+            ],
             SizedBox(
               height: 48,
               child: FilledButton(
@@ -58,7 +70,7 @@ class JourneyPage extends ConsumerWidget {
                             .confirmBoundary();
                       }
                     : null,
-                child: Text(state.isConfirmed ? '目标边界已确认' : '确认目标边界'),
+                child: Text(_confirmLabel(state)),
               ),
             ),
           ],
@@ -68,10 +80,32 @@ class JourneyPage extends ConsumerWidget {
   }
 
   bool _canConfirm(JourneyState state) {
-    return !state.isConfirmed &&
-        state.domain.isNotEmpty &&
+    final complete = state.domain.isNotEmpty &&
         state.goal.isNotEmpty &&
-        state.milestone != null;
+        state.milestone != null &&
+        state.direction.isNotEmpty &&
+        state.constraint.isNotEmpty;
+    if (!complete) {
+      return false;
+    }
+    if (state.saveStatus == LocalSaveStatus.saving ||
+        state.saveStatus == LocalSaveStatus.persisted) {
+      return false;
+    }
+    return true;
+  }
+
+  String _confirmLabel(JourneyState state) {
+    switch (state.saveStatus) {
+      case LocalSaveStatus.saving:
+        return '正在写入本机…';
+      case LocalSaveStatus.persisted:
+        return '目标边界已写入本机';
+      case LocalSaveStatus.failed:
+        return '重试写入本机';
+      case LocalSaveStatus.pendingPersistence:
+        return '确认目标边界';
+    }
   }
 }
 
@@ -105,7 +139,9 @@ class _EmptyJourney extends StatelessWidget {
               Text('先写下你想改善的方向',
                   style: Theme.of(context).textTheme.titleMedium),
               const SizedBox(height: AppTokens.space2),
-              const Text('你可以同时写下可用时间、场景与现实限制；先在本次会话整理，接入本机存储后再形成持久版本。'),
+              const Text(
+                '你可以同时写下可用时间、场景与现实限制。确认目标边界后才会尝试写入本机。',
+              ),
               const SizedBox(height: AppTokens.space5),
               SizedBox(
                 height: 48,
@@ -146,7 +182,9 @@ class _BoundarySummary extends StatelessWidget {
                       style: Theme.of(context).textTheme.titleMedium),
                 ),
                 TextButton(
-                  onPressed: () => context.push('/journey/direction'),
+                  onPressed: state.saveStatus == LocalSaveStatus.saving
+                      ? null
+                      : () => context.push('/journey/direction'),
                   child: const Text('编辑'),
                 ),
               ],
@@ -159,15 +197,41 @@ class _BoundarySummary extends StatelessWidget {
             ),
             const SizedBox(height: AppTokens.space3),
             Text(
-              state.isConfirmed ? '目标边界已确认，等待写入本机' : '草案仅保留在本次会话',
+              _statusLabel(state),
               style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    color: AppTokens.colorStatusSuccess,
+                    color: _statusColor(state),
                   ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  String _statusLabel(JourneyState state) {
+    switch (state.saveStatus) {
+      case LocalSaveStatus.pendingPersistence:
+        return '草案尚未写入本机';
+      case LocalSaveStatus.saving:
+        return '等待写入本机';
+      case LocalSaveStatus.persisted:
+        return '目标边界已写入本机';
+      case LocalSaveStatus.failed:
+        return '写入本机失败，可重试';
+    }
+  }
+
+  Color _statusColor(JourneyState state) {
+    switch (state.saveStatus) {
+      case LocalSaveStatus.persisted:
+        return AppTokens.colorStatusSuccess;
+      case LocalSaveStatus.failed:
+        return AppTokens.colorStatusDanger;
+      case LocalSaveStatus.saving:
+        return AppTokens.colorActionPrimary;
+      case LocalSaveStatus.pendingPersistence:
+        return AppTokens.colorTextMuted;
+    }
   }
 }
 
@@ -182,7 +246,7 @@ class _JourneyStep extends StatelessWidget {
   final String label;
   final String value;
   final String actionLabel;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
 
   @override
   Widget build(BuildContext context) {

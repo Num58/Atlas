@@ -1,4 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:primeatlas/app/bootstrap/persistence_providers.dart';
+import 'package:primeatlas/application/journey/confirm_journey_boundary.dart';
 
 enum LocalSaveStatus { pendingPersistence, saving, persisted, failed }
 
@@ -23,6 +25,8 @@ class JourneyState {
     required this.milestone,
     required this.saveStatus,
     required this.isConfirmed,
+    this.saveError,
+    this.isRestoring = false,
   });
 
   const JourneyState.initial()
@@ -32,7 +36,9 @@ class JourneyState {
         goal = '',
         milestone = null,
         saveStatus = LocalSaveStatus.pendingPersistence,
-        isConfirmed = false;
+        isConfirmed = false,
+        saveError = null,
+        isRestoring = false;
 
   final String direction;
   final String constraint;
@@ -41,6 +47,8 @@ class JourneyState {
   final MilestoneDraft? milestone;
   final LocalSaveStatus saveStatus;
   final bool isConfirmed;
+  final String? saveError;
+  final bool isRestoring;
 
   JourneyState copyWith({
     String? direction,
@@ -50,6 +58,9 @@ class JourneyState {
     MilestoneDraft? milestone,
     LocalSaveStatus? saveStatus,
     bool? isConfirmed,
+    String? saveError,
+    bool? isRestoring,
+    bool clearSaveError = false,
   }) {
     return JourneyState(
       direction: direction ?? this.direction,
@@ -59,13 +70,59 @@ class JourneyState {
       milestone: milestone ?? this.milestone,
       saveStatus: saveStatus ?? this.saveStatus,
       isConfirmed: isConfirmed ?? this.isConfirmed,
+      saveError: clearSaveError ? null : (saveError ?? this.saveError),
+      isRestoring: isRestoring ?? this.isRestoring,
     );
   }
 }
 
 class JourneyController extends Notifier<JourneyState> {
+  var _restoreStarted = false;
+
   @override
-  JourneyState build() => const JourneyState.initial();
+  JourneyState build() {
+    if (!_restoreStarted) {
+      _restoreStarted = true;
+      Future.microtask(restoreFromLocalStore);
+    }
+    return const JourneyState.initial();
+  }
+
+  Future<void> restoreFromLocalStore() async {
+    state = state.copyWith(isRestoring: true, clearSaveError: true);
+    try {
+      final loader = ref.read(loadLatestJourneyBoundaryProvider);
+      final snapshot = await loader();
+      if (snapshot == null) {
+        state = state.copyWith(isRestoring: false);
+        return;
+      }
+      state = JourneyState(
+        direction: snapshot.direction,
+        constraint: snapshot.constraint,
+        domain: snapshot.domain,
+        goal: snapshot.goalTitle,
+        milestone: MilestoneDraft(
+          title: snapshot.milestoneTitle,
+          evidenceRule: snapshot.milestoneEvidenceRule,
+          window: snapshot.milestoneWindow,
+        ),
+        saveStatus: LocalSaveStatus.persisted,
+        isConfirmed: true,
+        saveError: null,
+        isRestoring: false,
+      );
+    } catch (_) {
+      // Keep session draft if present; mark restore failure without fake save.
+      state = state.copyWith(
+        isRestoring: false,
+        saveStatus: state.saveStatus == LocalSaveStatus.persisted
+            ? LocalSaveStatus.failed
+            : state.saveStatus,
+        saveError: '本机恢复失败，请重试确认写入',
+      );
+    }
+  }
 
   void saveDirection({required String direction, required String constraint}) {
     state = state.copyWith(
@@ -73,22 +130,38 @@ class JourneyController extends Notifier<JourneyState> {
       constraint: constraint.trim(),
       saveStatus: LocalSaveStatus.pendingPersistence,
       isConfirmed: false,
+      clearSaveError: true,
     );
   }
 
   void selectDomain(String domain) {
-    state = state.copyWith(domain: domain, isConfirmed: false);
+    state = state.copyWith(
+      domain: domain,
+      isConfirmed: false,
+      saveStatus: LocalSaveStatus.pendingPersistence,
+      clearSaveError: true,
+    );
   }
 
   void saveGoal(String goal) {
-    state = state.copyWith(goal: goal.trim(), isConfirmed: false);
+    state = state.copyWith(
+      goal: goal.trim(),
+      isConfirmed: false,
+      saveStatus: LocalSaveStatus.pendingPersistence,
+      clearSaveError: true,
+    );
   }
 
   void saveMilestone(MilestoneDraft milestone) {
-    state = state.copyWith(milestone: milestone, isConfirmed: false);
+    state = state.copyWith(
+      milestone: milestone,
+      isConfirmed: false,
+      saveStatus: LocalSaveStatus.pendingPersistence,
+      clearSaveError: true,
+    );
   }
 
-  void confirmBoundary() {
+  Future<void> confirmBoundary() async {
     final complete = state.direction.isNotEmpty &&
         state.constraint.isNotEmpty &&
         state.domain.isNotEmpty &&
@@ -97,10 +170,51 @@ class JourneyController extends Notifier<JourneyState> {
     if (!complete) {
       throw StateError('The local journey boundary is incomplete.');
     }
+    if (state.saveStatus == LocalSaveStatus.saving) {
+      return;
+    }
+
+    // Keep edit buffer; only claim confirmation after use-case success.
+    final snapshot = state;
     state = state.copyWith(
-      isConfirmed: true,
-      saveStatus: LocalSaveStatus.pendingPersistence,
+      saveStatus: LocalSaveStatus.saving,
+      isConfirmed: false,
+      clearSaveError: true,
     );
+
+    final useCase = ref.read(confirmJourneyBoundaryProvider);
+    try {
+      final result = await useCase(
+        ConfirmJourneyBoundaryCommand(
+          direction: snapshot.direction,
+          constraint: snapshot.constraint,
+          domain: snapshot.domain,
+          goalTitle: snapshot.goal,
+          milestoneTitle: snapshot.milestone!.title,
+          milestoneEvidenceRule: snapshot.milestone!.evidenceRule,
+          milestoneWindow: snapshot.milestone!.window,
+        ),
+      );
+      if (result.ok) {
+        state = state.copyWith(
+          isConfirmed: true,
+          saveStatus: LocalSaveStatus.persisted,
+          clearSaveError: true,
+        );
+        return;
+      }
+      state = state.copyWith(
+        isConfirmed: false,
+        saveStatus: LocalSaveStatus.failed,
+        saveError: result.message ?? '写入本机失败，请重试',
+      );
+    } catch (_) {
+      state = state.copyWith(
+        isConfirmed: false,
+        saveStatus: LocalSaveStatus.failed,
+        saveError: '写入本机失败，请重试',
+      );
+    }
   }
 }
 

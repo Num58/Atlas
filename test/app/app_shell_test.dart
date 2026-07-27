@@ -2,8 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:primeatlas/app/bootstrap/persistence_providers.dart';
 import 'package:primeatlas/app/navigation/app_router.dart';
 import 'package:primeatlas/app/primeatlas_app.dart';
+import 'package:primeatlas/application/journey/confirm_journey_boundary.dart';
+
+class _SucceedingConfirm implements ConfirmJourneyBoundary {
+  @override
+  Future<ConfirmJourneyBoundaryResult> call(
+    ConfirmJourneyBoundaryCommand command,
+  ) async {
+    return const ConfirmJourneyBoundaryResult.success();
+  }
+}
 
 void main() {
   testWidgets('registers only journey and me primary destinations',
@@ -54,8 +65,29 @@ void main() {
     expect(find.textContaining('Pulse'), findsNothing);
     expect(find.textContaining('知识'), findsNothing);
     expect(find.textContaining('远程身份'), findsNothing);
-    expect(find.textContaining('本机已保存'), findsNothing);
+    // Not confirmed yet: must not claim persistence.
     expect(find.textContaining('已保存到本机'), findsNothing);
+    expect(find.textContaining('目标边界已写入本机'), findsNothing);
+    expect(find.textContaining('研发接入中'), findsOneWidget);
     expect(find.byType(NavigationBar), findsOneWidget);
+  });
+
+  testWidgets('does not show local saved claims before confirm succeeds', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          confirmJourneyBoundaryProvider
+              .overrideWithValue(_SucceedingConfirm()),
+        ],
+        child: const PrimeAtlasApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('已保存到本机'), findsNothing);
+    expect(find.textContaining('目标边界已写入本机'), findsNothing);
+    expect(find.textContaining('本机已保存'), findsNothing);
   });
 }
