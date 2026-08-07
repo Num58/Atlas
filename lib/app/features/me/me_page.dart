@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:primeatlas/app/design_system/app_tokens.dart';
+import 'package:primeatlas/app/features/me/v2/portrait_card_widget.dart';
+import 'package:primeatlas/app/features/me/v2/tone_settings_widget.dart';
 import 'package:primeatlas/app/state/journey_state.dart';
 
 class MePage extends ConsumerWidget {
@@ -22,6 +24,10 @@ class MePage extends ConsumerWidget {
                   color: AppTokens.colorTextSecondary,
                 ),
           ),
+          const SizedBox(height: AppTokens.space6),
+          const ToneSettingsWidget(),
+          const SizedBox(height: AppTokens.space6),
+          const PortraitCardWidget(),
           const SizedBox(height: AppTokens.space6),
           _StatusSection(journey: journey),
           const SizedBox(height: AppTokens.space6),

@@ -1,4 +1,4 @@
-import 'package:flutter_test/flutter_test.dart';
+import 'package:test/test.dart';
 import 'package:primeatlas/core/conflict/conflict_types.dart';
 
 void main() {

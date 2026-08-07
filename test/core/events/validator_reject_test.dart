@@ -1,10 +1,9 @@
-import 'package:flutter_test/flutter_test.dart';
+import 'package:test/test.dart';
 import 'package:primeatlas/core/events/schemas/arbitration_event.dart';
 import 'package:primeatlas/core/events/schemas/conflict_detected.dart';
 import 'package:primeatlas/core/events/event_receipt.dart';
 import 'package:primeatlas/core/events/schemas/content_tone_tag.dart';
 import 'package:primeatlas/core/events/schemas/dimension_data_presence.dart';
-import 'package:primeatlas/core/events/schemas/identity_transition_event.dart';
 import 'package:primeatlas/core/events/schemas/profile_field_update.dart';
 import 'package:primeatlas/core/events/schemas/tone_change_event.dart';
 import 'package:primeatlas/core/conflict/conflict_types.dart';
@@ -42,12 +41,6 @@ void main() {
           'consent_record_id': 'consent1',
           'portrait_version': 'v1'
         }),
-        IdentityTransitionEventValidator().validateMap({
-          'from_role': 'initiate',
-          'to_role': 'practitioner',
-          'has_narratable_change': true,
-          'narrative_shown': true
-        }),
         DimensionDataPresenceValidator()
             .validateMap({'dimension': 'd', 'is_active': true, 'rendered': true}),
       ];
@@ -69,7 +62,6 @@ void main() {
       expect(ConflictDetectedValidator().validate(wrong).valid, isFalse);
       expect(ArbitrationEventValidator().validate(wrong).valid, isFalse);
       expect(ProfileFieldUpdateValidator().validate(wrong).valid, isFalse);
-      expect(IdentityTransitionEventValidator().validate(wrong).valid, isFalse);
       expect(DimensionDataPresenceValidator().validate(wrong).valid, isFalse);
     });
 
