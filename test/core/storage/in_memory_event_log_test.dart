@@ -1,4 +1,4 @@
-import 'package:flutter_test/flutter_test.dart';
+import 'package:test/test.dart';
 import 'package:primeatlas/core/events/event_receipt.dart';
 import 'package:primeatlas/core/storage/in_memory_event_log.dart';
 

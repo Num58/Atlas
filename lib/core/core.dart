@@ -16,8 +16,13 @@ export 'events/schemas/content_tone_tag.dart';
 export 'events/schemas/conflict_detected.dart';
 export 'events/schemas/arbitration_event.dart';
 export 'events/schemas/profile_field_update.dart';
-export 'events/schemas/identity_transition_event.dart';
 export 'events/schemas/dimension_data_presence.dart';
+export 'events/schemas/agent_decision_event.dart';
+export 'events/schemas/fusion_opportunity_event.dart';
+
+// ---- Decision portfolio layer (FAD: Route C + safety + fusion + agents) ----
+export 'decision/decision_types.dart';
+export 'decision/decision_orchestrator.dart';
 
 // ---- Storage ----
 export 'storage/event_log_repository.dart';
@@ -42,3 +47,7 @@ export 'conflict/conflict_types.dart';
 export 'conflict/conflict_engine.dart';
 export 'portrait/portrait_types.dart';
 export 'portrait/portrait_engine.dart';
+
+// ---- Pulse module (Prime Pulse: energy / daily execution / check-in) ----
+export 'pulse/pulse_types.dart';
+export 'pulse/pulse_engine.dart';

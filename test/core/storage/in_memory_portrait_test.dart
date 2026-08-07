@@ -1,4 +1,4 @@
-import 'package:flutter_test/flutter_test.dart';
+import 'package:test/test.dart';
 import 'package:primeatlas/core/portrait/portrait_types.dart';
 import 'package:primeatlas/core/storage/in_memory_portrait.dart';
 

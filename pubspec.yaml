@@ -4,8 +4,8 @@ publish_to: 'none'
 version: 0.2.0+2
 
 environment:
-  sdk: '>=3.4.0 <4.0.0'
-  flutter: '>=3.22.0'
+  sdk: '>=3.6.0 <4.0.0'
+  flutter: '>=3.27.0'
 
 dependencies:
   flutter:
@@ -21,8 +21,13 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  integration_test:
+    sdk: flutter
   flutter_lints: ^4.0.0
   mocktail: ^1.0.0
+  # Enables `dart test` for the pure-Dart core layer (lib/core has no Flutter import).
+  # `test` is resolved from the local pub cache; not fetched from network.
+  test: ^1.29.0
 
 flutter:
   uses-material-design: true

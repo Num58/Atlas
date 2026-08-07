@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:primeatlas/app/design_system/app_icon.dart';
 import 'package:primeatlas/app/design_system/app_tokens.dart';
+import 'package:primeatlas/app/features/journey/v2/conflict_banner_widget.dart';
 import 'package:primeatlas/app/state/journey_state.dart';
 
 class JourneyPage extends ConsumerWidget {
@@ -25,6 +26,8 @@ class JourneyPage extends ConsumerWidget {
                 ),
           ),
           const SizedBox(height: AppTokens.space6),
+          const ConflictBannerList(),
+          const SizedBox(height: AppTokens.space4),
           if (state.direction.isEmpty)
             _EmptyJourney(onStart: () => context.push('/journey/direction'))
           else ...[
