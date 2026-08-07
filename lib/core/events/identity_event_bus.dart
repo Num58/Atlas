@@ -8,8 +8,9 @@ import 'schemas/content_tone_tag.dart';
 import 'schemas/conflict_detected.dart';
 import 'schemas/arbitration_event.dart';
 import 'schemas/profile_field_update.dart';
-import 'schemas/identity_transition_event.dart';
 import 'schemas/dimension_data_presence.dart';
+import 'schemas/agent_decision_event.dart';
+import 'schemas/fusion_opportunity_event.dart';
 
 /// Local-first identity event bus: publish / subscribe / validate / query.
 ///
@@ -59,9 +60,10 @@ class DefaultIdentityEventBus implements IdentityEventBus {
       ..register(ArbitrationEvent.eventType, ArbitrationEventValidator())
       ..register(ProfileFieldUpdate.eventType, ProfileFieldUpdateValidator())
       ..register(
-          IdentityTransitionEvent.eventType, IdentityTransitionEventValidator())
+          DimensionDataPresence.eventType, DimensionDataPresenceValidator())
+      ..register(AgentDecisionEvent.eventType, AgentDecisionEventValidator())
       ..register(
-          DimensionDataPresence.eventType, DimensionDataPresenceValidator());
+          FusionOpportunityEvent.eventType, FusionOpportunityEventValidator());
   }
 
   @override
